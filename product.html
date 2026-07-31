@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<script>(function(){try{var t=localStorage.getItem("alt_theme_v1");if(t==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0A0A0A" />
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Aesthetic Lifestyle Touch — Product</title>
+
+<!-- ============================================================
+     Same font system as Home + Store, for continuity
+     ============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="products-data.js"></script>
+<script src="site-content.js"></script>
+<script src="cart.js"></script>
+<script src="auth.js"></script>
+<script src="theme.js"></script>
+<script src="order-service.js"></script>
+<script src="search.js"></script>
+<link rel="stylesheet" href="cart.css">
+<link rel="stylesheet" href="search.css">
+<script src="loader.js"></script>
+<link rel="stylesheet" href="loader.css">
+<script src="footer.js"></script>
+<link rel="stylesheet" href="footer.css">
+<script src="mobile-nav.js"></script>
+<link rel="stylesheet" href="mobile-nav.css">
+<link rel="stylesheet" href="mobile.css">
+
+<style>
+  :root{
+    --alt-white:   #FFFFFF;
+    --alt-surface: #F5F4F1;
+    --alt-black:   #0A0A0A;
+    --alt-border:  #E8E6E1;
+    --alt-beige:   #C9C2B4;
+    --alt-muted:   #8A8A8A;
+  }
+  /* ================= DARK MODE ================= */
+  :root[data-theme="dark"]{
+    --alt-white:   #0A0A0A;
+    --alt-surface: #17160F;
+    --alt-black:   #F5F4F1;
+    --alt-border:  #2C2A22;
+    --alt-beige:   #C9C2B4;
+    --alt-muted:   #9C9890;
+    --alt-good:    #4FAE73;
+    --alt-warn:    #D4A24F;
+    --alt-bad:     #E0655C;
+  }
+  :root[data-theme="dark"] .nav-glass{
+    background: rgba(10,9,7,0.72);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  :root[data-theme="dark"] img{ filter: brightness(0.92); }
+
+  * { -webkit-font-smoothing: antialiased; }
+  body{
+    background: var(--alt-white);
+    font-family: 'Inter', sans-serif;
+    color: var(--alt-black);
+    overflow-x: hidden;
+  }
+  .font-display{ font-family: 'Space Grotesk', sans-serif; }
+  .font-mono{ font-family: 'JetBrains Mono', monospace; }
+  .no-scrollbar::-webkit-scrollbar{ display:none; }
+  .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
+
+  :focus-visible{ outline: 2px solid var(--alt-black); outline-offset: 2px; }
+
+  /* ================= NAV (identical to Home/Store) ================= */
+  .nav-glass{
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    border-bottom: 1px solid rgba(232,230,225,0.6);
+  }
+
+  /* ================= ENTRANCE + SCROLL REVEAL ================= */
+  [data-enter]{
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+  }
+  [data-enter].in{ opacity: 1; transform: translateY(0); }
+  [data-reveal]{
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1), transform 0.85s cubic-bezier(0.16,1,0.3,1);
+  }
+  [data-reveal].in{ opacity: 1; transform: translateY(0); }
+
+  /* ================= INCOMING / OUTGOING TRANSITION ================= */
+  /* Receiving half of Store's goToProduct() handoff, and the sending
+     half when a visitor taps into a *related* product from this page. */
+  #pdp-root{
+    opacity: 0;
+    transform: scale(1.05);
+    filter: blur(6px);
+    transition: opacity 1s cubic-bezier(0.16,1,0.3,1), transform 1s cubic-bezier(0.16,1,0.3,1), filter 1s cubic-bezier(0.16,1,0.3,1);
+  }
+  #pdp-root.settled{ opacity: 1; transform: scale(1); filter: blur(0px); }
+  #pdp-root.zooming{ opacity: 0; transform: scale(1.04); filter: blur(6px); }
+
+  #pdp-curtain{
+    position: fixed; inset: 0; z-index: 100;
+    background: var(--alt-white);
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(1.08);
+    transition: opacity 0.7s cubic-bezier(0.65,0,0.35,1), transform 0.7s cubic-bezier(0.65,0,0.35,1);
+  }
+  #pdp-curtain.active{ opacity: 1; pointer-events: all; transform: scale(1); }
+
+  /* ================= BREADCRUMB ================= */
+  .crumb-link{ transition: opacity 0.2s ease; }
+  .crumb-link:hover{ opacity: 0.55; }
+
+  /* ================= GALLERY ================= */
+  .gallery-stage{
+    position: relative;
+    aspect-ratio: 1/1;
+    border-radius: 26px;
+    overflow: hidden;
+    background: var(--alt-surface);
+    box-shadow: 0 30px 70px -30px rgba(10,10,10,0.18);
+  }
+  .gallery-stage img{
+    width: 100%; height: 100%; object-fit: cover;
+    transition: opacity 0.35s ease, transform 0.6s cubic-bezier(0.16,1,0.3,1);
+  }
+  .gallery-stage:hover img{ transform: scale(1.12); }
+  .gallery-stage .fallback{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(155deg, var(--alt-surface), var(--alt-border));
+    color: var(--alt-muted);
+    font-family:'Space Grotesk', sans-serif;
+    font-size: 0.85rem;
+    text-align:center; padding: 1rem;
+  }
+  .expand-btn{
+    position: absolute; top: 16px; right: 16px; z-index: 5;
+    width: 40px; height: 40px; border-radius: 999px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), background 0.2s ease;
+  }
+  .expand-btn:hover{ transform: scale(1.08); background: #fff; }
+
+  .thumb{
+    width: 76px; height: 76px; border-radius: 14px; overflow: hidden;
+    border: 2px solid transparent;
+    cursor: pointer; flex-shrink: 0;
+    background: var(--alt-surface);
+    transition: border-color 0.25s ease, transform 0.25s ease;
+  }
+  .thumb img{ width:100%; height:100%; object-fit:cover; }
+  .thumb:hover{ transform: translateY(-2px); }
+  .thumb.active{ border-color: var(--alt-black); }
+
+  /* ================= FULLSCREEN LIGHTBOX ================= */
+  #lightbox{
+    position: fixed; inset: 0; z-index: 110;
+    background: rgba(10,10,10,0.92);
+    opacity: 0; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  #lightbox.open{ opacity: 1; pointer-events: all; }
+  #lightbox img{
+    max-width: min(90vw, 900px); max-height: 80vh;
+    object-fit: contain;
+    border-radius: 12px;
+    transform: scale(0.96);
+    transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+    touch-action: none;
+  }
+  #lightbox.open img{ transform: scale(1); }
+  .lb-btn{
+    width: 44px; height: 44px; border-radius: 999px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s ease, transform 0.25s ease;
+  }
+  .lb-btn:hover{ background: rgba(255,255,255,0.22); transform: scale(1.06); }
+
+  /* ================= VARIANTS ================= */
+  .swatch{
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .swatch.selected{ border-color: var(--alt-black); transform: scale(1.1); }
+  .size-btn{
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .size-btn.selected{ background: var(--alt-black); color: var(--alt-white); border-color: var(--alt-black); }
+
+  .qty-btn{
+    width: 32px; height: 32px;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 1.1rem;
+    border-radius: 999px;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+  }
+  .qty-btn:hover{ background: var(--alt-surface); }
+  .qty-btn:active{ transform: scale(0.92); }
+
+  /* ================= STOCK BADGE ================= */
+  .stock-dot{ width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  /* ================= TEXT SKELETONS =================
+     These fields are filled by JS the instant the product resolves —
+     on a slow device that's still a real (if brief) gap, so they show
+     a shimmer placeholder purely via :empty, no extra JS required.
+     The moment JS sets .textContent, the element stops matching
+     :empty and the shimmer disappears on its own. */
+  #pdp-brand-cat:empty, #pdp-name:empty, #pdp-price:empty{
+    display: inline-block;
+    min-height: 1em;
+    background: linear-gradient(100deg, var(--alt-surface) 30%, var(--alt-border) 50%, var(--alt-surface) 70%);
+    background-size: 200% 100%;
+    animation: skel-shimmer 1.6s ease-in-out infinite;
+    border-radius: 6px;
+  }
+  #pdp-brand-cat:empty{ min-width: 140px; }
+  #pdp-name:empty{ min-width: 260px; min-height: 1.3em; }
+  #pdp-price:empty{ min-width: 70px; }
+  @media (prefers-reduced-motion: reduce){
+    #pdp-brand-cat:empty, #pdp-name:empty, #pdp-price:empty{ animation: none; }
+  }
+
+  /* ================= MAGNETIC / GLOW BUTTON (same as Home's Shop Now) ================= */
+  .btn-primary{
+    position: relative;
+    transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s ease, opacity 0.3s ease;
+    box-shadow: 0 8px 24px -8px rgba(10,10,10,0.35);
+  }
+  .btn-primary::after{
+    content:"";
+    position:absolute; inset:-2px;
+    border-radius: inherit;
+    background: radial-gradient(60% 60% at 50% 50%, rgba(201,194,180,0.55), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: -1;
+    filter: blur(14px);
+  }
+  .btn-primary:hover::after{ opacity: 1; }
+  .btn-primary:hover{ box-shadow: 0 16px 40px -10px rgba(10,10,10,0.45); }
+  .btn-primary:disabled{ opacity: 0.4; box-shadow:none; cursor: not-allowed; }
+  .btn-primary:disabled::after{ opacity: 0; }
+
+  .icon-btn{ transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), background-color 0.2s ease, color 0.2s ease; }
+  .icon-btn:hover{ transform: translateY(-2px); }
+  .icon-btn:active{ transform: scale(0.92); }
+  .wishlist-btn.active svg{ fill: var(--alt-black); stroke: var(--alt-black); }
+
+  /* ================= FEATURES ================= */
+  .feature-card{
+    border: 1px solid var(--alt-border);
+    border-radius: 20px;
+    transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s ease, border-color 0.4s ease;
+  }
+  .feature-card:hover{
+    transform: translateY(-4px);
+    box-shadow: 0 24px 50px -28px rgba(10,10,10,0.22);
+    border-color: transparent;
+  }
+
+  /* ================= SPEC TABLE ================= */
+  .spec-row{ border-top: 1px solid var(--alt-border); }
+  .spec-row:first-child{ border-top: none; }
+
+  /* ================= REVIEWS ================= */
+  .avatar{
+    width: 42px; height: 42px; border-radius: 999px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 500; font-size: 0.85rem;
+    color: #fff; flex-shrink:0;
+  }
+  .helpful-btn{ transition: opacity 0.2s ease, transform 0.2s ease; }
+  .helpful-btn:hover{ opacity: 0.6; }
+  .helpful-btn.active{ font-weight: 600; }
+
+  /* ================= REVIEW PHOTO ATTACHMENTS ================= */
+  .review-photo-thumb{ position:relative; width:56px; height:56px; border-radius:10px; overflow:hidden; flex-shrink:0; }
+  .review-photo-thumb img{ width:100%; height:100%; object-fit:cover; }
+  .review-photo-thumb button{
+    position:absolute; top:2px; right:2px; width:18px; height:18px; border-radius:999px;
+    background: rgba(10,10,10,0.65); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; line-height:1;
+  }
+  .review-photo-view{ width:64px; height:64px; border-radius:12px; overflow:hidden; flex-shrink:0; cursor:pointer; }
+  .review-photo-view img{ width:100%; height:100%; object-fit:cover; }
+
+  /* ================= RELATED PRODUCTS (same card system as Store) ================= */
+  .p-card{ transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), box-shadow 0.45s ease; cursor: pointer; }
+  .p-card:hover{ transform: translateY(-6px); box-shadow: 0 26px 50px -22px rgba(10,10,10,0.22); }
+  .p-stage{ position: relative; aspect-ratio: 1/1; border-radius: 18px; overflow: hidden; background: var(--alt-surface); }
+  .p-stage img{ width:100%; height:100%; object-fit: cover; transform: scale(1); transition: transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+  .p-card:hover .p-stage img{ transform: scale(1.08); }
+  .p-stage .fallback{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background: linear-gradient(155deg, var(--alt-surface), var(--alt-border)); color: var(--alt-muted); font-family:'Space Grotesk', sans-serif; font-size: 0.8rem; text-align:center; padding: 1rem; }
+  .badge{ font-family:'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; color: #0A0A0A; }
+
+  /* ================= RESTOCK REQUEST ================= */
+  .field-input{
+    background: var(--alt-surface); border:1px solid var(--alt-border); border-radius:14px;
+    padding: 13px 16px; font-size:14px; outline:none;
+    transition: border-color .25s ease, background-color .25s ease;
+  }
+  .field-input:focus{ border-color: var(--alt-black); background: var(--alt-white); }
+
+  /* ================= TOAST ================= */
+  #toast{
+    position: fixed; bottom: 28px; left: 50%;
+    transform: translate(-50%, 16px);
+    opacity: 0; pointer-events: none; z-index: 95;
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1);
+  }
+  #toast.show{ opacity: 1; transform: translate(-50%, 0); }
+
+  /* Flying add-to-cart image + cart badge/icon animations now live in
+     cart.css (shared drawer stylesheet) — see .cart-flying-img, #cart-badge. */
+
+  /* ================= MOBILE STICKY PURCHASE BAR ================= */
+  #mobile-bar{
+    position: fixed; left:0; right:0; bottom:0; z-index: 80;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--alt-border);
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  }
+  #mobile-bar.show{ transform: translateY(0); }
+
+  @media (prefers-reduced-motion: reduce){
+    [data-enter], [data-reveal], .gallery-stage img, .p-card, .p-stage img, #pdp-root, #pdp-curtain, #lightbox, #lightbox img, #mobile-bar, .feature-card, .icon-btn{
+      transition: none !important;
+      animation: none !important;
+    }
+    [data-enter], [data-reveal]{ opacity: 1 !important; transform: none !important; }
+    #pdp-root{ opacity: 1 !important; transform: none !important; filter: none !important; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ================================================================
+     INITIAL LOADING SCREEN -- see loader.js/loader.css
+     ================================================================ -->
+<div id="site-loader" aria-hidden="true">
+  <div class="sl-glow"></div>
+  <p class="sl-mark">AESTHETIC <span>LIFESTYLE TOUCH</span></p>
+  <div class="sl-progress-track"><div class="sl-progress-fill"></div></div>
+</div>
+
+<!-- ================================================================
+     FIXED NAVIGATION — identical spacing/typography/behavior to Home & Store
+     ================================================================ -->
+<header class="nav-glass fixed top-0 left-0 right-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 md:px-10 h-16 md:h-[72px] flex items-center justify-between">
+
+    <a href="Home.html" class="font-display text-[15px] md:text-base font-medium tracking-tight">
+      AESTHETIC <span class="text-[var(--alt-muted)] font-normal">LIFESTYLE TOUCH</span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-10">
+      <a href="Home.html" class="nav-link">Home</a>
+      <a href="store.html" class="nav-link active">Store</a>
+      <a href="collections.html" class="nav-link">Collections</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+    </nav>
+
+    <div class="flex items-center gap-5">
+      <button id="search-trigger" aria-label="Search (Ctrl+K)" class="hover:opacity-60 transition-opacity">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="M21 21l-4.3-4.3"/>
+        </svg>
+      </button>
+      <a id="account-icon" href="account.html" aria-label="Account" class="hover:opacity-60 transition-opacity">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/>
+        </svg>
+      </a>
+      <a id="messages-icon" href="dashboard.html?view=notifications" aria-label="Messages" class="hover:opacity-60 transition-opacity relative" style="display:none;">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span id="messages-badge" class="absolute -top-2 -right-2 bg-[var(--alt-black)] text-[var(--alt-white)] text-[10px] font-mono w-4 h-4 rounded-full flex items-center justify-center" style="display:none;">0</span>
+      </a>
+      <a id="wishlist-icon" href="wishlist.html" aria-label="Wishlist" class="hover:opacity-60 transition-opacity relative">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4 6 4c2 0 3.5 1 4.5 2.6C11.5 5 13 4 15 4c4 0 5.6 4.1 4 7.7C19.5 16.1 12 21 12 21z"/>
+        </svg>
+        <span id="wishlist-badge" class="absolute -top-2 -right-2 bg-[var(--alt-black)] text-[var(--alt-white)] text-[10px] font-mono w-4 h-4 rounded-full flex items-center justify-center">0</span>
+      </a>
+      <button id="cart-icon" aria-label="Cart, 0 items" class="hover:opacity-60 transition-opacity relative">
+        <svg width="20" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M6 6h15l-1.5 9h-12z"/>
+          <path d="M6 6L4.5 2.5H2"/>
+          <circle cx="9" cy="20" r="1.4" fill="currentColor" stroke="none"/>
+          <circle cx="17" cy="20" r="1.4" fill="currentColor" stroke="none"/>
+        </svg>
+        <span id="cart-badge" class="absolute -top-2 -right-2 bg-[var(--alt-black)] text-[var(--alt-white)] text-[10px] font-mono w-4 h-4 rounded-full flex items-center justify-center">0</span>
+      </button>
+      <button type="button" class="theme-toggle-btn theme-toggle-icon-btn hidden md:flex" aria-label="Toggle dark mode">
+        <svg class="theme-icon-light" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="theme-icon-dark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button aria-label="Menu" class="md:hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="pdp-root">
+
+  <!-- ============================================================
+       BREADCRUMB — populated by JS once the product is resolved
+       ============================================================ -->
+  <nav aria-label="Breadcrumb" class="pt-28 md:pt-32 pb-2 px-6 md:px-10">
+    <div id="breadcrumb" data-enter class="max-w-7xl mx-auto flex items-center gap-2 text-xs md:text-sm text-[var(--alt-muted)] font-mono flex-wrap"></div>
+  </nav>
+
+  <!-- ============================================================
+       PRODUCT HERO — gallery + purchase panel
+       ============================================================ -->
+  <section class="px-6 md:px-10 pt-6 pb-16 md:pb-24">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-14 items-start">
+
+      <!-- Gallery -->
+      <div class="lg:col-span-7" data-enter>
+        <div class="gallery-stage" id="gallery-stage">
+          <img id="main-image" src="" alt="" />
+          <div class="fallback" id="main-fallback" style="display:none;"></div>
+          <button class="expand-btn" id="expand-btn" aria-label="View fullscreen">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="1.8">
+              <path d="M8 3H4a1 1 0 0 0-1 1v4M16 3h4a1 1 0 0 1 1 1v4M8 21H4a1 1 0 0 1-1-1v-4M16 21h4a1 1 0 0 0 1-1v-4"/>
+            </svg>
+          </button>
+        </div>
+        <div id="thumb-row" class="mt-4 flex items-center gap-3 overflow-x-auto no-scrollbar"></div>
+      </div>
+
+      <!-- Purchase panel -->
+      <div class="lg:col-span-5 lg:sticky lg:top-28 lg:self-start" data-enter style="transition-delay:0.1s;">
+
+        <p id="pdp-brand-cat" class="font-mono text-xs tracking-[0.2em] text-[var(--alt-muted)] uppercase mb-4"></p>
+        <h1 id="pdp-name" class="font-display text-3xl md:text-[2.6rem] font-medium tracking-tight leading-[1.08]"></h1>
+
+        <div class="mt-3 flex items-center gap-3">
+          <span id="pdp-rating" class="text-sm font-mono"></span>
+        </div>
+
+        <div class="mt-6 flex items-baseline gap-3">
+          <span id="pdp-price" class="font-mono text-2xl"></span>
+          <span id="pdp-price-original" class="font-mono text-base text-[var(--alt-muted)] line-through"></span>
+        </div>
+
+        <div id="pdp-stock" class="mt-3 flex items-center gap-2 text-sm"></div>
+
+        <p id="pdp-desc" class="mt-6 text-[15px] text-[var(--alt-muted)] leading-relaxed max-w-md"></p>
+
+        <div class="mt-8 h-px bg-[var(--alt-border)]"></div>
+
+        <!-- Color -->
+        <div id="pdp-color-wrap" class="mt-7">
+          <p class="font-mono text-[11px] tracking-widest uppercase text-[var(--alt-muted)] mb-3">Color</p>
+          <div id="pdp-colors" class="flex items-center gap-3"></div>
+        </div>
+
+        <!-- Size -->
+        <div id="pdp-size-wrap" class="mt-7">
+          <p class="font-mono text-[11px] tracking-widest uppercase text-[var(--alt-muted)] mb-3">Size</p>
+          <div id="pdp-sizes" class="flex items-center gap-2"></div>
+        </div>
+
+        <!-- Quantity -->
+        <div class="mt-7">
+          <p class="font-mono text-[11px] tracking-widest uppercase text-[var(--alt-muted)] mb-3">Quantity</p>
+          <div class="flex items-center gap-1 border border-[var(--alt-border)] rounded-full w-fit px-2 py-1.5">
+            <button id="qty-minus" class="qty-btn" aria-label="Decrease quantity">–</button>
+            <span id="qty-value" class="font-mono text-sm w-8 text-center" aria-live="polite">1</span>
+            <button id="qty-plus" class="qty-btn" aria-label="Increase quantity">+</button>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div id="pdp-actions" class="mt-9 flex flex-col gap-3">
+          <button id="add-cart-btn" class="btn-primary font-display bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium tracking-wide py-4 rounded-full">
+            Add to Cart
+          </button>
+          <button id="buy-now-btn" class="w-full py-4 rounded-full border border-[var(--alt-black)] text-sm font-medium hover:bg-[var(--alt-surface)] transition-colors">
+            Buy Now
+          </button>
+          <div class="flex items-center gap-3 mt-1">
+            <button id="wishlist-btn" class="wishlist-btn icon-btn flex-1 py-3 rounded-full border border-[var(--alt-border)] text-sm font-medium flex items-center justify-center gap-2 text-[var(--alt-muted)] hover:text-[var(--alt-black)]" aria-label="Add to wishlist" aria-pressed="false">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4 6 4c2 0 3.5 1 4.5 2.6C11.5 5 13 4 15 4c4 0 5.6 4.1 4 7.7C19.5 16.1 12 21 12 21z"/>
+              </svg>
+              <span id="wishlist-label">Wishlist</span>
+            </button>
+            <button id="share-btn" class="icon-btn w-11 h-11 rounded-full border border-[var(--alt-border)] flex items-center justify-center text-[var(--alt-muted)] hover:text-[var(--alt-black)] shrink-0" aria-label="Share this product">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/>
+                <path d="M8.3 10.7l7.4-4.4M8.3 13.3l7.4 4.4"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Restock request — only shown once renderStock() detects stock === 0 -->
+          <div id="restock-panel" style="display:none;">
+            <div id="restock-form" style="display:none;margin-top:4px;">
+              <p class="font-mono text-[11px] tracking-widest uppercase text-[var(--alt-muted)] mb-2">Get notified when it's back</p>
+              <div class="flex gap-2">
+                <input type="text" id="restock-hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" aria-hidden="true">
+                <input type="email" id="restock-email" placeholder="you@email.com" class="field-input flex-1" aria-label="Email address">
+                <button id="restock-submit" class="px-5 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium shrink-0">Notify Me</button>
+              </div>
+              <p id="restock-error" style="display:none;color:var(--alt-bad);font-size:12px;margin-top:6px;">Enter a valid email first.</p>
+            </div>
+            <p id="restock-success" class="text-sm" style="display:none;color:var(--alt-good);">You're on the list — we'll email you the moment it's back in stock.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FEATURES
+       ============================================================ -->
+  <section class="px-6 md:px-10 py-16 md:py-20 bg-[var(--alt-surface)]">
+    <div class="max-w-7xl mx-auto">
+      <p data-reveal class="font-mono text-xs tracking-[0.22em] text-[var(--alt-muted)] uppercase mb-4 text-center">Why This Piece</p>
+      <h2 data-reveal class="font-display text-2xl md:text-4xl font-medium tracking-tight text-center max-w-2xl mx-auto" style="transition-delay:0.06s;">
+        Every detail earns its place.
+      </h2>
+      <div id="features-grid" class="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SPECIFICATIONS
+       ============================================================ -->
+  <section class="px-6 md:px-10 py-16 md:py-20">
+    <div class="max-w-3xl mx-auto">
+      <p data-reveal class="font-mono text-xs tracking-[0.22em] text-[var(--alt-muted)] uppercase mb-4">Specifications</p>
+      <h2 data-reveal class="font-display text-2xl md:text-3xl font-medium tracking-tight mb-8" style="transition-delay:0.06s;">The fine print, made clear.</h2>
+      <div id="specs-table" data-reveal style="transition-delay:0.1s;"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DESCRIPTION
+       ============================================================ -->
+  <section class="px-6 md:px-10 py-16 md:py-20 bg-[var(--alt-surface)]">
+    <div class="max-w-2xl mx-auto">
+      <p data-reveal class="font-mono text-xs tracking-[0.22em] text-[var(--alt-muted)] uppercase mb-4">The Story</p>
+      <h2 id="desc-heading" data-reveal class="font-display text-2xl md:text-3xl font-medium tracking-tight mb-6" style="transition-delay:0.06s;"></h2>
+      <div id="desc-body" data-reveal class="space-y-5 text-[15px] md:text-base text-[var(--alt-muted)] leading-[1.9]" style="transition-delay:0.1s;"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CUSTOMER REVIEWS
+       ============================================================ -->
+  <section class="px-6 md:px-10 py-16 md:py-20">
+    <div class="max-w-3xl mx-auto">
+      <div class="flex items-end justify-between flex-wrap gap-3 mb-10">
+        <div>
+          <p data-reveal class="font-mono text-xs tracking-[0.22em] text-[var(--alt-muted)] uppercase mb-4">Customer Reviews</p>
+          <h2 id="reviews-heading" data-reveal class="font-display text-2xl md:text-3xl font-medium tracking-tight" style="transition-delay:0.06s;"></h2>
+        </div>
+      </div>
+      <div id="reviews-list" class="space-y-8"></div>
+
+      <div class="mt-12 pt-10 border-t border-[var(--alt-border)]">
+        <h3 class="font-display text-lg font-medium mb-4">Write a Review</h3>
+        <div id="review-signin-prompt" style="display:none;">
+          <p class="text-sm text-[var(--alt-muted)]">
+            <a href="account.html" class="underline underline-offset-4 hover:opacity-60 transition-opacity">Sign in</a> to write a review.
+          </p>
+        </div>
+        <div id="review-not-eligible" style="display:none;">
+          <p class="text-sm text-[var(--alt-muted)]">Reviews are limited to customers who've received this product — once your order is marked delivered, you'll get a notification inviting you to review it.</p>
+        </div>
+        <div id="review-already-done" style="display:none;">
+          <p class="text-sm text-[var(--alt-muted)]">You've already reviewed this product — thanks for the feedback.</p>
+        </div>
+        <div id="review-form-wrap" style="display:none;">
+          <div id="review-star-picker" class="flex items-center gap-1 mb-4" role="group" aria-label="Rating"></div>
+          <textarea id="review-text" class="field-input" rows="3" placeholder="What did you think of this product?"></textarea>
+          <div class="mt-3">
+            <div id="review-photo-previews" class="flex items-center gap-2 flex-wrap mb-2"></div>
+            <button type="button" id="review-photo-trigger" class="text-xs font-medium underline underline-offset-4 hover:opacity-60 transition-opacity">+ Add photos (optional, up to 3)</button>
+            <input type="file" id="review-photo-input" accept="image/*" multiple style="display:none;">
+          </div>
+          <p id="review-photo-error" class="text-xs mt-2" style="color:var(--alt-bad); display:none;"></p>
+          <p id="review-form-error" class="text-xs mt-2" style="color:var(--alt-bad); display:none;"></p>
+          <p id="review-form-success" class="text-xs mt-2" style="color:var(--alt-good); display:none;">Thanks — your review will appear here once it's checked.</p>
+          <button id="review-submit-btn" class="btn-primary font-display bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium tracking-wide py-3 px-6 rounded-full mt-4">Submit Review</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       RELATED PRODUCTS
+       ============================================================ -->
+  <section class="px-6 md:px-10 py-16 md:py-24">
+    <div class="max-w-7xl mx-auto">
+      <p data-reveal class="font-mono text-xs tracking-[0.22em] text-[var(--alt-muted)] uppercase mb-4">You May Also Like</p>
+      <h2 data-reveal class="font-display text-2xl md:text-4xl font-medium tracking-tight mb-10" style="transition-delay:0.06s;">More from the collection.</h2>
+      <div id="related-grid" class="flex lg:grid lg:grid-cols-4 gap-6 overflow-x-auto no-scrollbar pb-2"></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ================================================================
+     MOBILE STICKY PURCHASE BAR
+     ================================================================ -->
+<div id="mobile-bar" class="lg:hidden px-5 py-3 flex items-center justify-between gap-3">
+  <span id="mobile-price" class="font-mono text-base shrink-0"></span>
+  <div class="flex items-center gap-2 flex-1 justify-end">
+    <button id="mobile-add-cart" class="px-5 py-3 rounded-full border border-[var(--alt-black)] text-sm font-medium">Add to Cart</button>
+    <button id="mobile-buy-now" class="px-5 py-3 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium">Buy Now</button>
+  </div>
+</div>
+
+<!-- ================================================================
+     FULLSCREEN LIGHTBOX
+     ================================================================ -->
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Product image, fullscreen">
+  <button class="lb-btn absolute left-4 md:left-8 top-1/2 -translate-y-1/2" id="lb-prev" aria-label="Previous image">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <img id="lb-img" src="" alt="" />
+  <button class="lb-btn absolute right-4 md:right-8 top-1/2 -translate-y-1/2" id="lb-next" aria-label="Next image">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+  <button class="lb-btn absolute top-5 right-5" id="lb-close" aria-label="Close fullscreen viewer">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium px-6 py-3.5 rounded-full shadow-[0_20px_40px_-15px_rgba(10,10,10,0.5)]">
+  Added to bag
+</div>
+
+<!-- Outgoing transition curtain (Product -> another Product, via Related) -->
+<div id="pdp-curtain"></div>
+
+<script>
+/* ================================================================
+   RESOLVE PRODUCT FROM URL
+   ================================================================ */
+const params = new URLSearchParams(window.location.search);
+const productId = Number(params.get("id"));
+const product = getStorefrontProducts().find(p => p.id === productId);
+
+if (!product) {
+  document.getElementById("pdp-root").innerHTML = `
+    <div class="pt-40 pb-24 px-6 text-center max-w-md mx-auto">
+      <h1 class="font-display text-2xl font-medium">Product not found</h1>
+      <p class="mt-3 text-[var(--alt-muted)] text-sm">This item may have been removed or the link is out of date.</p>
+      <div class="flex items-center gap-3 mt-8 flex-wrap justify-center">
+        <a href="store.html" class="inline-block px-7 py-3.5 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium">Back to Store</a>
+        <a href="request-product.html" class="inline-block px-7 py-3.5 rounded-full border border-[var(--alt-black)] text-sm font-medium">Request This Product</a>
+      </div>
+    </div>
+  `;
+  document.getElementById("pdp-root").classList.add("settled");
+}
+
+/* ================================================================
+   Everything below only runs once a real product has been resolved —
+   the not-found branch above already rendered its own state and stops here.
+   ================================================================ */
+if (product) {
+
+/* ================================================================
+   FEATURES — shared across every product
+   ================================================================ */
+const FEATURES = [
+  { title: "Premium Materials", text: "Sourced for how they age, not just how they photograph.", icon: `<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M12 21V12M20 7.5L12 12 4 7.5"/>` },
+  { title: "Modern Design", text: "Shaped by restraint — nothing added that doesn't earn its place.", icon: `<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>` },
+  { title: "Long-Lasting Quality", text: "Built to outlast trends, not just the return window.", icon: `<path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4 6 4c2 0 3.5 1 4.5 2.6C11.5 5 13 4 15 4c4 0 5.6 4.1 4 7.7C19.5 16.1 12 21 12 21z"/>` },
+  { title: "Fast, Careful Delivery", text: "Packed the way we'd want to receive it ourselves.", icon: `<path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/>` },
+  { title: "2-Year Warranty", text: "We stand behind everything we choose to sell.", icon: `<path d="M12 3l8 3v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/>` },
+  { title: "Loved by Customers", text: `Rated ${product.rating} by ${product.reviews}+ people who bought this.`, icon: `<path d="M12 17.3l-5.4 3 1-6-4.6-4 6.1-.6L12 4l2.9 5.7 6.1.6-4.6 4 1 6z"/>` },
+];
+
+function initialsAvatar(name){
+  const initials = name.split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase();
+  const palette = ["#0A0A0A", "#8A8A8A", "#C9C2B4"];
+  const bg = palette[name.length % palette.length];
+  return `<span class="avatar" style="background:${bg};">${initials}</span>`;
+}
+
+function timeAgo(days){
+  if (days < 30) return `${days} day${days===1?"":"s"} ago`;
+  const months = Math.round(days/30);
+  return `${months} month${months===1?"":"s"} ago`;
+}
+
+/* ================================================================
+   STATE
+   ================================================================ */
+let state = {
+  qty: 1,
+  colorIndex: 0,
+  size: product.sizes ? product.sizes[0] : null,
+  activeImage: 0,
+  lightboxIndex: 0,
+  helpful: new Set(),
+};
+
+// Tracked for the Search palette's "Recently Viewed" section (search.js).
+if (typeof recordProductView === "function") recordProductView(product.id);
+
+/* ================================================================
+   BREADCRUMB
+   ================================================================ */
+const primaryCategory = categoryLabel(product.tags[0]);
+document.getElementById("breadcrumb").innerHTML = `
+  <a href="Home.html" class="crumb-link">Home</a>
+  <span>→</span>
+  <a href="store.html" class="crumb-link">Store</a>
+  <span>→</span>
+  <a href="store.html" class="crumb-link">${primaryCategory}</a>
+  <span>→</span>
+  <span style="color:var(--alt-black)">${product.name}</span>
+`;
+
+/* ================================================================
+   GALLERY
+   ================================================================ */
+const mainImage = document.getElementById("main-image");
+const mainFallback = document.getElementById("main-fallback");
+const thumbRow = document.getElementById("thumb-row");
+
+function setActiveImage(index){
+  state.activeImage = ((index % product.gallery.length) + product.gallery.length) % product.gallery.length;
+  const src = product.gallery[state.activeImage];
+  mainImage.style.opacity = 0;
+  setTimeout(() => {
+    mainImage.src = src;
+    mainImage.alt = product.name;
+    mainImage.style.display = "";
+    mainFallback.style.display = "none";
+    mainImage.onerror = () => { mainImage.style.display = "none"; mainFallback.style.display = "flex"; mainFallback.textContent = product.name; };
+    mainImage.onload = () => { mainImage.style.opacity = 1; };
+  }, 160);
+
+  thumbRow.querySelectorAll(".thumb").forEach((t, i) => t.classList.toggle("active", i === state.activeImage));
+}
+
+thumbRow.innerHTML = product.gallery.map((src, i) => `
+  <button class="thumb ${i === 0 ? "active" : ""}" data-index="${i}" aria-label="Show image ${i+1} of ${product.gallery.length}">
+    <img src="${src}" alt="" loading="lazy" decoding="async" onerror="this.parentElement.style.background='var(--alt-border)'; this.remove();" />
+  </button>
+`).join("");
+thumbRow.querySelectorAll(".thumb").forEach(btn => {
+  btn.addEventListener("click", () => setActiveImage(Number(btn.dataset.index)));
+});
+setActiveImage(0);
+
+document.getElementById("expand-btn").addEventListener("click", () => openLightbox(state.activeImage));
+
+/* ================================================================
+   FULLSCREEN LIGHTBOX — with prev/next, swipe, and keyboard nav
+   ================================================================ */
+const lightbox = document.getElementById("lightbox");
+const lbImg = document.getElementById("lb-img");
+
+function openLightbox(index){
+  resetLbZoom();
+  state.lightboxIndex = index;
+  lbImg.src = product.gallery[index];
+  lbImg.alt = product.name;
+  lightbox.classList.add("open");
+  document.getElementById("lb-close").focus();
+}
+function closeLightbox(){ lightbox.classList.remove("open"); resetLbZoom(); }
+function stepLightbox(dir){
+  if (state.lightboxIndex === -1) return; // viewing a review photo, not the product gallery — no prev/next
+  resetLbZoom();
+  state.lightboxIndex = ((state.lightboxIndex + dir) % product.gallery.length + product.gallery.length) % product.gallery.length;
+  lbImg.src = product.gallery[state.lightboxIndex];
+}
+/* Same lightbox, used to view a review's attached photo full-size —
+   sentinel index -1 keeps stepLightbox()'s prev/next a no-op here. */
+function openLightboxSrc(src, alt){
+  resetLbZoom();
+  state.lightboxIndex = -1;
+  lbImg.src = src;
+  lbImg.alt = alt || product.name;
+  lightbox.classList.add("open");
+  document.getElementById("lb-close").focus();
+}
+
+/* ---------------- pinch-to-zoom + double-tap zoom (lightbox image) ---------------- */
+let lbZoom = 1, lbPanX = 0, lbPanY = 0, lbPinchStartDist = 0, lbPinchStartZoom = 1, lbLastTapAt = 0;
+function applyLbTransform(withTransition){
+  if (lbZoom === 1 && lbPanX === 0 && lbPanY === 0){
+    lbImg.style.transition = "";
+    lbImg.style.transform = "";
+    return;
+  }
+  lbImg.style.transition = withTransition ? "transform 0.3s cubic-bezier(0.16,1,0.3,1)" : "none";
+  lbImg.style.transform = `translate(${lbPanX}px, ${lbPanY}px) scale(${lbZoom})`;
+}
+function resetLbZoom(){ lbZoom = 1; lbPanX = 0; lbPanY = 0; lbPinchStartDist = 0; applyLbTransform(true); }
+function toggleLbZoom(){
+  if (lbZoom > 1) resetLbZoom();
+  else { lbZoom = 2.2; lbPanX = 0; lbPanY = 0; applyLbTransform(true); }
+}
+lbImg.addEventListener("touchstart", (e) => {
+  if (e.touches.length === 2){
+    const [a, b] = e.touches;
+    lbPinchStartDist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+    lbPinchStartZoom = lbZoom;
+  }
+}, { passive: true });
+lbImg.addEventListener("touchmove", (e) => {
+  if (e.touches.length === 2 && lbPinchStartDist){
+    const [a, b] = e.touches;
+    const dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+    lbZoom = Math.min(3.5, Math.max(1, lbPinchStartZoom * (dist / lbPinchStartDist)));
+    applyLbTransform(false);
+  }
+}, { passive: true });
+lbImg.addEventListener("touchend", (e) => {
+  if (lbPinchStartDist){
+    lbPinchStartDist = 0;
+    if (lbZoom < 1.05) resetLbZoom(); else applyLbTransform(true);
+    return;
+  }
+  if (e.changedTouches.length === 1){
+    const now = Date.now();
+    if (now - lbLastTapAt < 300) toggleLbZoom();
+    lbLastTapAt = now;
+  }
+});
+lbImg.addEventListener("dblclick", toggleLbZoom);
+
+document.getElementById("lb-close").addEventListener("click", closeLightbox);
+document.getElementById("lb-prev").addEventListener("click", () => stepLightbox(-1));
+document.getElementById("lb-next").addEventListener("click", () => stepLightbox(1));
+lightbox.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
+document.addEventListener("keydown", (e) => {
+  if (!lightbox.classList.contains("open")) return;
+  if (e.key === "Escape") closeLightbox();
+  if (e.key === "ArrowLeft") stepLightbox(-1);
+  if (e.key === "ArrowRight") stepLightbox(1);
+});
+
+// Mobile swipe support (main gallery stage + lightbox)
+function addSwipeSupport(el, onSwipe){
+  let startX = 0;
+  el.addEventListener("touchstart", (e) => { startX = e.touches[0].clientX; }, { passive: true });
+  el.addEventListener("touchend", (e) => {
+    const dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 40) onSwipe(dx < 0 ? 1 : -1);
+  }, { passive: true });
+}
+addSwipeSupport(document.getElementById("gallery-stage"), (dir) => setActiveImage(state.activeImage + dir));
+addSwipeSupport(lightbox, (dir) => { if (lbZoom === 1) stepLightbox(dir); });
+
+/* ================================================================
+   RENDER: PRODUCT INFO
+   ================================================================ */
+document.getElementById("pdp-brand-cat").textContent = `${product.brand} · ${primaryCategory}`;
+document.title = `${product.name} — Aesthetic Lifestyle Touch`;
+document.getElementById("pdp-name").textContent = product.name;
+document.getElementById("pdp-rating").innerHTML = `<span style="color:var(--alt-black)">${starString(product.rating)}</span> ${product.rating} · ${product.reviews} reviews`;
+document.getElementById("pdp-desc").textContent = product.desc;
+
+function renderPrice(){
+  const priceEl = document.getElementById("pdp-price");
+  const origEl = document.getElementById("pdp-price-original");
+  if (product.salePrice){
+    priceEl.textContent = bdt(product.salePrice);
+    origEl.textContent = bdt(product.price);
+  } else {
+    priceEl.textContent = bdt(product.price);
+    origEl.textContent = "";
+  }
+  const unit = product.salePrice || product.price;
+  document.getElementById("mobile-price").textContent = bdt(unit * state.qty);
+}
+renderPrice();
+
+function renderStock(){
+  const el = document.getElementById("pdp-stock");
+  let dot, label;
+  if (product.stock === 0){
+    dot = "var(--alt-muted)"; label = "Currently unavailable";
+  } else if (product.stock <= 5){
+    dot = "#B8863C"; label = `Only ${product.stock} left in stock`;
+  } else {
+    dot = "#3F8F5F"; label = "In stock, ready to ship";
+  }
+  el.innerHTML = `<span class="stock-dot" style="background:${dot};"></span><span>${label}</span>`;
+
+  const soldOut = product.stock === 0;
+  document.getElementById("buy-now-btn").disabled = soldOut;
+  document.getElementById("mobile-buy-now").disabled = soldOut;
+  document.getElementById("restock-panel").style.display = soldOut ? "block" : "none";
+  if (soldOut){
+    document.getElementById("buy-now-btn").classList.add("opacity-40", "cursor-not-allowed");
+    document.getElementById("add-cart-btn").textContent = "Notify Me When Available";
+    document.getElementById("mobile-add-cart").textContent = "Notify Me";
+    syncRestockState();
+  }
+}
+
+/* ================================================================
+   RESTOCK REQUEST — "Notify Me When Available" on sold-out products.
+   Reuses the same alt_tickets_v1 ticket store as Contact/Support, so
+   these show up in the Admin Support inbox and the customer's
+   Dashboard ticket history with zero extra plumbing on either side.
+   ================================================================ */
+function restockRequestedKey(){ return `alt_restock_requested_${product.id}`; }
+function hasRequestedRestock(){ return localStorage.getItem(restockRequestedKey()) === "1"; }
+
+function showRestockRequestedState(){
+  document.getElementById("restock-form").style.display = "none";
+  document.getElementById("restock-success").style.display = "block";
+  [document.getElementById("add-cart-btn"), document.getElementById("mobile-add-cart")].forEach(btn => {
+    btn.textContent = "You'll Be Notified";
+    btn.disabled = true;
+  });
+}
+function syncRestockState(){
+  if (hasRequestedRestock()) showRestockRequestedState();
+}
+function submitRestockRequest(email){
+  const loggedIn = typeof Auth !== "undefined" && Auth.isLoggedIn();
+  const userId = loggedIn ? Auth.currentUser().id : "guest";
+  const key = "alt_tickets_v1";
+  const all = JSON.parse(localStorage.getItem(key) || "{}");
+  const tickets = all[userId] || [];
+  tickets.unshift({
+    id: "TCK-" + Math.random().toString(36).slice(2, 7).toUpperCase(),
+    subject: `Restock Request: ${product.name}`,
+    message: `Please email ${email} when "${product.name}" (Product #${product.id}) is back in stock.`,
+    guestName: loggedIn ? null : email,
+    guestEmail: loggedIn ? null : email,
+    status: "Open",
+    at: Date.now(),
+  });
+  all[userId] = tickets;
+  localStorage.setItem(key, JSON.stringify(all));
+  localStorage.setItem(restockRequestedKey(), "1");
+  showRestockRequestedState();
+}
+function handleNotifyClick(){
+  if (hasRequestedRestock()) return;
+  const loggedIn = typeof Auth !== "undefined" && Auth.isLoggedIn();
+  if (loggedIn){ submitRestockRequest(Auth.currentUser().email); return; }
+  document.getElementById("restock-form").style.display = "block";
+  document.getElementById("restock-email").focus();
+}
+document.getElementById("restock-submit").addEventListener("click", () => {
+  const email = document.getElementById("restock-email").value.trim();
+  const errEl = document.getElementById("restock-error");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ errEl.style.display = "block"; return; }
+  errEl.style.display = "none";
+  if (isSuspiciousSubmission(document.getElementById("restock-hp"))){
+    runHumanCheck(document.getElementById("restock-form"), () => submitRestockRequest(email));
+    return;
+  }
+  submitRestockRequest(email);
+});
+document.getElementById("restock-email").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("restock-submit").click(); });
+
+renderStock();
+
+/* Colors — selecting one also scrubs the gallery to the matching image */
+const colorWrap = document.getElementById("pdp-color-wrap");
+if (product.colors && product.colors.length){
+  document.getElementById("pdp-colors").innerHTML = product.colors.map((c, i) => `
+    <button class="swatch ${i === 0 ? "selected" : ""}" style="background:${c};" data-index="${i}" aria-label="Select color option ${i+1}"></button>
+  `).join("");
+  document.querySelectorAll("#pdp-colors .swatch").forEach(sw => {
+    sw.addEventListener("click", () => {
+      document.querySelectorAll("#pdp-colors .swatch").forEach(s => s.classList.remove("selected"));
+      sw.classList.add("selected");
+      state.colorIndex = Number(sw.dataset.index);
+      setActiveImage(state.colorIndex);
+    });
+  });
+} else {
+  colorWrap.style.display = "none";
+}
+
+/* Sizes */
+const sizeWrap = document.getElementById("pdp-size-wrap");
+if (product.sizes && product.sizes.length){
+  document.getElementById("pdp-sizes").innerHTML = product.sizes.map((s, i) => `
+    <button class="size-btn w-11 h-11 rounded-full border border-[var(--alt-border)] text-sm ${i === 0 ? "selected" : ""}" data-size="${s}">${s}</button>
+  `).join("");
+  document.querySelectorAll("#pdp-sizes .size-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#pdp-sizes .size-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      state.size = btn.dataset.size;
+    });
+  });
+} else {
+  sizeWrap.style.display = "none";
+}
+
+/* Quantity */
+document.getElementById("qty-minus").addEventListener("click", () => {
+  state.qty = Math.max(1, state.qty - 1);
+  document.getElementById("qty-value").textContent = state.qty;
+  renderPrice();
+});
+document.getElementById("qty-plus").addEventListener("click", () => {
+  state.qty += 1;
+  document.getElementById("qty-value").textContent = state.qty;
+  renderPrice();
+});
+
+/* Wishlist — persisted via the shared Wishlist module (cart.js) so it
+   shows up on the dedicated Wishlist page too. */
+const wishlistBtn = document.getElementById("wishlist-btn");
+function syncWishlist(){
+  const active = Wishlist.has(product.id);
+  wishlistBtn.classList.toggle("active", active);
+  wishlistBtn.setAttribute("aria-pressed", String(active));
+  document.getElementById("wishlist-label").textContent = active ? "Saved" : "Wishlist";
+}
+syncWishlist();
+wishlistBtn.addEventListener("click", () => {
+  const active = Wishlist.toggle(product.id);
+  syncWishlist();
+  if (active){ pulseHeart(wishlistBtn); glowCard(document.getElementById("gallery-stage")); }
+});
+
+/* Share — copies the product link, with a graceful clipboard fallback */
+document.getElementById("share-btn").addEventListener("click", async () => {
+  const url = window.location.href;
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: product.name, url });
+      return;
+    }
+    await navigator.clipboard.writeText(url);
+    showCartToast("Link copied to clipboard");
+  } catch (err) {
+    showCartToast("Link copied to clipboard");
+  }
+});
+
+/* ================================================================
+   ADD TO CART
+   Cart state, the flying-image animation, and the toast all live in
+   the shared Cart module (cart.js) — see addToCartWithFlourish().
+   ================================================================ */
+function currentVariant(){
+  return { color: product.colors ? product.colors[state.colorIndex] : null, size: state.size };
+}
+
+document.getElementById("add-cart-btn").addEventListener("click", () => {
+  if (product.stock === 0){ handleNotifyClick(); return; }
+  addToCartWithFlourish(product.id, currentVariant(), state.qty, mainImage);
+});
+document.getElementById("mobile-add-cart").addEventListener("click", () => {
+  if (product.stock === 0){ handleNotifyClick(); return; }
+  addToCartWithFlourish(product.id, currentVariant(), state.qty, mainImage);
+});
+document.getElementById("buy-now-btn").addEventListener("click", () => {
+  Cart.add(product.id, currentVariant(), state.qty);
+  Cart.open();
+});
+document.getElementById("mobile-buy-now").addEventListener("click", () => {
+  Cart.add(product.id, currentVariant(), state.qty);
+  Cart.open();
+});
+
+/* Magnetic hover — Add to Cart (desktop only, same feel as Home's Shop Now) */
+if (window.matchMedia("(min-width: 1024px)").matches && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const addBtn = document.getElementById("add-cart-btn");
+  addBtn.addEventListener("mousemove", (e) => {
+    const rect = addBtn.getBoundingClientRect();
+    const x = (e.clientX - rect.left - rect.width / 2) * 0.15;
+    const y = (e.clientY - rect.top - rect.height / 2) * 0.3;
+    addBtn.style.transform = `translate(${x}px, ${y}px) scale(1.02)`;
+  });
+  addBtn.addEventListener("mouseleave", () => { addBtn.style.transform = "translate(0,0) scale(1)"; });
+}
+
+/* ================================================================
+   FEATURES GRID
+   ================================================================ */
+document.getElementById("features-grid").innerHTML = FEATURES.map((f, i) => `
+  <div class="feature-card bg-[var(--alt-white)] p-7" data-reveal style="transition-delay:${i * 0.06}s;">
+    <div class="w-11 h-11 rounded-full bg-[var(--alt-surface)] flex items-center justify-center mb-5">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--alt-black)" stroke-width="1.5">${f.icon}</svg>
+    </div>
+    <h3 class="font-display text-base font-medium">${f.title}</h3>
+    <p class="mt-2 text-sm text-[var(--alt-muted)] leading-relaxed">${f.text}</p>
+  </div>
+`).join("");
+
+/* ================================================================
+   SPECIFICATIONS TABLE
+   ================================================================ */
+document.getElementById("specs-table").innerHTML = Object.entries(product.specs).map(([label, value]) => `
+  <div class="spec-row py-4 flex items-start justify-between gap-6">
+    <span class="font-mono text-xs uppercase tracking-wide text-[var(--alt-muted)] shrink-0">${label}</span>
+    <span class="text-sm text-right">${value}</span>
+  </div>
+`).join("");
+
+/* ================================================================
+   DESCRIPTION
+   ================================================================ */
+document.getElementById("desc-heading").textContent = `The ${product.name}, in detail.`;
+document.getElementById("desc-body").innerHTML = `
+  <p>${product.desc}</p>
+  <p>Every piece we carry is chosen the same way — for material, proportion, and the quiet way it fits into daily life. The ${product.name} went through the same process: sourced, handled, and tested before it earned a place in the collection.</p>
+  <p>It's designed to be used, not just displayed — built from materials that are meant to age well, and finished with the kind of restraint that ages better than trend-driven design ever does.</p>
+`;
+
+/* ================================================================
+   REVIEWS
+   ================================================================ */
+document.getElementById("reviews-heading").textContent = `${product.reviews} reviews · ${product.rating} average`;
+
+/* Real, per-product reviews (approved only) — reviewsForProduct() lives in
+   products-data.js, the same store admin.js's moderation queue reads/writes. */
+let realReviews = reviewsForProduct(product.id);
+function renderReviewsList(){
+  document.getElementById("reviews-list").innerHTML = realReviews.length ? realReviews.map(r => {
+    const helpful = reviewHelpfulState(r);
+    return `
+  <div class="flex gap-4">
+    ${initialsAvatar(r.author)}
+    <div class="flex-1">
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <span class="font-medium text-sm">${escapeHTML(r.author)}</span>
+        <span class="text-xs text-[var(--alt-muted)] font-mono">${timeAgo(Math.max(0, Math.round((Date.now() - r.at) / 86400000)))}</span>
+      </div>
+      <p class="text-sm mt-1" style="color:var(--alt-black)">${starString(r.rating)}</p>
+      <p class="mt-2 text-sm text-[var(--alt-muted)] leading-relaxed">${escapeHTML(r.text)}</p>
+      ${r.photos && r.photos.length ? `<div class="flex items-center gap-2 mt-3">${r.photos.map((src, i) => `<div class="review-photo-view" data-review="${r.id}" data-index="${i}"><img src="${src}" alt="Photo from ${escapeHTML(r.author)}'s review" loading="lazy"></div>`).join("")}</div>` : ""}
+      ${r.reply ? `<div class="mt-3 pl-4 border-l-2 border-[var(--alt-border)]"><p class="text-xs font-medium">Aesthetic Lifestyle Touch</p><p class="text-xs text-[var(--alt-muted)] mt-1">${escapeHTML(r.reply)}</p></div>` : ""}
+      <button type="button" class="helpful-btn ${helpful.active ? "active" : ""} flex items-center gap-1.5 text-xs text-[var(--alt-muted)] mt-3" data-review="${r.id}">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="${helpful.active ? "currentColor" : "none"}" stroke="currentColor" stroke-width="1.8"><path d="M7 22V11M2 13v7a2 2 0 0 0 2 2h12.5a2 2 0 0 0 2-1.6l1.4-7A2 2 0 0 0 18 9h-5V4a2 2 0 0 0-2-2L7 11"/></svg>
+        Helpful${helpful.count ? ` (${helpful.count})` : ""}
+      </button>
+    </div>
+  </div>
+`;
+  }).join("") : `<p class="text-sm text-[var(--alt-muted)]">No reviews yet for this product — be the first to write one.</p>`;
+  document.querySelectorAll(".review-photo-view").forEach(el => {
+    el.addEventListener("click", () => {
+      const r = realReviews.find(x => x.id === el.dataset.review);
+      if (r) openLightboxSrc(r.photos[Number(el.dataset.index)], `Photo from ${r.author}'s review`);
+    });
+  });
+  document.querySelectorAll(".helpful-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const result = toggleReviewHelpful(btn.dataset.review);
+      if (!result) return;
+      realReviews = reviewsForProduct(product.id);
+      renderReviewsList();
+    });
+  });
+}
+renderReviewsList();
+
+/* ---------------- write a review ---------------- */
+const reviewer = (typeof Auth !== "undefined") ? Auth.currentUser() : null;
+const canReview = reviewer && hasPurchasedProduct(reviewer.id, product.id);
+const alreadyReviewed = reviewer && hasReviewedProduct(reviewer.id, product.id);
+document.getElementById("review-signin-prompt").style.display = reviewer ? "none" : "block";
+document.getElementById("review-not-eligible").style.display = (reviewer && !canReview) ? "block" : "none";
+document.getElementById("review-already-done").style.display = (canReview && alreadyReviewed) ? "block" : "none";
+document.getElementById("review-form-wrap").style.display = (canReview && !alreadyReviewed) ? "block" : "none";
+document.getElementById("review-star-picker").innerHTML = [1, 2, 3, 4, 5].map(n => `<button type="button" class="review-star" data-star="${n}" aria-label="${n} star${n === 1 ? "" : "s"}" style="font-size:22px;line-height:1;color:var(--alt-border);background:none;">★</button>`).join("");
+
+let reviewStars = 0;
+document.querySelectorAll(".review-star").forEach(btn => {
+  btn.addEventListener("click", () => {
+    reviewStars = Number(btn.dataset.star);
+    document.querySelectorAll(".review-star").forEach(b => {
+      b.style.color = Number(b.dataset.star) <= reviewStars ? "var(--alt-black)" : "var(--alt-border)";
+    });
+  });
+});
+
+/* Photo attachments — resized/compressed client-side (this is a no-backend
+   site, so every photo lives in localStorage as a data URI; keeping each
+   one small is what stops 2-3 photos from blowing the storage quota). */
+const REVIEW_PHOTO_LIMIT = 3;
+let reviewPhotos = [];
+
+function resizeImageFile(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(reader.error);
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("Could not read image."));
+      img.onload = () => {
+        const maxSide = 800;
+        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.7));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderReviewPhotoPreviews(){
+  document.getElementById("review-photo-previews").innerHTML = reviewPhotos.map((src, i) => `
+    <div class="review-photo-thumb"><img src="${src}" alt="Attached photo ${i + 1}"><button type="button" class="review-photo-remove" data-index="${i}" aria-label="Remove photo">×</button></div>
+  `).join("");
+  document.querySelectorAll(".review-photo-remove").forEach(btn => {
+    btn.addEventListener("click", () => {
+      reviewPhotos.splice(Number(btn.dataset.index), 1);
+      renderReviewPhotoPreviews();
+    });
+  });
+  document.getElementById("review-photo-trigger").style.display = reviewPhotos.length >= REVIEW_PHOTO_LIMIT ? "none" : "inline-block";
+}
+
+document.getElementById("review-photo-trigger").addEventListener("click", () => {
+  document.getElementById("review-photo-input").click();
+});
+document.getElementById("review-photo-input").addEventListener("change", async (e) => {
+  const errEl = document.getElementById("review-photo-error");
+  errEl.style.display = "none";
+  const files = Array.from(e.target.files).slice(0, REVIEW_PHOTO_LIMIT - reviewPhotos.length);
+  for (const file of files){
+    if (!file.type.startsWith("image/")) continue;
+    try {
+      reviewPhotos.push(await resizeImageFile(file));
+    } catch (err) {
+      errEl.textContent = "One of those photos couldn't be loaded — try another.";
+      errEl.style.display = "block";
+    }
+  }
+  e.target.value = "";
+  renderReviewPhotoPreviews();
+});
+
+document.getElementById("review-submit-btn").addEventListener("click", () => {
+  const errorEl = document.getElementById("review-form-error");
+  const successEl = document.getElementById("review-form-success");
+  errorEl.style.display = "none";
+  successEl.style.display = "none";
+  const result = submitReview({
+    productId: product.id,
+    productName: product.name,
+    userId: reviewer ? reviewer.id : null,
+    author: reviewer ? `${reviewer.firstName} ${reviewer.lastName}`.trim() : "",
+    rating: reviewStars,
+    text: document.getElementById("review-text").value,
+    photos: reviewPhotos,
+  });
+  if (!result.ok){
+    errorEl.textContent = result.errors[0];
+    errorEl.style.display = "block";
+    return;
+  }
+  successEl.style.display = "block";
+  document.getElementById("review-text").value = "";
+  reviewStars = 0;
+  reviewPhotos = [];
+  renderReviewPhotoPreviews();
+  document.querySelectorAll(".review-star").forEach(b => { b.style.color = "var(--alt-border)"; });
+});
+
+/* ================================================================
+   RELATED PRODUCTS — same card language as Store, horizontal on mobile
+   ================================================================ */
+function relatedCardHTML(p){
+  return `
+    <article class="p-card group shrink-0 w-[220px] lg:w-auto" data-id="${p.id}">
+      <div class="p-stage">
+        <img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+        <div class="fallback" style="display:none;">${p.name}</div>
+        ${p.badge ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 backdrop-blur px-2.5 py-1 rounded-full">${p.badge}</span>` : ""}
+      </div>
+      <div class="mt-4">
+        <div class="flex items-start justify-between gap-2">
+          <h3 class="font-display text-[15px] font-medium leading-snug">${p.name}</h3>
+          <span class="font-mono text-sm shrink-0">${bdt(p.salePrice || p.price)}</span>
+        </div>
+        <p class="text-[11px] text-[var(--alt-muted)] mt-2 font-mono">
+          <span style="color:var(--alt-black)">${starString(p.rating)}</span> ${p.rating} (${p.reviews})
+        </p>
+      </div>
+    </article>
+  `;
+}
+
+const storefrontProductsForRelated = getStorefrontProducts();
+const related = storefrontProductsForRelated
+  .filter(p => p.id !== product.id && p.tags.some(t => product.tags.includes(t)))
+  .slice(0, 4);
+const relatedFinal = related.length >= 4 ? related : storefrontProductsForRelated.filter(p => p.id !== product.id).slice(0, 4);
+
+document.getElementById("related-grid").innerHTML = relatedFinal.map(relatedCardHTML).join("");
+document.querySelectorAll("#related-grid .p-card").forEach(card => {
+  card.addEventListener("click", () => goToProduct(Number(card.dataset.id)));
+});
+
+/* ================================================================
+   PRODUCT -> PRODUCT TRANSITION (Related products)
+   Same cinematic language as Store -> Product.
+   ================================================================ */
+const pdpRoot = document.getElementById("pdp-root");
+const pdpCurtain = document.getElementById("pdp-curtain");
+
+function goToProduct(id){
+  pdpRoot.classList.add("zooming");
+  pdpCurtain.classList.add("active");
+  setTimeout(() => { window.location.href = `product.html?id=${id}`; }, 650);
+}
+
+/* ================================================================
+   MOBILE STICKY BAR — appears once the desktop actions block scrolls
+   out of view, hides again when it's back on screen.
+   ================================================================ */
+const mobileBar = document.getElementById("mobile-bar");
+const actionsBlock = document.getElementById("pdp-actions");
+new IntersectionObserver((entries) => {
+  entries.forEach(entry => mobileBar.classList.toggle("show", !entry.isIntersecting));
+}, { threshold: 0 }).observe(actionsBlock);
+
+/* ================================================================
+   SCROLL REVEAL — Features / Specs / Description / Reviews / Related
+   ================================================================ */
+const revealObserver = new IntersectionObserver((entries, obs) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("in");
+      obs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
+
+/* ================================================================
+   INIT
+   ================================================================ */
+window.addEventListener("load", () => {
+  pdpRoot.classList.add("settled");
+  document.querySelectorAll("[data-enter]").forEach(el => el.classList.add("in"));
+  // data-reveal elements are added after the DOM writes above, so observe on load
+  document.querySelectorAll("[data-reveal]").forEach(el => revealObserver.observe(el));
+});
+
+} // end if (product)
+</script>
+
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0A0A0A" />
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin — Aesthetic Lifestyle Touch</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="products-data.js"></script>
+<script src="cart.js"></script>
+<script src="auth.js"></script>
+<script src="loader.js"></script>
+<link rel="stylesheet" href="cart.css">
+<link rel="stylesheet" href="loader.css">
+<link rel="stylesheet" href="mobile.css">
+<link rel="stylesheet" href="admin-shell.css">
+
+<style>
+  /* ================================================================
+     LOGIN — split brand/form, dark royal panel + light form panel.
+     No dead white space: the empty half carries real brand content.
+     ================================================================ */
+  #admin-login-root{ min-height: 100vh; display:flex; }
+  #admin-login-brand{
+    flex: 1 1 56%; position:relative; overflow:hidden; background: var(--alt-black); color:#fff;
+    display:flex; flex-direction:column; justify-content:space-between;
+    padding: 56px 60px; min-height: 100vh;
+  }
+  #admin-login-brand::before{
+    content:""; position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 12% 12%, rgba(201,194,180,0.32), transparent 55%),
+      radial-gradient(circle at 88% 88%, rgba(201,194,180,0.2), transparent 55%);
+    pointer-events:none;
+  }
+  #admin-login-brand::after{
+    content:""; position:absolute; inset:0; opacity:0.05; pointer-events:none;
+    background-image: linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+  .login-brand-quote{ font-family:'Space Grotesk', sans-serif; font-weight:500; line-height:1.14; letter-spacing:-0.01em; }
+  #admin-login-form-side{
+    flex: 1 1 44%; display:flex; align-items:center; justify-content:center; padding: 40px 24px;
+    background: var(--alt-white); position:relative;
+  }
+  @media (max-width: 900px){
+    #admin-login-root{ flex-direction:column; }
+    #admin-login-brand{ min-height: auto; padding: 44px 32px 60px; flex: none; }
+    #admin-login-form-side{ flex: none; }
+  }
+
+</style>
+</head>
+<body>
+
+<div id="site-loader" aria-hidden="true">
+  <div class="sl-glow"></div>
+  <p class="sl-mark">AESTHETIC <span>LIFESTYLE TOUCH</span></p>
+  <div class="sl-progress-track"><div class="sl-progress-fill"></div></div>
+</div>
+
+<!-- ================================================================
+     ADMIN LOGIN GATE — split brand/form
+     ================================================================ -->
+<div id="admin-login-root">
+  <div id="admin-login-brand">
+    <a href="Home.html" class="font-display text-[15px] font-medium tracking-tight relative z-10" style="opacity:0.9;">
+      AESTHETIC <span style="opacity:0.55;">LIFESTYLE TOUCH</span>
+    </a>
+    <div class="relative z-10" data-enter>
+      <p class="font-mono text-[11px] tracking-[0.22em] uppercase mb-6" style="color:var(--alt-beige);">Command Center</p>
+      <h1 class="login-brand-quote text-[2.6rem] md:text-[3.4rem] mb-6">
+        Run the store<br>like it deserves<br>to be run.
+      </h1>
+      <p class="text-sm max-w-[420px]" style="color:rgba(255,255,255,0.6);">
+        Orders, inventory, customers, reviews, and revenue — one considered
+        command center, built with the same restraint as the storefront itself.
+      </p>
+    </div>
+    <div class="relative z-10 flex items-center gap-8 font-mono text-[10.5px] uppercase tracking-[0.1em]" style="color:rgba(255,255,255,0.4);">
+      <span>Orders</span><span>Inventory</span><span>Customers</span><span>Analytics</span>
+    </div>
+  </div>
+
+  <div id="admin-login-form-side">
+    <div class="relative z-10 w-full max-w-[380px]" data-enter>
+      <p class="font-mono text-[11px] tracking-[0.2em] uppercase text-[var(--alt-muted)] mb-3">Welcome back</p>
+      <h2 class="font-display text-[1.7rem] font-medium mb-1">Sign in to Admin</h2>
+      <p class="text-sm text-[var(--alt-muted)] mb-8">Store owner and administrators only.</p>
+
+      <div class="mb-4">
+        <label class="field-label" for="admin-login-email">Email</label>
+        <input id="admin-login-email" type="email" autocomplete="username" class="field-input" placeholder="owner@aestheticlifestyletouch.com">
+      </div>
+      <div class="mb-2">
+        <label class="field-label" for="admin-login-password">Password</label>
+        <input id="admin-login-password" type="password" autocomplete="current-password" class="field-input" placeholder="••••••••">
+      </div>
+      <p id="admin-login-error" class="text-xs text-[var(--alt-bad)] mb-3" style="display:none;">Incorrect email or password.</p>
+      <button id="admin-login-submit" class="adm-btn adm-btn-primary w-full mt-4" style="padding-top:13px;padding-bottom:13px;">Sign In</button>
+      <div class="mt-6 pt-5 border-t border-[var(--alt-border)]">
+        <div class="rounded-2xl border border-[var(--alt-border)] bg-[var(--alt-surface)] p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--alt-muted)" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <p class="font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--alt-muted)]">Demo Credentials</p>
+          </div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-[var(--alt-muted)]">Email</span>
+            <button type="button" class="demo-cred-copy font-mono text-xs text-[var(--alt-black)] hover:opacity-60 transition-opacity" data-value="owner@aestheticlifestyletouch.com" title="Click to copy">owner@aestheticlifestyletouch.com</button>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-[var(--alt-muted)]">Password</span>
+            <button type="button" class="demo-cred-copy font-mono text-xs text-[var(--alt-black)] hover:opacity-60 transition-opacity" data-value="Owner@2026" title="Click to copy">Owner@2026</button>
+          </div>
+        </div>
+        <p class="text-[10.5px] text-[var(--alt-muted)] leading-relaxed mt-3">Prototype auth only, hashed client-side — no real backend or server session exists behind this gate.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     ADMIN SHELL
+     ================================================================ -->
+<div id="admin-shell-root" style="display:none;">
+<div id="admin-shell">
+
+  <div id="admin-sidebar-overlay"></div>
+  <aside id="admin-sidebar">
+    <div class="flex items-center justify-between px-5 pt-6 pb-5">
+      <a href="Home.html" class="font-display text-[14px] font-medium tracking-tight leading-tight" style="color:#fff;">
+        AESTHETIC<br><span style="color:rgba(255,255,255,0.45);font-weight:400;">LIFESTYLE TOUCH</span>
+      </a>
+      <button id="admin-sidebar-close" class="adm-icon-btn lg:hidden" style="color:rgba(255,255,255,0.6);" aria-label="Close menu">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div id="admin-sidebar-scroll" class="no-scrollbar">
+      <div id="admin-nav"></div>
+    </div>
+    <div class="p-4" style="border-top:1px solid rgba(255,255,255,0.08);">
+      <button id="admin-logout-btn" class="side-link" style="color:#C97B7B;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <div id="admin-main">
+    <header id="admin-topbar">
+      <button id="admin-sidebar-open" class="adm-icon-btn lg:hidden" aria-label="Open menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <h1 id="admin-page-title" class="font-display text-base font-medium">Overview</h1>
+      <button id="admin-cmdk-trigger" class="adm-input flex items-center gap-2 text-[var(--alt-muted)] ml-2" style="max-width:280px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <span class="text-[13px] hidden sm:inline">Search orders, customers, products…</span>
+        <span class="font-mono text-[10px] border border-[var(--alt-border)] rounded px-1.5 py-0.5 ml-auto hidden sm:inline">⌘K</span>
+      </button>
+      <div class="flex items-center gap-2 ml-auto">
+        <button id="admin-notif-trigger" class="topbar-icon-btn" aria-label="Notifications">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span id="admin-notif-dot" class="topbar-dot" style="display:none;"></span>
+        </button>
+        <div class="avatar-circle" id="admin-avatar">O</div>
+      </div>
+    </header>
+
+    <main id="admin-content">
+      <div class="admin-hero-glow" aria-hidden="true"></div>
+      <div class="admin-view active" data-view="overview" id="view-overview"></div>
+      <div class="admin-view" data-view="analytics" id="view-analytics"></div>
+      <div class="admin-view" data-view="orders" id="view-orders"></div>
+      <div class="admin-view" data-view="custom-requests" id="view-custom-requests"></div>
+      <div class="admin-view" data-view="returns" id="view-returns"></div>
+      <div class="admin-view" data-view="reward-vault" id="view-reward-vault"></div>
+      <div class="admin-view" data-view="products" id="view-products"></div>
+      <div class="admin-view" data-view="inventory" id="view-inventory"></div>
+      <div class="admin-view" data-view="customers" id="view-customers"></div>
+      <div class="admin-view" data-view="reviews" id="view-reviews"></div>
+      <div class="admin-view" data-view="coupons" id="view-coupons"></div>
+      <div class="admin-view" data-view="notifications" id="view-notifications"></div>
+      <div class="admin-view" data-view="support" id="view-support"></div>
+      <div class="admin-view" data-view="staff" id="view-staff"></div>
+      <div class="admin-view" data-view="settings" id="view-settings"></div>
+      <div class="admin-view" data-view="backup" id="view-backup"></div>
+      <div class="admin-view" data-view="security" id="view-security"></div>
+    </main>
+  </div>
+</div>
+</div>
+
+<!-- ================================================================
+     COMMAND PALETTE
+     ================================================================ -->
+<div id="adm-cmdk-overlay" role="dialog" aria-modal="true" aria-label="Admin search">
+  <div id="adm-cmdk-panel">
+    <div style="padding:16px 18px; border-bottom:1px solid var(--alt-border); display:flex; align-items:center; gap:10px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--alt-muted)" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="adm-cmdk-input" type="text" placeholder="Search orders, customers, products, coupons, settings…" class="flex-1 outline-none text-[15px]" autocomplete="off">
+      <span class="font-mono text-[10px] text-[var(--alt-muted)] border border-[var(--alt-border)] rounded px-1.5 py-0.5">ESC</span>
+    </div>
+    <div id="adm-cmdk-results" class="no-scrollbar" style="max-height:min(50vh,420px); overflow-y:auto; padding:8px 0;"></div>
+  </div>
+</div>
+
+<!-- ================================================================
+     GENERIC DRAWER (used for order detail, product edit, coupon editor, customer detail)
+     ================================================================ -->
+<div id="adm-drawer-overlay" class="adm-overlay"></div>
+<div id="adm-drawer" class="adm-drawer" role="dialog" aria-modal="true">
+  <div class="adm-drawer-head">
+    <h2 id="adm-drawer-title" class="font-display text-lg font-medium">Details</h2>
+    <button id="adm-drawer-close" class="adm-icon-btn" aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div id="adm-drawer-body" class="adm-drawer-body"></div>
+  <div id="adm-drawer-foot" class="adm-drawer-foot" style="display:none;"></div>
+</div>
+
+<!-- ================================================================
+     CONFIRM DIALOG (sensitive action confirmation)
+     ================================================================ -->
+<div id="adm-modal-wrap" class="adm-modal-wrap">
+  <div class="adm-modal-backdrop"></div>
+  <div class="adm-modal" role="alertdialog" aria-modal="true">
+    <h3 id="adm-modal-title" class="font-display text-lg font-medium mb-2">Are you sure?</h3>
+    <p id="adm-modal-body" class="text-sm text-[var(--alt-muted)] leading-relaxed mb-6"></p>
+    <div class="flex gap-3">
+      <button id="adm-modal-cancel" class="adm-btn adm-btn-ghost flex-1">Cancel</button>
+      <button id="adm-modal-confirm" class="adm-btn adm-btn-primary flex-1">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script src="admin-auth.js"></script>
+<script src="order-service.js"></script>
+<script src="loyalty.js"></script>
+<script src="custom-requests.js"></script>
+<script src="returns.js"></script>
+<script src="rewards-engine.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

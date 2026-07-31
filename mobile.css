@@ -1,0 +1,95 @@
+/* ================================================================
+   MOBILE EXPERIENCE POLISH — applies sitewide, including checkout.html
+   and account.html (which intentionally skip mobile-nav.js/css to stay
+   distraction-free). Pure CSS: safe-area support, touch target sizing,
+   input zoom prevention, press feedback, overflow guard.
+   ================================================================ */
+
+/* ---------------- dark-mode icon toggle (used in page headers that
+   don't get mobile-nav.js's own menu-based toggle) ---------------- */
+.theme-toggle-icon-btn{
+  width: 36px; height: 36px; border-radius: 999px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--alt-border); color: var(--alt-black);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.theme-toggle-icon-btn:hover{ background: var(--alt-surface); }
+.theme-toggle-icon-btn:active{ transform: scale(0.92); }
+.theme-icon-dark{ display: none; }
+:root[data-theme="dark"] .theme-icon-light{ display: none; }
+:root[data-theme="dark"] .theme-icon-dark{ display: inline-flex; }
+
+:root{
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+html, body{ overflow-x: hidden; max-width: 100vw; }
+
+/* ---------------- header consolidation ---------------- */
+/* mobile-nav.js adds a hamburger into the header's icon row without
+   hiding the original desktop icons (search/account/messages/wishlist/
+   cart) next to it, AND the same destinations already live in the
+   floating bottom bar it also builds — so mobile visitors were seeing
+   every icon twice (crammed top row + full bottom bar), which was also
+   what pushed the wordmark onto 3 lines. Below 768px, on any page that
+   actually has the bottom bar, the header keeps just the logo + the
+   hamburger; the bottom bar and the hamburger's own menu (which already
+   includes Account/Wishlist/Orders links) cover the rest. Pages that
+   intentionally skip mobile-nav.js (checkout, account) have no
+   #mnav-bottombar, so this rule leaves their header icons untouched. */
+@media (max-width: 767px){
+  body:has(#mnav-bottombar) header #search-trigger,
+  body:has(#mnav-bottombar) header #account-icon,
+  body:has(#mnav-bottombar) header #messages-icon,
+  body:has(#mnav-bottombar) header #wishlist-icon,
+  body:has(#mnav-bottombar) header #cart-icon{
+    display: none;
+  }
+}
+
+/* Safety net for pages like product.html that keep their full icon row
+   on mobile (they have their own sticky purchase bar instead of the
+   generic bottom nav, so the icons aren't redundant there) — the
+   wordmark must still never wrap to 3 lines fighting them for space. */
+@media (max-width: 767px){
+  header a[href="Home.html"], header a[href="#home"]{
+    font-size: clamp(11px, 3.1vw, 15px) !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 46vw;
+  }
+}
+
+/* Never let mobile Safari/Chrome zoom the page on input focus. */
+@media (max-width: 767px){
+  .field-input, .float-field input, .float-field textarea, .float-field select,
+  .co-news-input, .ft-news-input, #sp-input{
+    font-size: 16px !important;
+  }
+}
+
+/* ---------------- touch target sizing ---------------- */
+@media (max-width: 767px){
+  .sp-icon-btn{ width: 42px; height: 42px; }
+  .cart-qty-btn{ width: 36px; height: 36px; font-size: 1.05rem; }
+  .cart-qty-stepper{ padding: 3px; gap: 4px; }
+  .ft-icon-btn{ width: 44px; height: 44px; }
+  .pw-toggle{ padding: 12px; margin: -12px; }
+  .thumb{ min-width: 44px; min-height: 44px; }
+}
+
+/* ---------------- press feedback (touch devices only) ---------------- */
+@media (hover: none){
+  .btn-primary:active, .cart-btn-primary:active,
+  button:active:not(:disabled), a.nav-link:active{
+    transform: scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  * { scroll-behavior: auto !important; }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Aesthetic Lifestyle Touch",
+  "short_name": "ALT",
+  "description": "Premium lifestyle essentials — considered design, honest quality.",
+  "start_url": "Home.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0A0A0A",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

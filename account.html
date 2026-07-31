@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<script>(function(){try{var t=localStorage.getItem("alt_theme_v1");if(t==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0A0A0A" />
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Sign In — Aesthetic Lifestyle Touch</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="auth.js"></script>
+<script src="theme.js"></script>
+<script src="loader.js"></script>
+<link rel="stylesheet" href="loader.css">
+<link rel="stylesheet" href="mobile.css">
+
+<style>
+  :root{
+    --alt-white:   #FFFFFF;
+    --alt-surface: #F5F4F1;
+    --alt-black:   #0A0A0A;
+    --alt-border:  #E8E6E1;
+    --alt-beige:   #C9C2B4;
+    --alt-muted:   #8A8A8A;
+    --alt-bad:     #B23B3B;
+    --alt-good:    #3F8F5F;
+  }
+  /* ================= DARK MODE ================= */
+  :root[data-theme="dark"]{
+    --alt-white:   #0A0A0A;
+    --alt-surface: #17160F;
+    --alt-black:   #F5F4F1;
+    --alt-border:  #2C2A22;
+    --alt-beige:   #C9C2B4;
+    --alt-muted:   #9C9890;
+    --alt-good:    #4FAE73;
+    --alt-warn:    #D4A24F;
+    --alt-bad:     #E0655C;
+  }
+  :root[data-theme="dark"] .nav-glass{
+    background: rgba(10,9,7,0.72);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  :root[data-theme="dark"] img{ filter: brightness(0.92); }
+  * { -webkit-font-smoothing: antialiased; }
+  body{ background: var(--alt-white); font-family:'Inter', sans-serif; color: var(--alt-black); overflow-x: hidden; min-height: 100vh; }
+  .font-display{ font-family:'Space Grotesk', sans-serif; }
+  .font-mono{ font-family:'JetBrains Mono', monospace; }
+  :focus-visible{ outline: 2px solid var(--alt-black); outline-offset: 2px; }
+
+  .ambient-light{ position:absolute; border-radius:50%; filter: blur(90px); pointer-events:none; z-index:0; }
+
+  [data-enter]{ opacity:0; transform: translateY(16px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+  [data-enter].in{ opacity:1; transform: translateY(0); }
+
+  #auth-root{ opacity:0; transform: scale(1.03); transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+  #auth-root.settled{ opacity:1; transform: scale(1); }
+
+  /* ================= TAB SWITCHER ================= */
+  .auth-tab{
+    flex: 1; text-align: center; padding: 12px 0; font-size: 14px; font-weight: 500;
+    color: var(--alt-muted); position: relative; z-index: 1;
+    transition: color 0.3s ease;
+  }
+  .auth-tab.active{ color: var(--alt-white); }
+  #tab-indicator{
+    position: absolute; top: 4px; bottom: 4px; left: 4px;
+    width: calc(50% - 4px); border-radius: 999px; background: var(--alt-black);
+    transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  /* ================= FLOATING LABEL FIELDS ================= */
+  .float-field{ position: relative; }
+  .float-field input{
+    width: 100%;
+    background: var(--alt-surface);
+    border: 1px solid var(--alt-border);
+    border-radius: 14px;
+    padding: 22px 16px 9px;
+    font-size: 14px;
+    color: var(--alt-black);
+    outline: none;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+  }
+  .float-field input:focus{ border-color: var(--alt-black); background: var(--alt-white); box-shadow: 0 0 0 3px rgba(10,10,10,0.06); }
+  .float-field input.invalid{ border-color: var(--alt-bad); }
+  .float-field label{
+    position: absolute; left: 16px; top: 16px;
+    font-size: 14px; color: var(--alt-muted);
+    transition: top 0.2s ease, font-size 0.2s ease, color 0.2s ease;
+    pointer-events: none;
+  }
+  .float-field input:focus + label,
+  .float-field input:not(:placeholder-shown) + label{
+    top: 7px; font-size: 10.5px; letter-spacing: 0.03em;
+  }
+  .float-field input:focus + label{ color: var(--alt-black); }
+  .field-error{ font-size: 11.5px; color: var(--alt-bad); margin-top: 6px; opacity:0; max-height:0; overflow:hidden; transition: opacity .25s ease, max-height .25s ease; }
+  .field-error.show{ opacity:1; max-height:26px; }
+  .form-error-banner{
+    font-size: 13px; color: var(--alt-bad); background: rgba(178,59,59,0.08);
+    border: 1px solid rgba(178,59,59,0.25); border-radius: 12px; padding: 11px 14px;
+    opacity: 0; max-height: 0; overflow: hidden; margin-bottom: 0;
+    transition: opacity .3s ease, max-height .3s ease, margin-bottom .3s ease;
+  }
+  .form-error-banner.show{ opacity: 1; max-height: 60px; margin-bottom: 16px; }
+
+  .pw-toggle{ position:absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--alt-muted); transition: color 0.2s ease; }
+  .pw-toggle:hover{ color: var(--alt-black); }
+
+  .field-check{ display:flex; align-items:flex-start; gap: 10px; font-size: 13px; color: var(--alt-muted); cursor: pointer; }
+  .field-check input{ width:16px; height:16px; accent-color: var(--alt-black); margin-top: 1px; flex-shrink:0; }
+
+  /* ================= PASSWORD STRENGTH ================= */
+  .strength-track{ display:flex; gap:4px; margin-top: 8px; }
+  .strength-seg{ height: 3px; flex:1; border-radius: 999px; background: var(--alt-border); transition: background-color 0.3s ease; }
+  .strength-label{ font-size: 11px; color: var(--alt-muted); margin-top: 5px; }
+
+  /* ================= PRIMARY BUTTON ================= */
+  .btn-primary{
+    position: relative;
+    transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s ease, opacity 0.3s ease;
+    box-shadow: 0 8px 24px -8px rgba(10,10,10,0.35);
+  }
+  .btn-primary::after{
+    content:""; position:absolute; inset:-2px; border-radius: inherit;
+    background: radial-gradient(60% 60% at 50% 50%, rgba(201,194,180,0.55), transparent 70%);
+    opacity: 0; transition: opacity 0.4s ease; z-index:-1; filter: blur(14px);
+  }
+  .btn-primary:hover::after{ opacity: 1; }
+  .btn-primary:hover{ box-shadow: 0 16px 40px -10px rgba(10,10,10,0.45); }
+  .btn-primary:disabled{ opacity: 0.5; box-shadow:none; cursor: not-allowed; }
+  .spinner{ width:14px; height:14px; border-radius:999px; border:2px solid rgba(255,255,255,0.35); border-top-color: var(--alt-white); animation: spin 0.7s linear infinite; display:inline-block; }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  .social-btn{
+    display:flex; align-items:center; justify-content:center; gap: 10px;
+    border: 1px solid var(--alt-border); border-radius: 999px; padding: 12px;
+    font-size: 13px; font-weight: 500;
+    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1), background-color 0.2s ease, box-shadow 0.25s ease;
+  }
+  .social-btn:hover{ transform: translateY(-2px); box-shadow: 0 14px 28px -16px rgba(10,10,10,0.2); background: var(--alt-surface); }
+
+  .auth-panel{ display:none; }
+  .auth-panel.active{ display:block; }
+
+  .link-quiet{ transition: opacity 0.2s ease; }
+  .link-quiet:hover{ opacity: 0.55; }
+
+  #toast{
+    position: fixed; bottom: 28px; left: 50%; transform: translate(-50%, 16px);
+    opacity:0; pointer-events:none; z-index: 95;
+    background: var(--alt-black); color: var(--alt-white); font-size:14px; font-weight:500;
+    padding: 14px 24px; border-radius: 999px; box-shadow: 0 20px 40px -15px rgba(10,10,10,0.5);
+    transition: opacity .35s ease, transform .35s cubic-bezier(0.16,1,0.3,1);
+  }
+  #toast.show{ opacity:1; transform: translate(-50%, 0); }
+
+  @media (prefers-reduced-motion: reduce){
+    [data-enter], #auth-root, .btn-primary, .social-btn, #toast, .strength-seg, .float-field label{ transition:none !important; }
+    [data-enter]{ opacity:1 !important; transform:none !important; }
+    #auth-root{ opacity:1 !important; transform:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+     INITIAL LOADING SCREEN -- see loader.js/loader.css
+     ================================================================ -->
+<div id="site-loader" aria-hidden="true">
+  <div class="sl-glow"></div>
+  <p class="sl-mark">AESTHETIC <span>LIFESTYLE TOUCH</span></p>
+  <div class="sl-progress-track"><div class="sl-progress-fill"></div></div>
+</div>
+
+<div class="ambient-light" style="width:640px; height:640px; top:-160px; left:-160px; background: radial-gradient(circle, rgba(201,194,180,0.3), transparent 70%);"></div>
+<div class="ambient-light" style="width:520px; height:520px; bottom:-160px; right:-140px; background: radial-gradient(circle, rgba(245,244,241,0.9), transparent 70%);"></div>
+
+<header class="relative z-10 px-6 md:px-10 py-6 flex items-center justify-between">
+  <a href="Home.html" class="font-display text-[15px] font-medium tracking-tight">
+    AESTHETIC <span class="text-[var(--alt-muted)] font-normal">LIFESTYLE TOUCH</span>
+  </a>
+  <button type="button" class="theme-toggle-btn theme-toggle-icon-btn" aria-label="Toggle dark mode">
+    <svg class="theme-icon-light" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    <svg class="theme-icon-dark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</header>
+
+<div id="auth-root" class="relative z-10 min-h-[80vh] flex items-center justify-center px-6 py-10">
+  <div class="w-full max-w-[420px]">
+
+    <!-- ============ SIGN IN / CREATE ACCOUNT TABS ============ -->
+    <div id="tab-switcher" data-enter class="relative flex bg-[var(--alt-surface)] rounded-full p-1 mb-8">
+      <div id="tab-indicator"></div>
+      <button class="auth-tab active" data-tab="signin">Sign In</button>
+      <button class="auth-tab" data-tab="signup">Create Account</button>
+    </div>
+
+    <div class="border border-[var(--alt-border)] rounded-[26px] p-7 md:p-9" data-enter style="transition-delay:0.08s;">
+
+      <!-- ============ SIGN IN ============ -->
+      <section class="auth-panel active" data-panel="signin">
+        <h1 class="font-display text-2xl font-medium mb-1">Welcome back.</h1>
+        <p id="si-subtitle" class="text-sm text-[var(--alt-muted)] mb-7">Sign in to view your orders, wishlist, and saved details.</p>
+
+        <p class="form-error-banner" id="signin-error"></p>
+
+        <input type="text" id="si-hp" name="website" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;">
+        <div class="space-y-4">
+          <div class="float-field">
+            <input id="si-identifier" type="text" placeholder=" " autocomplete="username">
+            <label for="si-identifier">Email or Phone Number</label>
+          </div>
+          <div class="float-field relative">
+            <input id="si-password" type="password" placeholder=" " autocomplete="current-password">
+            <label for="si-password">Password</label>
+            <button type="button" class="pw-toggle" data-toggle-for="si-password" aria-label="Show password">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <label class="field-check"><input type="checkbox" id="si-remember" checked> Remember me</label>
+            <button type="button" id="show-forgot" class="link-quiet text-xs font-mono underline underline-offset-4 text-[var(--alt-muted)]">Forgot password?</button>
+          </div>
+
+          <button id="signin-submit" class="btn-primary font-display bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium tracking-wide py-4 rounded-full w-full flex items-center justify-center gap-2">
+            <span id="signin-label">Sign In</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-3 my-7">
+          <div class="flex-1 h-px bg-[var(--alt-border)]"></div>
+          <span class="text-xs text-[var(--alt-muted)] font-mono">OR</span>
+          <div class="flex-1 h-px bg-[var(--alt-border)]"></div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <button class="social-btn" data-provider="Google" aria-label="Continue with Google">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
+          </button>
+          <button class="social-btn" data-provider="Apple" aria-label="Continue with Apple">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l8 3v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V6l8-3z"/></svg>
+          </button>
+          <button class="social-btn" data-provider="Facebook" aria-label="Continue with Facebook">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M14 9h-2a1 1 0 0 0-1 1v2h3M11 12v6"/></svg>
+          </button>
+        </div>
+
+        <button id="show-guest-1" class="link-quiet w-full text-center mt-7 text-sm text-[var(--alt-muted)] underline underline-offset-4">Continue as Guest</button>
+      </section>
+
+      <!-- ============ CREATE ACCOUNT ============ -->
+      <section class="auth-panel" data-panel="signup">
+        <h1 class="font-display text-2xl font-medium mb-1">Create your account.</h1>
+        <p id="ca-subtitle" class="text-sm text-[var(--alt-muted)] mb-7">Takes less than a minute — no spam, ever.</p>
+
+        <p class="form-error-banner" id="signup-error"></p>
+
+        <input type="text" id="ca-hp" name="website" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;">
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="float-field">
+              <input id="ca-first" type="text" placeholder=" " autocomplete="given-name">
+              <label for="ca-first">First Name</label>
+            </div>
+            <div class="float-field">
+              <input id="ca-last" type="text" placeholder=" " autocomplete="family-name">
+              <label for="ca-last">Last Name</label>
+            </div>
+          </div>
+          <div class="float-field">
+            <input id="ca-email" type="email" placeholder=" " autocomplete="email">
+            <label for="ca-email">Email Address</label>
+            <p class="field-error" data-error-for="ca-email">Enter a valid email address.</p>
+          </div>
+          <div class="float-field">
+            <input id="ca-phone" type="tel" placeholder=" " autocomplete="tel">
+            <label for="ca-phone">Phone Number</label>
+            <p class="field-error" data-error-for="ca-phone">Enter a valid Bangladeshi phone number.</p>
+          </div>
+          <div class="float-field relative">
+            <input id="ca-password" type="password" placeholder=" " autocomplete="new-password">
+            <label for="ca-password">Password</label>
+            <button type="button" class="pw-toggle" data-toggle-for="ca-password" aria-label="Show password">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+            <div class="strength-track"><div class="strength-seg"></div><div class="strength-seg"></div><div class="strength-seg"></div><div class="strength-seg"></div></div>
+            <p class="strength-label" id="strength-label">Use 8+ characters with a mix of letters, numbers &amp; symbols.</p>
+          </div>
+          <div class="float-field relative">
+            <input id="ca-confirm" type="password" placeholder=" " autocomplete="new-password">
+            <label for="ca-confirm">Confirm Password</label>
+            <button type="button" class="pw-toggle" data-toggle-for="ca-confirm" aria-label="Show password">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+            <p class="field-error" data-error-for="ca-confirm">Passwords don't match.</p>
+          </div>
+
+          <label class="field-check"><input type="checkbox" id="ca-terms"> I agree to the <a href="terms.html" target="_blank" class="underline">Terms</a> and <a href="privacy.html" target="_blank" class="underline">Privacy Policy</a>.</label>
+          <label class="field-check"><input type="checkbox" id="ca-newsletter"> Send me new arrivals and offers <span class="font-mono text-[10px]">(optional)</span></label>
+
+          <button id="signup-submit" class="btn-primary font-display bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium tracking-wide py-4 rounded-full w-full flex items-center justify-center gap-2">
+            <span id="signup-label">Create Account</span>
+          </button>
+        </div>
+
+        <button id="show-guest-2" class="link-quiet w-full text-center mt-7 text-sm text-[var(--alt-muted)] underline underline-offset-4">Continue as Guest</button>
+      </section>
+
+      <!-- ============ FORGOT PASSWORD ============ -->
+      <section class="auth-panel" data-panel="forgot">
+        <button id="forgot-back" class="link-quiet text-xs font-mono text-[var(--alt-muted)] mb-5">← Back to Sign In</button>
+        <h1 class="font-display text-2xl font-medium mb-1">Reset your password.</h1>
+        <p class="text-sm text-[var(--alt-muted)] mb-7">Enter the email or phone number on your account.</p>
+
+        <div class="space-y-4">
+          <div class="float-field">
+            <input id="fp-identifier" type="text" placeholder=" ">
+            <label for="fp-identifier">Email or Phone Number</label>
+          </div>
+          <button id="forgot-submit" class="btn-primary font-display bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium tracking-wide py-4 rounded-full w-full">Send Reset Instructions</button>
+        </div>
+
+        <div id="forgot-sent" class="mt-6" style="display:none;">
+          <p class="text-sm text-[var(--alt-muted)] leading-relaxed">If an account exists for that email or phone, we've sent instructions to reset the password.</p>
+          <div class="mt-4 p-4 rounded-[14px] bg-[var(--alt-surface)] border border-[var(--alt-border)]">
+            <p class="font-mono text-[11px] uppercase tracking-widest text-[var(--alt-muted)] mb-2">Prototype shortcut</p>
+            <p class="text-xs text-[var(--alt-muted)] mb-3">This demo has no email delivery — continue here instead of clicking a real emailed link.</p>
+            <button id="forgot-continue" class="text-sm font-medium underline underline-offset-4">Continue to Reset Password</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ RESET PASSWORD ============ -->
+      <section class="auth-panel" data-panel="reset">
+        <h1 class="font-display text-2xl font-medium mb-1">Choose a new password.</h1>
+        <p class="text-sm text-[var(--alt-muted)] mb-7" id="reset-subtitle"></p>
+        <p class="form-error-banner" id="reset-error"></p>
+
+        <div class="space-y-4">
+          <div class="float-field relative">
+            <input id="rp-password" type="password" placeholder=" ">
+            <label for="rp-password">New Password</label>
+            <button type="button" class="pw-toggle" data-toggle-for="rp-password" aria-label="Show password">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="float-field relative">
+            <input id="rp-confirm" type="password" placeholder=" ">
+            <label for="rp-confirm">Confirm New Password</label>
+            <button type="button" class="pw-toggle" data-toggle-for="rp-confirm" aria-label="Show password">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <button id="reset-submit" class="btn-primary font-display bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium tracking-wide py-4 rounded-full w-full">Reset Password</button>
+        </div>
+      </section>
+
+      <!-- ============ VERIFY EMAIL (future-ready) ============ -->
+      <section class="auth-panel" data-panel="verify">
+        <div class="w-14 h-14 rounded-full bg-[var(--alt-surface)] flex items-center justify-center mb-6">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--alt-black)" stroke-width="1.6"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg>
+        </div>
+        <h1 class="font-display text-2xl font-medium mb-1">Verify your email.</h1>
+        <p class="text-sm text-[var(--alt-muted)] leading-relaxed">We've sent a verification link to <span id="verify-email" class="font-medium text-[var(--alt-black)]"></span>. We'll also text a code to verify your phone number once SMS verification is available.</p>
+        <button id="resend-verify" class="link-quiet mt-5 text-sm underline underline-offset-4">Resend email</button>
+        <button id="verify-continue" class="btn-primary font-display bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium tracking-wide py-4 rounded-full w-full mt-7">Continue to Dashboard</button>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const redirectTo = params.get("redirect") || "dashboard.html";
+const guestRedirectTo = params.get("redirect") || "store.html";
+/* Checkout requires an account — no guest bypass on that one flow. */
+const checkoutRequired = params.get("redirect") === "checkout.html";
+if (checkoutRequired){
+  document.getElementById("show-guest-1").style.display = "none";
+  document.getElementById("show-guest-2").style.display = "none";
+  document.getElementById("si-subtitle").textContent = "Sign in to complete your order — checkout requires an account.";
+  document.getElementById("ca-subtitle").textContent = "Create an account to complete your order below.";
+}
+
+/* Already signed in? Skip straight to the dashboard. */
+if (Auth.isLoggedIn()){
+  window.location.href = redirectTo;
+}
+
+let toastTimeout;
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove("show"), 2400);
+}
+
+/* ================================================================
+   PANEL SWITCHING (fade + slide, same language as data-enter)
+   ================================================================ */
+function showPanel(name){
+  document.querySelectorAll(".auth-panel").forEach(p => p.classList.toggle("active", p.dataset.panel === name));
+  const card = document.querySelector(".auth-panel.active").closest("[data-enter]");
+  card.classList.remove("in");
+  requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add("in")));
+}
+
+document.querySelectorAll(".auth-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    document.getElementById("tab-indicator").style.transform = tab.dataset.tab === "signup" ? "translateX(100%)" : "translateX(0)";
+    showPanel(tab.dataset.tab);
+  });
+});
+
+document.getElementById("show-forgot").addEventListener("click", () => showPanel("forgot"));
+document.getElementById("forgot-back").addEventListener("click", () => {
+  document.querySelector('.auth-tab[data-tab="signin"]').click();
+});
+document.getElementById("show-guest-1").addEventListener("click", () => { window.location.href = guestRedirectTo; });
+document.getElementById("show-guest-2").addEventListener("click", () => { window.location.href = guestRedirectTo; });
+
+document.querySelectorAll('[data-provider]').forEach(btn => {
+  btn.addEventListener("click", () => showToast(`Sign in with ${btn.dataset.provider} is coming soon.`));
+});
+
+/* ================================================================
+   PASSWORD VISIBILITY TOGGLES
+   ================================================================ */
+document.querySelectorAll(".pw-toggle").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const input = document.getElementById(btn.dataset.toggleFor);
+    const showing = input.type === "text";
+    input.type = showing ? "password" : "text";
+    btn.setAttribute("aria-label", showing ? "Show password" : "Hide password");
+  });
+});
+
+/* ================================================================
+   VALIDATION HELPERS
+   ================================================================ */
+const PHONE_RE = /^(\+?880|0)1[3-9]\d{8}$/;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function setFieldError(id, show){
+  document.getElementById(id).classList.toggle("invalid", show);
+  const err = document.querySelector(`.field-error[data-error-for="${id}"]`);
+  if (err) err.classList.toggle("show", show);
+}
+function showFormError(id, msg){
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.toggle("show", !!msg);
+}
+
+/* ================================================================
+   PASSWORD STRENGTH METER
+   ================================================================ */
+const caPassword = document.getElementById("ca-password");
+caPassword.addEventListener("input", () => {
+  const { score, label } = Auth.passwordStrength(caPassword.value);
+  const segs = caPassword.closest(".float-field").querySelectorAll(".strength-seg");
+  const colors = ["var(--alt-border)", "#B23B3B", "#B8863C", "#3F8F5F", "#0A0A0A"];
+  segs.forEach((seg, i) => { seg.style.background = i < score ? colors[score] : "var(--alt-border)"; });
+  document.getElementById("strength-label").textContent = caPassword.value ? label : "Use 8+ characters with a mix of letters, numbers & symbols.";
+});
+
+/* ================================================================
+   SIGN IN
+   ================================================================ */
+async function doSignin(){
+  const identifier = document.getElementById("si-identifier").value.trim();
+  const password = document.getElementById("si-password").value;
+  const btn = document.getElementById("signin-submit");
+  btn.disabled = true;
+  document.getElementById("signin-label").innerHTML = `<span class="spinner"></span> Signing in…`;
+
+  const remember = document.getElementById("si-remember").checked;
+  const result = await Auth.login({ identifier, password, rememberMe: remember });
+
+  btn.disabled = false;
+  document.getElementById("signin-label").textContent = "Sign In";
+
+  if (!result.ok){ showFormError("signin-error", result.error); return; }
+  window.location.href = redirectTo;
+}
+document.getElementById("signin-submit").addEventListener("click", () => {
+  showFormError("signin-error", "");
+  const identifier = document.getElementById("si-identifier").value.trim();
+  const password = document.getElementById("si-password").value;
+  if (!identifier || !password){
+    showFormError("signin-error", "Enter your email or phone number and password.");
+    return;
+  }
+  if (isSuspiciousSubmission(document.getElementById("si-hp"))){
+    runHumanCheck(document.getElementById("signin-submit").parentElement, doSignin);
+    return;
+  }
+  doSignin();
+});
+
+/* ================================================================
+   CREATE ACCOUNT
+   ================================================================ */
+async function doSignup(){
+  const first = document.getElementById("ca-first").value.trim();
+  const last = document.getElementById("ca-last").value.trim();
+  const email = document.getElementById("ca-email").value.trim();
+  const phone = document.getElementById("ca-phone").value.trim();
+  const password = document.getElementById("ca-password").value;
+  const newsletter = document.getElementById("ca-newsletter").checked;
+
+  const btn = document.getElementById("signup-submit");
+  btn.disabled = true;
+  document.getElementById("signup-label").innerHTML = `<span class="spinner"></span> Creating account…`;
+
+  const result = await Auth.signup({ firstName: first, lastName: last, email, phone, password, newsletter });
+
+  btn.disabled = false;
+  document.getElementById("signup-label").textContent = "Create Account";
+
+  if (!result.ok){ showFormError("signup-error", result.error); return; }
+
+  document.getElementById("verify-email").textContent = email;
+  showPanel("verify");
+}
+document.getElementById("signup-submit").addEventListener("click", () => {
+  showFormError("signup-error", "");
+  const first = document.getElementById("ca-first").value.trim();
+  const last = document.getElementById("ca-last").value.trim();
+  const email = document.getElementById("ca-email").value.trim();
+  const phone = document.getElementById("ca-phone").value.trim();
+  const password = document.getElementById("ca-password").value;
+  const confirm = document.getElementById("ca-confirm").value;
+  const terms = document.getElementById("ca-terms").checked;
+
+  const emailOk = EMAIL_RE.test(email);
+  const phoneOk = PHONE_RE.test(phone);
+  const confirmOk = password.length > 0 && password === confirm;
+  setFieldError("ca-email", !emailOk);
+  setFieldError("ca-phone", !phoneOk);
+  setFieldError("ca-confirm", !confirmOk);
+
+  if (!first || !last || !emailOk || !phoneOk || !confirmOk){
+    showFormError("signup-error", "Please fix the highlighted fields.");
+    return;
+  }
+  if (!terms){ showFormError("signup-error", "Please accept the Terms and Privacy Policy to continue."); return; }
+
+  if (isSuspiciousSubmission(document.getElementById("ca-hp"))){
+    runHumanCheck(document.getElementById("signup-submit").parentElement, doSignup);
+    return;
+  }
+  doSignup();
+});
+document.getElementById("verify-continue").addEventListener("click", () => { window.location.href = redirectTo; });
+document.getElementById("resend-verify").addEventListener("click", () => showToast("Verification email resent."));
+
+/* ================================================================
+   FORGOT / RESET PASSWORD
+   ================================================================ */
+let resetIdentifier = null;
+document.getElementById("forgot-submit").addEventListener("click", () => {
+  const identifier = document.getElementById("fp-identifier").value.trim();
+  if (!identifier) return;
+  resetIdentifier = identifier;
+  document.getElementById("forgot-sent").style.display = "block";
+  document.getElementById("forgot-submit").closest(".space-y-4").style.display = "none";
+});
+document.getElementById("forgot-continue").addEventListener("click", () => {
+  const user = Auth.findByIdentifier(resetIdentifier);
+  document.getElementById("reset-subtitle").textContent = user
+    ? `Resetting the password for ${user.email}.`
+    : "We couldn't find that account, but you can still try again from Sign In.";
+  showPanel("reset");
+});
+document.getElementById("reset-submit").addEventListener("click", async () => {
+  showFormError("reset-error", "");
+  const pw = document.getElementById("rp-password").value;
+  const confirm = document.getElementById("rp-confirm").value;
+  if (pw.length < 8){ showFormError("reset-error", "Use at least 8 characters."); return; }
+  if (pw !== confirm){ showFormError("reset-error", "Passwords don't match."); return; }
+
+  const result = await Auth.resetPassword(resetIdentifier, pw);
+  if (!result.ok){ showFormError("reset-error", result.error); return; }
+
+  showToast("Password updated — sign in with your new password.");
+  document.getElementById("si-identifier").value = resetIdentifier;
+  document.querySelector('.auth-tab[data-tab="signin"]').click();
+});
+
+/* ================================================================
+   INIT
+   ================================================================ */
+window.addEventListener("load", () => {
+  document.getElementById("auth-root").classList.add("settled");
+  document.querySelectorAll("[data-enter]").forEach(el => el.classList.add("in"));
+});
+</script>
+
+</body>
+</html>

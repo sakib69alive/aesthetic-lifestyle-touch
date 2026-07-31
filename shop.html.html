@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aesthetic Lifestyle Touch — Store</title>
+
+<!-- ============================================================
+     Same font system as Home + Shop section, for continuity
+     ============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  :root{
+    --alt-white:   #FFFFFF;
+    --alt-surface: #F5F4F1;
+    --alt-black:   #0A0A0A;
+    --alt-border:  #E8E6E1;
+    --alt-beige:   #C9C2B4;
+    --alt-muted:   #8A8A8A;
+  }
+
+  * { -webkit-font-smoothing: antialiased; }
+  body{
+    background: var(--alt-white);
+    font-family: 'Inter', sans-serif;
+    color: var(--alt-black);
+    overflow-x: hidden;
+  }
+  .font-display{ font-family: 'Space Grotesk', sans-serif; }
+  .font-mono{ font-family: 'JetBrains Mono', monospace; }
+  .no-scrollbar::-webkit-scrollbar{ display:none; }
+  .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
+
+  /* ================= NAV (identical to Home) ================= */
+  .nav-glass{
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    border-bottom: 1px solid rgba(232,230,225,0.6);
+  }
+
+  /* ================= ENTRANCE SYSTEM (same pattern as Home) ================= */
+  [data-enter]{
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+  }
+  [data-enter].in{ opacity: 1; transform: translateY(0); }
+
+  /* ================= INCOMING TRANSITION (arrival from Home) ================= */
+  /* Page starts slightly zoomed/blurred and settles — the receiving half
+     of the Home page's "goToStore()" cinematic handoff. */
+  #store-root{
+    opacity: 0;
+    transform: scale(1.05);
+    filter: blur(6px);
+    transition: opacity 1s cubic-bezier(0.16,1,0.3,1), transform 1s cubic-bezier(0.16,1,0.3,1), filter 1s cubic-bezier(0.16,1,0.3,1);
+  }
+  #store-root.settled{
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+
+  /* ================= CATEGORY CHIPS ================= */
+  .chip{
+    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1), background-color 0.25s ease, color 0.25s ease;
+    white-space: nowrap;
+  }
+  .chip:active{ transform: scale(0.96); }
+
+  /* ================= SEARCH / SORT ================= */
+  .glass-input{
+    background: rgba(245,244,241,0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--alt-border);
+  }
+  .glass-input:focus-within{
+    border-color: rgba(10,10,10,0.35);
+  }
+
+  .sort-menu{
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16,1,0.3,1);
+  }
+  .sort-menu.open{
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  /* ================= PRODUCT CARD ================= */
+  .p-card{
+    transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), box-shadow 0.45s ease;
+  }
+  .p-card:hover{
+    transform: translateY(-6px);
+    box-shadow: 0 26px 50px -22px rgba(10,10,10,0.22);
+  }
+  .p-stage{
+    position: relative;
+    aspect-ratio: 1/1;
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--alt-surface);
+  }
+  .p-stage img{
+    width:100%; height:100%; object-fit: cover;
+    transform: scale(1);
+    transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
+  }
+  .p-card:hover .p-stage img{ transform: scale(1.08); }
+  .p-stage .fallback{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(155deg, var(--alt-surface), var(--alt-border));
+    color: var(--alt-muted);
+    font-family:'Space Grotesk', sans-serif;
+    font-size: 0.8rem;
+    text-align:center; padding: 1rem;
+  }
+
+  .p-actions{
+    position:absolute; left:12px; right:12px; bottom:12px;
+    display:flex; gap:8px;
+    opacity: 0; transform: translateY(10px);
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1);
+  }
+  .p-card:hover .p-actions{ opacity:1; transform: translateY(0); }
+
+  .wishlist-btn svg{ transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), fill 0.2s ease, stroke 0.2s ease; }
+  .wishlist-btn.active svg{ fill: var(--alt-black); stroke: var(--alt-black); transform: scale(1.15); }
+  .wishlist-btn:active svg{ transform: scale(0.85); }
+
+  .badge{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  /* ================= MODAL (Quick View) ================= */
+  #modal-backdrop{
+    position: fixed; inset:0; z-index: 90;
+    background: rgba(10,10,10,0.4);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+  #modal-backdrop.open{ opacity: 1; pointer-events: all; }
+
+  #modal-panel{
+    transform: scale(0.94) translateY(10px);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease;
+  }
+  #modal-backdrop.open #modal-panel{
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+
+  .swatch{
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .swatch.selected{ border-color: var(--alt-black); transform: scale(1.1); }
+
+  .size-btn{
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .size-btn.selected{ background: var(--alt-black); color: white; border-color: var(--alt-black); }
+
+  /* ================= TOAST ================= */
+  #toast{
+    position: fixed; bottom: 28px; left: 50%;
+    transform: translate(-50%, 16px);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 95;
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1);
+  }
+  #toast.show{ opacity: 1; transform: translate(-50%, 0); }
+
+  /* ================= FLYING IMAGE (add to cart) ================= */
+  .flying-img{
+    position: fixed;
+    z-index: 96;
+    border-radius: 12px;
+    object-fit: cover;
+    pointer-events: none;
+    transition: transform 0.75s cubic-bezier(0.65,0,0.35,1), opacity 0.75s ease, top 0.75s cubic-bezier(0.65,0,0.35,1), left 0.75s cubic-bezier(0.65,0,0.35,1), width 0.75s cubic-bezier(0.65,0,0.35,1), height 0.75s cubic-bezier(0.65,0,0.35,1);
+  }
+
+  #cart-badge{
+    transform: scale(0);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  #cart-badge.show{ transform: scale(1); }
+  #cart-icon.bump{ animation: cart-bump 0.4s ease; }
+  @keyframes cart-bump{
+    0%,100% { transform: scale(1); }
+    40% { transform: scale(1.22); }
+  }
+
+  /* ================= EMPTY STATE ================= */
+  #empty-state{ display: none; }
+  #empty-state.show{ display: flex; }
+
+  @media (prefers-reduced-motion: reduce){
+    [data-enter], .p-card, .p-stage img, .p-actions, #store-root, #modal-panel, #modal-backdrop, .flying-img, #cart-badge, #cart-icon{
+      transition: none !important;
+      animation: none !important;
+    }
+    [data-enter]{ opacity: 1 !important; transform: none !important; }
+    #store-root{ opacity: 1 !important; transform: none !important; filter:none !important; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ================================================================
+     FIXED NAVIGATION — identical spacing/typography/behavior to Home
+     ================================================================ -->
+<header class="nav-glass fixed top-0 left-0 right-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 md:px-10 h-16 md:h-[72px] flex items-center justify-between">
+
+    <a href="#" class="font-display text-[15px] md:text-base font-medium tracking-tight">
+      AESTHETIC <span class="text-[var(--alt-muted)] font-normal">LIFESTYLE TOUCH</span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-10">
+      <a href="#" class="text-sm font-medium hover:opacity-60 transition-opacity">Home</a>
+      <a href="#store-hero" class="text-sm font-medium hover:opacity-60 transition-opacity">Store</a>
+      <a href="#" class="text-sm font-medium hover:opacity-60 transition-opacity">Collections</a>
+      <a href="#" class="text-sm font-medium hover:opacity-60 transition-opacity">About</a>
+      <a href="#" class="text-sm font-medium hover:opacity-60 transition-opacity">Contact</a>
+    </nav>
+
+    <div class="flex items-center gap-5">
+      <button aria-label="Search" class="hover:opacity-60 transition-opacity">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="M21 21l-4.3-4.3"/>
+        </svg>
+      </button>
+      <button id="cart-icon" aria-label="Cart" class="hover:opacity-60 transition-opacity relative">
+        <svg width="20" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M6 6h15l-1.5 9h-12z"/>
+          <path d="M6 6L4.5 2.5H2"/>
+          <circle cx="9" cy="20" r="1.4" fill="currentColor" stroke="none"/>
+          <circle cx="17" cy="20" r="1.4" fill="currentColor" stroke="none"/>
+        </svg>
+        <span id="cart-badge" class="absolute -top-2 -right-2 bg-[var(--alt-black)] text-white text-[10px] font-mono w-4 h-4 rounded-full flex items-center justify-center">0</span>
+      </button>
+      <button aria-label="Menu" class="md:hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="store-root">
+
+  <!-- ============================================================
+       STORE HERO
+       ============================================================ -->
+  <section id="store-hero" class="pt-40 pb-16 md:pt-48 md:pb-20 px-6 md:px-10">
+    <div class="max-w-3xl mx-auto text-center">
+      <p data-enter class="font-mono text-xs tracking-[0.22em] text-[var(--alt-muted)] uppercase mb-5">
+        003 — Store
+      </p>
+      <h1 data-enter class="font-display text-4xl md:text-6xl font-medium tracking-tight leading-[1.05]" style="transition-delay:0.08s;">
+        Our Collection
+      </h1>
+      <p data-enter class="mt-6 text-base md:text-lg text-[var(--alt-muted)] leading-relaxed max-w-xl mx-auto" style="transition-delay:0.16s;">
+        Every piece here is chosen the same way — for material, proportion,
+        and the quiet way it fits into daily life. Nothing is added just to fill a shelf.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CATEGORY CHIPS + SEARCH/SORT
+       ============================================================ -->
+  <section class="max-w-7xl mx-auto px-6 md:px-10" data-enter>
+
+    <!-- Category chips -->
+    <div id="chip-row" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- Search + Sort -->
+    <div class="mt-6 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+
+      <!-- Search -->
+      <div class="glass-input flex items-center gap-3 rounded-full px-5 py-3 w-full sm:max-w-xs">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="text-[var(--alt-muted)] shrink-0">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="M21 21l-4.3-4.3"/>
+        </svg>
+        <input id="search-input" type="text" placeholder="Search products"
+               class="bg-transparent outline-none text-sm w-full placeholder:text-[var(--alt-muted)]" />
+      </div>
+
+      <!-- Sort -->
+      <div class="relative shrink-0">
+        <button id="sort-toggle" class="flex items-center gap-2 text-sm font-medium px-5 py-3 rounded-full border border-[var(--alt-border)] hover:border-[var(--alt-black)] transition-colors">
+          <span id="sort-label">Featured</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </button>
+        <div id="sort-menu" class="sort-menu absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-[0_20px_50px_-15px_rgba(10,10,10,0.25)] border border-[var(--alt-border)] py-2 z-20">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PRODUCT GRID
+       ============================================================ -->
+  <section class="max-w-7xl mx-auto px-6 md:px-10 py-14 md:py-16">
+    <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-14 md:gap-x-8 md:gap-y-16">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="flex-col items-center text-center py-20">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--alt-muted)" stroke-width="1.4" class="mb-5">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="M21 21l-4.3-4.3"/>
+      </svg>
+      <h3 class="font-display text-xl font-medium">Nothing matches yet</h3>
+      <p class="mt-2 text-sm text-[var(--alt-muted)] max-w-xs">
+        Try a different search term, or clear your filters to see the full collection.
+      </p>
+      <button id="clear-filters" class="mt-6 px-6 py-3 rounded-full bg-[var(--alt-black)] text-white text-sm font-medium hover:opacity-90 transition-opacity">
+        Clear filters
+      </button>
+    </div>
+  </section>
+
+</div>
+
+<!-- ================================================================
+     QUICK VIEW MODAL
+     ================================================================ -->
+<div id="modal-backdrop">
+  <div class="fixed inset-0 flex items-center justify-center p-4 md:p-8">
+    <div id="modal-panel" class="bg-white rounded-[26px] w-full max-w-3xl max-h-[88vh] overflow-y-auto shadow-[0_40px_100px_-30px_rgba(10,10,10,0.4)]">
+      <div class="grid grid-cols-1 md:grid-cols-2">
+
+        <!-- Image -->
+        <div class="p-6 md:p-8">
+          <div class="p-stage" id="modal-image-stage">
+            <img id="modal-img" src="" alt="" />
+            <div class="fallback" id="modal-fallback" style="display:none;"></div>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div class="p-6 md:p-8 md:pl-0 flex flex-col">
+          <div class="flex items-start justify-between">
+            <div>
+              <h2 id="modal-name" class="font-display text-2xl font-medium"></h2>
+              <p id="modal-rating" class="text-xs text-[var(--alt-muted)] mt-1 font-mono"></p>
+            </div>
+            <button id="modal-close" aria-label="Close" class="shrink-0 w-9 h-9 rounded-full border border-[var(--alt-border)] flex items-center justify-center hover:bg-[var(--alt-surface)] transition-colors">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 6l12 12M18 6L6 18"/>
+              </svg>
+            </button>
+          </div>
+
+          <p id="modal-price" class="font-mono text-lg mt-4"></p>
+          <p id="modal-desc" class="text-sm text-[var(--alt-muted)] leading-relaxed mt-3"></p>
+
+          <!-- Colors -->
+          <div class="mt-6">
+            <p class="font-mono text-[11px] tracking-widest uppercase text-[var(--alt-muted)] mb-3">Color</p>
+            <div id="modal-colors" class="flex items-center gap-3"></div>
+          </div>
+
+          <!-- Sizes -->
+          <div id="modal-size-wrap" class="mt-6">
+            <p class="font-mono text-[11px] tracking-widest uppercase text-[var(--alt-muted)] mb-3">Size</p>
+            <div id="modal-sizes" class="flex items-center gap-2"></div>
+          </div>
+
+          <!-- Quantity -->
+          <div class="mt-6">
+            <p class="font-mono text-[11px] tracking-widest uppercase text-[var(--alt-muted)] mb-3">Quantity</p>
+            <div class="flex items-center gap-4 border border-[var(--alt-border)] rounded-full w-fit px-2 py-1.5">
+              <button id="qty-minus" class="w-7 h-7 flex items-center justify-center text-lg hover:opacity-60">–</button>
+              <span id="qty-value" class="font-mono text-sm w-5 text-center">1</span>
+              <button id="qty-plus" class="w-7 h-7 flex items-center justify-center text-lg hover:opacity-60">+</button>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="mt-8 flex flex-col gap-3">
+            <button id="modal-add-cart" class="w-full py-4 rounded-full bg-[var(--alt-black)] text-white text-sm font-medium hover:opacity-90 transition-opacity">
+              Add to Cart
+            </button>
+            <button id="modal-buy-now" class="w-full py-4 rounded-full border border-[var(--alt-black)] text-sm font-medium hover:bg-[var(--alt-surface)] transition-colors">
+              Buy Now
+            </button>
+            <button id="modal-wishlist" class="wishlist-btn w-full py-3 text-sm font-medium flex items-center justify-center gap-2 text-[var(--alt-muted)] hover:text-[var(--alt-black)] transition-colors">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4 6 4c2 0 3.5 1 4.5 2.6C11.5 5 13 4 15 4c4 0 5.6 4.1 4 7.7C19.5 16.1 12 21 12 21z"/>
+              </svg>
+              <span id="modal-wishlist-label">Add to wishlist</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="bg-[var(--alt-black)] text-white text-sm font-medium px-6 py-3.5 rounded-full shadow-[0_20px_40px_-15px_rgba(10,10,10,0.5)]">
+  Added to bag
+</div>
+
+<script>
+/* ================================================================
+   PRODUCT DATA
+   Reusable source of truth — cards, modal, and cart all read from
+   this array. Swap this for an API response later without touching
+   render logic.
+   ================================================================ */
+const PRODUCTS = [
+  { id: 1,  name: "Aura Headphones",     price: 189, rating: 4.8, reviews: 124, tags: ["tech","new-arrivals"],            badge: "New",      desc: "Matte ceramic shell with adaptive spatial audio, tuned for long, quiet listening.", img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=900&q=80&auto=format&fit=crop", colors: ["#0A0A0A","#C9C2B4","#E8E6E1"] },
+  { id: 2,  name: "Halo Desk Lamp",      price: 96,  rating: 4.6, reviews: 98,  tags: ["desk-setup","trending"],          badge: "Trending", desc: "Anodized aluminum arm with three warmth settings and a weighted, silent base.", img: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=900&q=80&auto=format&fit=crop", colors: ["#0A0A0A","#8A8A8A"] },
+  { id: 3,  name: "Orbit Watch",         price: 249, rating: 4.9, reviews: 210, tags: ["tech","new-arrivals","best-sellers"], badge: "New",  desc: "Sapphire face, ten-day battery, and a clasp machined from a single block of steel.", img: "https://images.unsplash.com/photo-1544117519-31a4b719223d?w=900&q=80&auto=format&fit=crop", colors: ["#0A0A0A","#C9C2B4"] },
+  { id: 4,  name: "Dune Vase",           price: 68,  rating: 4.7, reviews: 56,  tags: ["room-decor","lifestyle"],         badge: null,       desc: "Hand-poured stoneware with a soft matte finish, no two exactly alike.", img: "https://images.unsplash.com/photo-1602874801007-bd458bb1b8b6?w=900&q=80&auto=format&fit=crop", colors: ["#E8E6E1","#C9C2B4"] },
+  { id: 5,  name: "Tray Charger",        price: 79,  rating: 4.5, reviews: 77,  tags: ["desk-setup","gadgets","new-arrivals"], badge: "New", desc: "Three-in-one wireless charging tray finished in woven performance fabric.", img: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=900&q=80&auto=format&fit=crop", colors: ["#0A0A0A","#E8E6E1"] },
+  { id: 6,  name: "Echo Speaker",        price: 129, rating: 4.6, reviews: 143, tags: ["tech","trending","best-sellers"], badge: "Trending", desc: "360° sound from a compact woven shell that looks at home anywhere.", img: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=900&q=80&auto=format&fit=crop", colors: ["#C9C2B4","#0A0A0A"] },
+  { id: 7,  name: "Fold Wallet",         price: 54,  rating: 4.4, reviews: 61,  tags: ["accessories","lifestyle"],        badge: null,       desc: "Full-grain leather, RFID-shielded, breaks in beautifully over the first month.", img: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=900&q=80&auto=format&fit=crop", colors: ["#0A0A0A","#8A8A8A","#C9C2B4"] },
+  { id: 8,  name: "Ember Candle",        price: 42,  rating: 4.8, reviews: 189, tags: ["room-decor","best-sellers"],     badge: null,       desc: "Poured into a matte concrete vessel; sixty hours of clean, quiet burn.", img: "https://images.unsplash.com/photo-1602928321679-560bb453f190?w=900&q=80&auto=format&fit=crop", colors: ["#E8E6E1"] },
+  { id: 9,  name: "Woven Tote",          price: 88,  rating: 4.5, reviews: 44,  tags: ["lifestyle","accessories"],       badge: null,       desc: "Structured canvas tote with leather trim, sized for a laptop and a day out.", img: "https://images.unsplash.com/photo-1591561954557-26941169b49e?w=900&q=80&auto=format&fit=crop", colors: ["#0A0A0A","#C9C2B4"], sizes: ["S","M","L"] },
+  { id: 10, name: "Desk Organizer Tray", price: 58,  rating: 4.3, reviews: 39,  tags: ["desk-setup"],                    badge: null,       desc: "Walnut and powder-coated steel, keeps everything in its place without trying hard.", img: "https://images.unsplash.com/photo-1518106797856-4d7c3e0f1e9a?w=900&q=80&auto=format&fit=crop", colors: ["#8A8A8A","#0A0A0A"] },
+  { id: 11, name: "Ceramic Mug Set",     price: 46,  rating: 4.7, reviews: 72,  tags: ["lifestyle","new-arrivals"],      badge: "New",      desc: "Set of two, thrown by hand with a soft speckled glaze that ages with use.", img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=900&q=80&auto=format&fit=crop", colors: ["#E8E6E1","#C9C2B4"] },
+  { id: 12, name: "Mini Projector",      price: 219, rating: 4.6, reviews: 133, tags: ["gadgets","tech","trending"],     badge: "Trending", desc: "Pocket-sized, 1080p, bright enough for a wall in daylight — genuinely useful.", img: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=900&q=80&auto=format&fit=crop", colors: ["#0A0A0A"] },
+  { id: 13, name: "Leather Card Holder", price: 38,  rating: 4.5, reviews: 29,  tags: ["accessories"],                   badge: null,       desc: "Slim enough to forget it's in your pocket, holds exactly what you need.", img: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=900&q=80&auto=format&fit=crop", colors: ["#0A0A0A","#8A8A8A"] },
+  { id: 14, name: "Aroma Diffuser",      price: 72,  rating: 4.6, reviews: 67,  tags: ["room-decor","new-arrivals"],     badge: "New",      desc: "Ultrasonic, near-silent, with a warm ceramic housing instead of plastic.", img: "https://images.unsplash.com/photo-1602928321679-560bb453f190?w=900&q=80&auto=format&fit=crop", colors: ["#E8E6E1","#C9C2B4"] },
+];
+
+const CATEGORIES = [
+  { label: "All",            slug: "all" },
+  { label: "New Arrivals",   slug: "new-arrivals" },
+  { label: "Trending",       slug: "trending" },
+  { label: "Best Sellers",   slug: "best-sellers" },
+  { label: "Accessories",    slug: "accessories" },
+  { label: "Lifestyle",      slug: "lifestyle" },
+  { label: "Tech",           slug: "tech" },
+  { label: "Desk Setup",     slug: "desk-setup" },
+  { label: "Room Decor",     slug: "room-decor" },
+  { label: "Gadgets",        slug: "gadgets" },
+];
+
+const SORTS = [
+  { label: "Featured",             value: "featured" },
+  { label: "Newest",               value: "newest" },
+  { label: "Most Popular",         value: "popular" },
+  { label: "Price: Low to High",   value: "price-asc" },
+  { label: "Price: High to Low",   value: "price-desc" },
+];
+
+/* ================= STATE ================= */
+let state = {
+  category: "all",
+  sort: "featured",
+  search: "",
+  wishlist: new Set(),
+  cartCount: 0,
+};
+
+/* ================================================================
+   RENDER: CATEGORY CHIPS
+   ================================================================ */
+const chipRow = document.getElementById("chip-row");
+function renderChips(){
+  chipRow.innerHTML = CATEGORIES.map(cat => `
+    <button
+      class="chip shrink-0 px-5 py-2.5 rounded-full text-sm font-medium ${cat.slug === state.category ? 'bg-[var(--alt-black)] text-white' : 'bg-[var(--alt-surface)] text-[var(--alt-black)] hover:bg-[var(--alt-border)]'}"
+      data-slug="${cat.slug}">
+      ${cat.label}
+    </button>
+  `).join("");
+
+  chipRow.querySelectorAll(".chip").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.category = btn.dataset.slug;
+      renderChips();
+      renderGrid();
+    });
+  });
+}
+
+/* ================================================================
+   RENDER: SORT MENU
+   ================================================================ */
+const sortToggle = document.getElementById("sort-toggle");
+const sortMenu = document.getElementById("sort-menu");
+const sortLabel = document.getElementById("sort-label");
+
+function renderSortMenu(){
+  sortMenu.innerHTML = SORTS.map(s => `
+    <button class="sort-item w-full text-left px-5 py-2.5 text-sm hover:bg-[var(--alt-surface)] transition-colors ${s.value === state.sort ? 'font-semibold' : ''}" data-value="${s.value}">
+      ${s.label}
+    </button>
+  `).join("");
+
+  sortMenu.querySelectorAll(".sort-item").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.sort = btn.dataset.value;
+      sortLabel.textContent = SORTS.find(s => s.value === state.sort).label;
+      sortMenu.classList.remove("open");
+      renderSortMenu();
+      renderGrid();
+    });
+  });
+}
+
+sortToggle.addEventListener("click", (e) => {
+  e.stopPropagation();
+  sortMenu.classList.toggle("open");
+});
+document.addEventListener("click", () => sortMenu.classList.remove("open"));
+
+/* ================================================================
+   SEARCH
+   ================================================================ */
+const searchInput = document.getElementById("search-input");
+let searchDebounce;
+searchInput.addEventListener("input", (e) => {
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(() => {
+    state.search = e.target.value.trim().toLowerCase();
+    renderGrid();
+  }, 150);
+});
+
+/* ================================================================
+   FILTER + SORT PIPELINE
+   ================================================================ */
+function getVisibleProducts(){
+  let list = PRODUCTS.filter(p => {
+    const matchesCategory = state.category === "all" || p.tags.includes(state.category);
+    const matchesSearch = state.search === "" ||
+      p.name.toLowerCase().includes(state.search) ||
+      p.desc.toLowerCase().includes(state.search);
+    return matchesCategory && matchesSearch;
+  });
+
+  switch(state.sort){
+    case "newest":     list = list.slice().sort((a,b) => b.id - a.id); break;
+    case "popular":    list = list.slice().sort((a,b) => b.reviews - a.reviews); break;
+    case "price-asc":  list = list.slice().sort((a,b) => a.price - b.price); break;
+    case "price-desc": list = list.slice().sort((a,b) => b.price - a.price); break;
+    default: break; // "featured" = original curated order
+  }
+  return list;
+}
+
+/* ================================================================
+   RENDER: PRODUCT GRID (reusable card template)
+   ================================================================ */
+const grid = document.getElementById("product-grid");
+const emptyState = document.getElementById("empty-state");
+
+function starString(rating){
+  const full = Math.round(rating);
+  return "★".repeat(full) + "☆".repeat(5 - full);
+}
+
+function productCardHTML(p){
+  const isWished = state.wishlist.has(p.id);
+  return `
+    <article class="p-card group cursor-pointer" data-id="${p.id}">
+      <div class="p-stage">
+        <img src="${p.img}" alt="${p.name}" loading="lazy"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+        <div class="fallback" style="display:none;">${p.name}</div>
+
+        ${p.badge ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 backdrop-blur px-2.5 py-1 rounded-full">${p.badge}</span>` : ""}
+
+        <button class="wishlist-btn ${isWished ? 'active' : ''} absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center" data-action="wishlist" aria-label="Add to wishlist">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4 6 4c2 0 3.5 1 4.5 2.6C11.5 5 13 4 15 4c4 0 5.6 4.1 4 7.7C19.5 16.1 12 21 12 21z"/>
+          </svg>
+        </button>
+
+        <div class="p-actions">
+          <button class="flex-1 py-2.5 rounded-full bg-white/95 backdrop-blur text-xs font-medium hover:bg-white transition-colors" data-action="quickview">
+            Quick View
+          </button>
+          <button class="flex-1 py-2.5 rounded-full bg-[var(--alt-black)] text-white text-xs font-medium hover:opacity-90 transition-opacity" data-action="addcart">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div class="flex items-start justify-between gap-2">
+          <h3 class="font-display text-[15px] font-medium leading-snug">${p.name}</h3>
+          <span class="font-mono text-sm shrink-0">$${p.price}</span>
+        </div>
+        <p class="text-[13px] text-[var(--alt-muted)] mt-1 leading-snug">${p.desc}</p>
+        <p class="text-[11px] text-[var(--alt-muted)] mt-2 font-mono">
+          <span style="color:var(--alt-black)">${starString(p.rating)}</span> ${p.rating} (${p.reviews})
+        </p>
+      </div>
+    </article>
+  `;
+}
+
+function renderGrid(){
+  const visible = getVisibleProducts();
+
+  if (visible.length === 0){
+    grid.style.display = "none";
+    emptyState.classList.add("show");
+    return;
+  }
+  grid.style.display = "grid";
+  emptyState.classList.remove("show");
+
+  grid.innerHTML = visible.map(productCardHTML).join("");
+
+  // stagger a light reveal on re-render
+  grid.querySelectorAll(".p-card").forEach((card, i) => {
+    card.style.opacity = 0;
+    card.style.transform = "translateY(16px)";
+    requestAnimationFrame(() => {
+      card.style.transition = `opacity 0.5s ease ${i * 40}ms, transform 0.5s cubic-bezier(0.16,1,0.3,1) ${i * 40}ms`;
+      card.style.opacity = 1;
+      card.style.transform = "translateY(0)";
+    });
+  });
+
+  // wire up card interactions
+  grid.querySelectorAll(".p-card").forEach(card => {
+    const id = Number(card.dataset.id);
+
+    card.querySelector('[data-action="wishlist"]').addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleWishlist(id, e.currentTarget);
+    });
+
+    card.querySelector('[data-action="quickview"]').addEventListener("click", (e) => {
+      e.stopPropagation();
+      openQuickView(id);
+    });
+
+    card.querySelector('[data-action="addcart"]').addEventListener("click", (e) => {
+      e.stopPropagation();
+      const imgEl = card.querySelector(".p-stage img");
+      addToCart(id, imgEl);
+    });
+
+    // whole-card click -> product page transition (PDP not built yet)
+    card.addEventListener("click", () => goToProduct(id));
+  });
+}
+
+document.getElementById("clear-filters").addEventListener("click", () => {
+  state.category = "all";
+  state.sort = "featured";
+  state.search = "";
+  searchInput.value = "";
+  sortLabel.textContent = "Featured";
+  renderChips();
+  renderSortMenu();
+  renderGrid();
+});
+
+/* ================================================================
+   WISHLIST
+   ================================================================ */
+function toggleWishlist(id, btnEl){
+  if (state.wishlist.has(id)){
+    state.wishlist.delete(id);
+    btnEl.classList.remove("active");
+  } else {
+    state.wishlist.add(id);
+    btnEl.classList.add("active");
+  }
+}
+
+/* ================================================================
+   QUICK VIEW MODAL
+   ================================================================ */
+const modalBackdrop = document.getElementById("modal-backdrop");
+const modalImg = document.getElementById("modal-img");
+const modalFallback = document.getElementById("modal-fallback");
+let modalQty = 1;
+let modalProductId = null;
+let modalColor = null;
+let modalSize = null;
+
+function openQuickView(id){
+  const p = PRODUCTS.find(x => x.id === id);
+  modalProductId = id;
+  modalQty = 1;
+  modalColor = p.colors[0];
+  modalSize = p.sizes ? p.sizes[0] : null;
+
+  modalImg.src = p.img;
+  modalImg.alt = p.name;
+  modalImg.style.display = "";
+  modalFallback.style.display = "none";
+  modalFallback.textContent = p.name;
+  modalImg.onerror = () => { modalImg.style.display = "none"; modalFallback.style.display = "flex"; };
+
+  document.getElementById("modal-name").textContent = p.name;
+  document.getElementById("modal-rating").innerHTML = `<span style="color:var(--alt-black)">${starString(p.rating)}</span> ${p.rating} · ${p.reviews} reviews`;
+  document.getElementById("modal-price").textContent = `$${p.price}`;
+  document.getElementById("modal-desc").textContent = p.desc;
+  document.getElementById("qty-value").textContent = "1";
+
+  // colors
+  document.getElementById("modal-colors").innerHTML = p.colors.map((c,i) => `
+    <button class="swatch ${i===0 ? 'selected' : ''}" style="background:${c};" data-color="${c}"></button>
+  `).join("");
+  document.querySelectorAll("#modal-colors .swatch").forEach(sw => {
+    sw.addEventListener("click", () => {
+      document.querySelectorAll("#modal-colors .swatch").forEach(s => s.classList.remove("selected"));
+      sw.classList.add("selected");
+      modalColor = sw.dataset.color;
+    });
+  });
+
+  // sizes (only if product has them)
+  const sizeWrap = document.getElementById("modal-size-wrap");
+  const sizesEl = document.getElementById("modal-sizes");
+  if (p.sizes && p.sizes.length){
+    sizeWrap.style.display = "";
+    sizesEl.innerHTML = p.sizes.map((s,i) => `
+      <button class="size-btn w-10 h-10 rounded-full border border-[var(--alt-border)] text-sm ${i===0 ? 'selected' : ''}" data-size="${s}">${s}</button>
+    `).join("");
+    sizesEl.querySelectorAll(".size-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        sizesEl.querySelectorAll(".size-btn").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        modalSize = btn.dataset.size;
+      });
+    });
+  } else {
+    sizeWrap.style.display = "none";
+  }
+
+  // wishlist state in modal
+  const wishBtn = document.getElementById("modal-wishlist");
+  const wishLabel = document.getElementById("modal-wishlist-label");
+  function syncModalWishlist(){
+    const active = state.wishlist.has(id);
+    wishBtn.classList.toggle("active", active);
+    wishLabel.textContent = active ? "In your wishlist" : "Add to wishlist";
+  }
+  syncModalWishlist();
+  wishBtn.onclick = () => { toggleWishlist(id, wishBtn); syncModalWishlist(); renderGrid(); };
+
+  modalBackdrop.classList.add("open");
+}
+
+document.getElementById("qty-minus").addEventListener("click", () => {
+  modalQty = Math.max(1, modalQty - 1);
+  document.getElementById("qty-value").textContent = modalQty;
+});
+document.getElementById("qty-plus").addEventListener("click", () => {
+  modalQty += 1;
+  document.getElementById("qty-value").textContent = modalQty;
+});
+
+function closeModal(){ modalBackdrop.classList.remove("open"); }
+document.getElementById("modal-close").addEventListener("click", closeModal);
+modalBackdrop.addEventListener("click", (e) => { if (e.target === modalBackdrop) closeModal(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+document.getElementById("modal-add-cart").addEventListener("click", () => {
+  addToCart(modalProductId, modalImg, modalQty);
+  closeModal();
+});
+document.getElementById("modal-buy-now").addEventListener("click", () => {
+  addToCart(modalProductId, modalImg, modalQty);
+  closeModal();
+  showToast("Taking you to checkout…");
+});
+
+/* ================================================================
+   ADD TO CART — flying image + badge bump + toast
+   ================================================================ */
+const cartIcon = document.getElementById("cart-icon");
+const cartBadge = document.getElementById("cart-badge");
+const toast = document.getElementById("toast");
+
+function addToCart(id, sourceImgEl, qty = 1){
+  state.cartCount += qty;
+  cartBadge.textContent = state.cartCount;
+  cartBadge.classList.add("show");
+  cartIcon.classList.remove("bump");
+  void cartIcon.offsetWidth; // restart animation
+  cartIcon.classList.add("bump");
+
+  flyToCart(sourceImgEl);
+  showToast("Added to bag");
+}
+
+function flyToCart(sourceImgEl){
+  if (!sourceImgEl || !sourceImgEl.getBoundingClientRect) return;
+  const startRect = sourceImgEl.getBoundingClientRect();
+  const endRect = cartIcon.getBoundingClientRect();
+
+  const clone = sourceImgEl.cloneNode(true);
+  clone.className = "flying-img";
+  clone.style.top = `${startRect.top}px`;
+  clone.style.left = `${startRect.left}px`;
+  clone.style.width = `${startRect.width}px`;
+  clone.style.height = `${startRect.height}px`;
+  clone.style.opacity = "0.95";
+  document.body.appendChild(clone);
+
+  requestAnimationFrame(() => {
+    clone.style.top = `${endRect.top + endRect.height/2 - 10}px`;
+    clone.style.left = `${endRect.left + endRect.width/2 - 10}px`;
+    clone.style.width = "20px";
+    clone.style.height = "20px";
+    clone.style.opacity = "0.2";
+  });
+
+  setTimeout(() => clone.remove(), 800);
+}
+
+let toastTimeout;
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add("show");
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove("show"), 2200);
+}
+
+/* ================================================================
+   PRODUCT PAGE TRANSITION HOOK
+   Card click -> future PDP. Not built yet (Step 4); this just
+   prepares the cinematic handoff the same way Home -> Store worked.
+   ================================================================ */
+function goToProduct(id){
+  document.getElementById("store-root").style.transition = "opacity 0.6s ease, transform 0.6s cubic-bezier(0.65,0,0.35,1), filter 0.6s ease";
+  document.getElementById("store-root").style.opacity = "0";
+  document.getElementById("store-root").style.transform = "scale(1.03)";
+  document.getElementById("store-root").style.filter = "blur(4px)";
+  setTimeout(() => {
+    // Hook point: mount/navigate to the Product Details page (Step 4) here.
+    console.log("Navigate to product detail page for product id:", id);
+    // Reset visually for now since PDP doesn't exist yet.
+    document.getElementById("store-root").style.opacity = "1";
+    document.getElementById("store-root").style.transform = "scale(1)";
+    document.getElementById("store-root").style.filter = "blur(0px)";
+  }, 650);
+}
+
+/* ================================================================
+   INIT
+   ================================================================ */
+renderChips();
+renderSortMenu();
+renderGrid();
+
+window.addEventListener("load", () => {
+  document.getElementById("store-root").classList.add("settled");
+  document.querySelectorAll("[data-enter]").forEach(el => el.classList.add("in"));
+});
+</script>
+
+</body>
+</html>

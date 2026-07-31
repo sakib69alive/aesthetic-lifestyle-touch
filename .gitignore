@@ -1,0 +1,7 @@
+# Editor/OS cruft — not needed in the public repo
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+
+# server/ has its own .gitignore (node_modules, .env, payments.sqlite)

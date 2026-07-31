@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<script>(function(){try{var t=localStorage.getItem("alt_theme_v1");if(t==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0A0A0A" />
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Checkout — Aesthetic Lifestyle Touch</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="products-data.js"></script>
+<script src="auth.js"></script>
+<script src="theme.js"></script>
+<script src="cart.js"></script>
+<script src="order-service.js"></script>
+<script src="loyalty.js"></script>
+<script src="rewards-engine.js"></script>
+<script src="scratch-card-ui.js"></script>
+<link rel="stylesheet" href="cart.css">
+<link rel="stylesheet" href="scratch-card.css">
+<script src="loader.js"></script>
+<link rel="stylesheet" href="loader.css">
+<link rel="stylesheet" href="mobile.css">
+
+<style>
+  :root{
+    --alt-white:   #FFFFFF;
+    --alt-surface: #F5F4F1;
+    --alt-black:   #0A0A0A;
+    --alt-border:  #E8E6E1;
+    --alt-beige:   #C9C2B4;
+    --alt-muted:   #8A8A8A;
+    --alt-good:    #3F8F5F;
+    --alt-warn:    #B8863C;
+    --alt-bad:     #B23B3B;
+  }
+  /* ================= DARK MODE ================= */
+  :root[data-theme="dark"]{
+    --alt-white:   #0A0A0A;
+    --alt-surface: #17160F;
+    --alt-black:   #F5F4F1;
+    --alt-border:  #2C2A22;
+    --alt-beige:   #C9C2B4;
+    --alt-muted:   #9C9890;
+    --alt-good:    #4FAE73;
+    --alt-warn:    #D4A24F;
+    --alt-bad:     #E0655C;
+  }
+  :root[data-theme="dark"] .nav-glass{
+    background: rgba(10,9,7,0.72);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  :root[data-theme="dark"] #stepper{
+    background: rgba(10,9,7,0.85);
+  }
+  :root[data-theme="dark"] img{ filter: brightness(0.92); }
+  * { -webkit-font-smoothing: antialiased; }
+  body{ background: var(--alt-white); font-family:'Inter', sans-serif; color: var(--alt-black); overflow-x: hidden; }
+  .font-display{ font-family:'Space Grotesk', sans-serif; }
+  .font-mono{ font-family:'JetBrains Mono', monospace; }
+  :focus-visible{ outline: 2px solid var(--alt-black); outline-offset: 2px; }
+
+  .nav-glass{
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    border-bottom: 1px solid rgba(232,230,225,0.6);
+  }
+
+  /* ================= INCOMING TRANSITION (from Cart drawer) ================= */
+  #checkout-root{
+    opacity: 0;
+    transform: scale(1.04);
+    filter: blur(6px);
+    transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1), filter 0.9s cubic-bezier(0.16,1,0.3,1);
+  }
+  #checkout-root.settled{ opacity: 1; transform: scale(1); filter: blur(0px); }
+
+  [data-enter]{
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+  }
+  [data-enter].in{ opacity: 1; transform: translateY(0); }
+
+  /* ================= PROGRESS STEPPER ================= */
+  #stepper{
+    position: sticky; top: 64px; z-index: 40;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--alt-border);
+  }
+  .step-track{ display:flex; align-items:center; }
+  .step-dot{
+    width: 26px; height: 26px; border-radius: 999px;
+    border: 1.5px solid var(--alt-border);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--alt-muted);
+    background: var(--alt-white);
+    transition: background-color 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.4s ease, color 0.4s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    flex-shrink: 0;
+  }
+  .step-label{
+    font-size: 12px; font-family:'JetBrains Mono', monospace; letter-spacing:0.05em;
+    color: var(--alt-muted); transition: color 0.4s ease;
+    white-space: nowrap;
+  }
+  .step-line{ height:1px; flex:1; background: var(--alt-border); margin: 0 10px; min-width: 16px; position: relative; overflow: hidden; }
+  .step-line::after{
+    content:""; position:absolute; inset:0; background: var(--alt-black);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+  }
+  .step-item.done .step-dot{ background: var(--alt-black); border-color: var(--alt-black); color: var(--alt-white); }
+  .step-item.active .step-dot{ background: var(--alt-black); border-color: var(--alt-black); color: var(--alt-white); transform: scale(1.15); }
+  .step-item.active .step-label, .step-item.done .step-label{ color: var(--alt-black); font-weight: 500; }
+  .step-item.done + .step-line::after{ transform: scaleX(1); }
+
+  /* ================= FORM FIELDS ================= */
+  .field-label{ font-size: 12px; color: var(--alt-muted); margin-bottom: 6px; display:block; }
+  .field-input{
+    width: 100%;
+    background: var(--alt-surface);
+    border: 1px solid var(--alt-border);
+    border-radius: 14px;
+    padding: 13px 16px;
+    font-size: 14px;
+    color: var(--alt-black);
+    outline: none;
+    transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .field-input:focus{ border-color: var(--alt-black); background: var(--alt-white); box-shadow: 0 0 0 3px rgba(10,10,10,0.06); }
+  .field-input.invalid{ border-color: var(--alt-bad); }
+  select.field-input{ appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A8A8A' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; background-size: 14px; padding-right: 40px; }
+  .field-error{
+    font-size: 11.5px; color: var(--alt-bad); margin-top: 6px;
+    opacity: 0; max-height: 0; overflow: hidden;
+    transition: opacity 0.25s ease, max-height 0.25s ease;
+  }
+  .field-error.show{ opacity: 1; max-height: 30px; }
+  .field-check{
+    display:flex; align-items:center; gap: 10px; font-size: 13px; color: var(--alt-muted); cursor: pointer;
+  }
+  .field-check input{ width:16px; height:16px; accent-color: var(--alt-black); }
+
+  /* ================= SELECTABLE CARDS (delivery / payment) ================= */
+  .select-card{
+    border: 1.5px solid var(--alt-border);
+    border-radius: 18px;
+    padding: 16px;
+    cursor: pointer;
+    transition: border-color 0.25s ease, transform 0.25s cubic-bezier(0.16,1,0.3,1), box-shadow 0.25s ease, background-color 0.25s ease;
+    position: relative;
+  }
+  .select-card:hover{ transform: translateY(-2px); box-shadow: 0 16px 32px -18px rgba(10,10,10,0.2); }
+  .select-card.selected{ border-color: var(--alt-black); background: var(--alt-surface); }
+  .select-card.disabled{ opacity: 0.45; cursor: not-allowed; }
+  .select-card.disabled:hover{ transform:none; box-shadow:none; }
+  .select-radio{
+    width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid var(--alt-border);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    transition: border-color 0.25s ease;
+  }
+  .select-radio::after{
+    content:""; width: 9px; height: 9px; border-radius: 999px; background: var(--alt-black);
+    transform: scale(0); transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .select-card.selected .select-radio{ border-color: var(--alt-black); }
+  .select-card.selected .select-radio::after{ transform: scale(1); }
+
+  /* ================= REVIEW ================= */
+  .review-block{ border-top: 1px solid var(--alt-border); padding: 20px 0; }
+  .review-block:first-child{ border-top: none; padding-top: 0; }
+  .edit-link{ font-size: 12px; font-family:'JetBrains Mono', monospace; text-decoration: underline; text-underline-offset: 3px; transition: opacity 0.2s ease; }
+  .edit-link:hover{ opacity: 0.55; }
+
+  /* ================= ORDER SUMMARY ================= */
+  .summary-row{ display:flex; align-items:baseline; justify-content:space-between; font-size: 13.5px; padding: 6px 0; color: var(--alt-muted); }
+  .summary-row.total{ color: var(--alt-black); font-size: 17px; padding-top: 14px; margin-top: 6px; border-top: 1px solid var(--alt-border); }
+
+  /* ================= PRIMARY / MAGNETIC BUTTON ================= */
+  .btn-primary{
+    position: relative;
+    transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s ease, opacity 0.3s ease;
+    box-shadow: 0 8px 24px -8px rgba(10,10,10,0.35);
+  }
+  .btn-primary::after{
+    content:""; position:absolute; inset:-2px; border-radius: inherit;
+    background: radial-gradient(60% 60% at 50% 50%, rgba(201,194,180,0.55), transparent 70%);
+    opacity: 0; transition: opacity 0.4s ease; z-index: -1; filter: blur(14px);
+  }
+  .btn-primary:hover::after{ opacity: 1; }
+  .btn-primary:hover{ box-shadow: 0 16px 40px -10px rgba(10,10,10,0.45); }
+  .btn-primary:disabled{ opacity: 0.45; box-shadow: none; cursor: not-allowed; }
+  .btn-primary:disabled::after{ opacity: 0; }
+
+  .spinner{
+    width: 16px; height: 16px; border-radius: 999px;
+    border: 2px solid rgba(255,255,255,0.35); border-top-color: var(--alt-white);
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  /* ================= STEP PANEL TRANSITIONS ================= */
+  .step-panel{ display: none; }
+  .step-panel.active{ display: block; }
+
+  /* ================= PROCESSING / SUCCESS / FAILURE ================= */
+  #checkout-complete{ display: none; }
+  #checkout-complete.show{ display: flex; }
+  .state-view{ display: none; }
+  .state-view.active{ display: flex; }
+
+  .success-ring{
+    width: 88px; height: 88px; border-radius: 999px;
+    border: 1.5px solid var(--alt-border);
+    display:flex; align-items:center; justify-content:center;
+    position: relative;
+  }
+  .success-check{
+    width: 34px; height: 26px;
+  }
+  .success-check path{
+    stroke: var(--alt-black); stroke-width: 2.4; fill: none;
+    stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 40; stroke-dashoffset: 40;
+    animation: draw-check 0.6s ease-out 0.3s forwards;
+  }
+  @keyframes draw-check{ to{ stroke-dashoffset: 0; } }
+  .success-ring::before{
+    content:""; position:absolute; inset:-6px; border-radius: 999px;
+    border: 1.5px solid var(--alt-border);
+    opacity: 0; transform: scale(0.8);
+    animation: ring-pulse 1s ease-out 0.2s forwards;
+  }
+  @keyframes ring-pulse{ 0%{ opacity: 0.6; transform: scale(0.8); } 100%{ opacity: 0; transform: scale(1.3); } }
+
+  .processing-track{ width: 220px; height: 2px; background: var(--alt-border); border-radius: 999px; overflow: hidden; }
+  .processing-fill{ height: 100%; width: 30%; background: var(--alt-black); border-radius: 999px; animation: processing-slide 1.1s ease-in-out infinite; }
+  @keyframes processing-slide{ 0%{ transform: translateX(-100%); } 100%{ transform: translateX(320%); } }
+
+  /* ================= MOBILE STICKY BAR ================= */
+  #checkout-mobile-bar{
+    position: fixed; left:0; right:0; bottom:0; z-index: 60;
+    background: rgba(255,255,255,0.94);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--alt-border);
+  }
+
+  #checkout-empty{ display:none; }
+  #checkout-empty.show{ display:flex; }
+
+  .no-scrollbar::-webkit-scrollbar{ display:none; }
+  .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
+
+  @media (prefers-reduced-motion: reduce){
+    [data-enter], #checkout-root, .step-dot, .step-line::after, .select-card, .btn-primary, .success-check path, .success-ring::before, .processing-fill, .spinner{
+      transition: none !important; animation: none !important;
+    }
+    [data-enter]{ opacity:1 !important; transform:none !important; }
+    #checkout-root{ opacity:1 !important; transform:none !important; filter:none !important; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ================================================================
+     INITIAL LOADING SCREEN -- see loader.js/loader.css
+     ================================================================ -->
+<div id="site-loader" aria-hidden="true">
+  <div class="sl-glow"></div>
+  <p class="sl-mark">AESTHETIC <span>LIFESTYLE TOUCH</span></p>
+  <div class="sl-progress-track"><div class="sl-progress-fill"></div></div>
+</div>
+
+<!-- ================================================================
+     MINIMAL HEADER — deliberately stripped of nav links/cart icon.
+     Checkout is a focused flow; every extra exit point costs conversions.
+     ================================================================ -->
+<header class="nav-glass fixed top-0 left-0 right-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
+    <a href="Home.html" class="font-display text-[15px] font-medium tracking-tight">
+      AESTHETIC <span class="text-[var(--alt-muted)] font-normal">LIFESTYLE TOUCH</span>
+    </a>
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 text-[var(--alt-muted)] font-mono text-xs tracking-wide">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></svg>
+        Secure Checkout
+      </div>
+      <button type="button" class="theme-toggle-btn theme-toggle-icon-btn" aria-label="Toggle dark mode">
+        <svg class="theme-icon-light" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="theme-icon-dark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="checkout-root">
+
+  <!-- ============================================================
+       PROGRESS STEPPER
+       ============================================================ -->
+  <nav id="stepper" aria-label="Checkout progress">
+    <div class="max-w-5xl mx-auto px-6 md:px-10 py-5 overflow-x-auto no-scrollbar">
+      <div class="step-track min-w-[560px]">
+        <div class="step-item done" data-step-id="cart">
+          <div class="step-dot">✓</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item active" data-step-id="shipping">
+          <div class="flex items-center gap-2"><div class="step-dot">1</div><span class="step-label">SHIPPING</span></div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item" data-step-id="payment">
+          <div class="flex items-center gap-2"><div class="step-dot">2</div><span class="step-label">PAYMENT</span></div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item" data-step-id="review">
+          <div class="flex items-center gap-2"><div class="step-dot">3</div><span class="step-label">REVIEW</span></div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item" data-step-id="complete">
+          <div class="flex items-center gap-2"><div class="step-dot">4</div><span class="step-label">COMPLETE</span></div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============================================================
+       EMPTY CHECKOUT (nothing to check out)
+       ============================================================ -->
+  <div id="checkout-empty" class="flex-col items-center text-center px-6 py-28 max-w-md mx-auto">
+    <h1 class="font-display text-2xl font-medium">There's nothing to check out yet.</h1>
+    <p class="mt-3 text-sm text-[var(--alt-muted)]">Your cart is empty — add something you love, then come back here.</p>
+    <a href="store.html" class="inline-block mt-8 px-7 py-3.5 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium">Browse the Store</a>
+  </div>
+
+  <!-- ============================================================
+       CHECKOUT LAYOUT — two columns, steps 1–3
+       ============================================================ -->
+  <div id="checkout-layout" class="max-w-5xl mx-auto px-6 md:px-10 py-10 md:py-14 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 pb-28 lg:pb-14">
+
+    <!-- LEFT: steps -->
+    <div class="lg:col-span-7">
+
+      <!-- ============ STEP 1: SHIPPING ============ -->
+      <section class="step-panel active" data-step="shipping" data-enter>
+        <h2 class="font-display text-2xl font-medium mb-1">Customer Information</h2>
+        <p class="text-sm text-[var(--alt-muted)] mb-6">Who are we shipping this to?</p>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="field-label" for="cf-first">First Name</label>
+            <input id="cf-first" class="field-input" type="text" autocomplete="given-name" required>
+            <p class="field-error" data-error-for="cf-first">Please enter your first name.</p>
+          </div>
+          <div>
+            <label class="field-label" for="cf-last">Last Name</label>
+            <input id="cf-last" class="field-input" type="text" autocomplete="family-name" required>
+            <p class="field-error" data-error-for="cf-last">Please enter your last name.</p>
+          </div>
+          <div>
+            <label class="field-label" for="cf-phone">Phone Number</label>
+            <input id="cf-phone" class="field-input" type="tel" placeholder="01XXXXXXXXX" autocomplete="tel" required>
+            <p class="field-error" data-error-for="cf-phone">Enter a valid Bangladeshi phone number.</p>
+          </div>
+          <div>
+            <label class="field-label" for="cf-email">Email Address <span class="font-mono text-[10px]">(optional)</span></label>
+            <input id="cf-email" class="field-input" type="email" autocomplete="email">
+            <p class="field-error" data-error-for="cf-email">That email doesn't look right.</p>
+          </div>
+        </div>
+
+        <h2 class="font-display text-2xl font-medium mt-10 mb-1">Shipping Address</h2>
+        <p class="text-sm text-[var(--alt-muted)] mb-6">Currently shipping within Bangladesh.</p>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="field-label" for="sf-division">Division</label>
+            <select id="sf-division" class="field-input" required></select>
+            <p class="field-error" data-error-for="sf-division">Select your division.</p>
+          </div>
+          <div>
+            <label class="field-label" for="sf-district">District</label>
+            <select id="sf-district" class="field-input" required></select>
+            <p class="field-error" data-error-for="sf-district">Select your district.</p>
+          </div>
+          <div>
+            <label class="field-label" for="sf-upazila">Upazila / Thana</label>
+            <input id="sf-upazila" class="field-input" type="text" required>
+            <p class="field-error" data-error-for="sf-upazila">Please enter your upazila or thana.</p>
+          </div>
+          <div>
+            <label class="field-label" for="sf-area">Area</label>
+            <input id="sf-area" class="field-input" type="text" required>
+            <p class="field-error" data-error-for="sf-area">Please enter your area.</p>
+          </div>
+          <div class="col-span-2">
+            <label class="field-label" for="sf-street">Street Address</label>
+            <input id="sf-street" class="field-input" type="text" autocomplete="address-line1" required>
+            <p class="field-error" data-error-for="sf-street">Please enter your street address.</p>
+          </div>
+          <div>
+            <label class="field-label" for="sf-apartment">Apartment <span class="font-mono text-[10px]">(optional)</span></label>
+            <input id="sf-apartment" class="field-input" type="text" autocomplete="address-line2">
+          </div>
+          <div>
+            <label class="field-label" for="sf-postal">Postal Code</label>
+            <input id="sf-postal" class="field-input" type="text" inputmode="numeric" placeholder="1207" required>
+            <p class="field-error" data-error-for="sf-postal">Enter a valid 4-digit postal code.</p>
+          </div>
+        </div>
+        <label class="field-check mt-5">
+          <input type="checkbox" id="sf-save-address">
+          Save this address for future purchases
+        </label>
+        <label class="field-check mt-3">
+          <input type="checkbox" id="bf-same-as-shipping" checked>
+          Billing address is the same as shipping
+        </label>
+        <div id="bf-address-wrap" class="mt-4" style="display:none;">
+          <label class="field-label" for="bf-address">Billing Address</label>
+          <textarea id="bf-address" class="field-input" rows="2" placeholder="Street, area, district, division, postal code"></textarea>
+        </div>
+
+        <h2 class="font-display text-2xl font-medium mt-10 mb-1">Delivery Method</h2>
+        <p class="text-sm text-[var(--alt-muted)] mb-6">Choose how fast you'd like it.</p>
+        <div id="delivery-cards" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+        <p id="delivery-zone-note" class="mt-2 text-xs text-[var(--alt-muted)] font-mono"></p>
+
+        <button id="shipping-continue-btn" class="btn-primary font-display bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium tracking-wide py-4 rounded-full w-full mt-9">
+          Continue to Payment
+        </button>
+      </section>
+
+      <!-- ============ STEP 2: PAYMENT ============ -->
+      <section class="step-panel" data-step="payment">
+        <h2 class="font-display text-2xl font-medium mb-1">Payment Method</h2>
+        <p class="text-sm text-[var(--alt-muted)] mb-6">Choose how you'd like to pay.</p>
+        <div id="payment-cards" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+
+        <!-- Conditional: online gateway note -->
+        <div id="online-fields" class="mt-6" style="display:none;">
+          <div class="rounded-2xl p-4" style="background:var(--alt-surface);">
+            <p class="text-sm font-medium mb-1">You'll be sent to a secure payment page.</p>
+            <p class="text-xs text-[var(--alt-muted)]">Pick card, bKash, Nagad, or Rocket there — your payment is confirmed automatically the moment it clears, no manual verification needed.</p>
+          </div>
+          <p id="online-error" class="field-error mt-3" style="display:none;">Online payment isn't available right now — please choose another method or try again shortly.</p>
+        </div>
+
+        <!-- Conditional: mobile wallet number + manual transaction verification -->
+        <div id="wallet-fields" class="mt-6" style="display:none;">
+          <div class="rounded-2xl p-4 mb-4" style="background:var(--alt-surface);">
+            <p class="text-sm font-medium mb-1">Send <span id="wallet-amount-hint"></span> via <span id="wallet-method-name"></span> to:</p>
+            <p class="font-mono text-base tracking-wide" id="wallet-send-number">—</p>
+            <p class="text-xs text-[var(--alt-muted)] mt-2">After sending, enter the Transaction ID you received below. We verify it manually before confirming your order.</p>
+          </div>
+          <label class="field-label" for="wallet-number">Your Wallet Number</label>
+          <input id="wallet-number" class="field-input max-w-xs" type="tel" placeholder="01XXXXXXXXX">
+          <p class="field-error" data-error-for="wallet-number">Enter the number linked to this wallet.</p>
+          <label class="field-label mt-4" for="wallet-txn">Transaction ID</label>
+          <input id="wallet-txn" class="field-input max-w-xs" type="text" placeholder="e.g. 8N7A2K91X1">
+          <p class="field-error" data-error-for="wallet-txn">Enter the Transaction ID you received after sending money.</p>
+        </div>
+
+        <!-- Conditional: COD note -->
+        <p id="cod-note" class="mt-6 text-sm text-[var(--alt-muted)]" style="display:none;">You'll pay in cash when your order arrives.</p>
+
+        <h2 class="font-display text-lg font-medium mt-10 mb-3">Order Notes <span class="font-mono text-xs text-[var(--alt-muted)]">(optional)</span></h2>
+        <textarea id="order-notes" class="field-input" rows="3" placeholder="Delivery instructions, gift note, anything we should know…"></textarea>
+
+        <div class="flex items-center gap-3 mt-9">
+          <button id="payment-back-btn" class="w-full py-4 rounded-full border border-[var(--alt-black)] text-sm font-medium hover:bg-[var(--alt-surface)] transition-colors">Back</button>
+          <button id="payment-continue-btn" class="btn-primary font-display bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium tracking-wide py-4 rounded-full w-full">Continue to Review</button>
+        </div>
+      </section>
+
+      <!-- ============ STEP 3: REVIEW ============ -->
+      <section class="step-panel" data-step="review">
+        <h2 class="font-display text-2xl font-medium mb-6">Review Your Order</h2>
+
+        <div class="review-block">
+          <div class="flex items-center justify-between mb-3">
+            <p class="font-mono text-[11px] tracking-widest uppercase text-[var(--alt-muted)]">Contact &amp; Shipping</p>
+            <button class="edit-link" data-edit-step="shipping">Edit</button>
+          </div>
+          <p id="review-contact" class="text-sm"></p>
+          <p id="review-address" class="text-sm text-[var(--alt-muted)] mt-1"></p>
+          <p id="review-delivery" class="text-sm text-[var(--alt-muted)] mt-1"></p>
+        </div>
+
+        <div class="review-block">
+          <div class="flex items-center justify-between mb-3">
+            <p class="font-mono text-[11px] tracking-widest uppercase text-[var(--alt-muted)]">Payment</p>
+            <button class="edit-link" data-edit-step="payment">Edit</button>
+          </div>
+          <p id="review-payment" class="text-sm"></p>
+          <p id="review-notes" class="text-sm text-[var(--alt-muted)] mt-1"></p>
+        </div>
+
+        <div class="review-block">
+          <div class="flex items-center justify-between mb-3">
+            <p class="font-mono text-[11px] tracking-widest uppercase text-[var(--alt-muted)]">Items</p>
+            <button class="edit-link" id="review-edit-items">Edit</button>
+          </div>
+          <div id="review-items" class="space-y-4"></div>
+        </div>
+
+        <p id="checkout-order-error" class="text-xs text-center mt-4" style="color:var(--alt-bad); display:none;"></p>
+        <button id="place-order-btn" class="btn-primary font-display bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium tracking-wide py-4 rounded-full w-full mt-4 flex items-center justify-center gap-3">
+          <span id="place-order-label">Place Order</span>
+        </button>
+        <p class="text-xs text-[var(--alt-muted)] text-center mt-3">By placing this order, you agree to our terms and privacy policy.</p>
+      </section>
+
+    </div>
+
+    <!-- RIGHT: sticky order summary -->
+    <div class="lg:col-span-5">
+      <div class="lg:sticky lg:top-32" data-enter style="transition-delay:0.1s;">
+        <div class="border border-[var(--alt-border)] rounded-[22px] p-6">
+          <h3 class="font-display text-lg font-medium mb-5">Order Summary</h3>
+          <div id="summary-items" class="space-y-4 max-h-64 overflow-y-auto no-scrollbar"></div>
+
+          <div class="mt-6">
+            <div class="flex gap-2">
+              <input id="checkout-coupon-input" class="field-input" type="text" placeholder="Promo code">
+              <button id="checkout-coupon-apply" class="px-5 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium shrink-0">Apply</button>
+            </div>
+            <p id="checkout-coupon-feedback" class="cart-coupon-feedback" role="status"></p>
+          </div>
+
+          <div id="rewards-redeem-wrap" class="mt-5" style="display:none;">
+            <label class="flex items-center justify-between gap-3 text-sm cursor-pointer">
+              <span id="rewards-redeem-label"></span>
+              <input type="checkbox" id="rewards-redeem-toggle" style="accent-color:var(--alt-black);width:18px;height:18px;">
+            </label>
+          </div>
+
+          <div class="mt-6">
+            <div class="summary-row"><span>Subtotal</span><span id="summary-subtotal" class="font-mono">৳0</span></div>
+            <div class="summary-row"><span>Discount</span><span id="summary-discount" class="font-mono">৳0</span></div>
+            <div class="summary-row" id="summary-points-row" style="display:none;"><span>Reward Points</span><span id="summary-points" class="font-mono">৳0</span></div>
+            <div class="summary-row"><span>Shipping</span><span id="summary-shipping" class="font-mono">৳0</span></div>
+            <div class="summary-row"><span>Estimated Tax</span><span id="summary-tax" class="font-mono">৳0</span></div>
+            <div class="summary-row total"><span>Total</span><span id="summary-total" class="font-mono">৳0</span></div>
+          </div>
+
+          <p id="summary-delivery-estimate" class="mt-4 text-xs text-[var(--alt-muted)] font-mono"></p>
+
+          <button id="summary-cta" class="hidden lg:block btn-primary font-display bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium tracking-wide py-4 rounded-full w-full mt-6">
+            Continue to Payment
+          </button>
+
+          <div class="grid grid-cols-4 gap-2 mt-7 pt-6 border-t border-[var(--alt-border)]">
+            <div class="text-center">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--alt-black)" stroke-width="1.5" class="mx-auto mb-1.5"><path d="M12 3l8 3v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V6l8-3z"/></svg>
+              <p class="text-[9.5px] text-[var(--alt-muted)] leading-tight">Secure Checkout</p>
+            </div>
+            <div class="text-center">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--alt-black)" stroke-width="1.5" class="mx-auto mb-1.5"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+              <p class="text-[9.5px] text-[var(--alt-muted)] leading-tight">Encrypted Payments</p>
+            </div>
+            <div class="text-center">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--alt-black)" stroke-width="1.5" class="mx-auto mb-1.5"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.4"/><circle cx="17.5" cy="18" r="1.4"/></svg>
+              <p class="text-[9.5px] text-[var(--alt-muted)] leading-tight">Fast Delivery</p>
+            </div>
+            <div class="text-center">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--alt-black)" stroke-width="1.5" class="mx-auto mb-1.5"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M4.5 15a8 8 0 0 0 14 4.2M19.5 9A8 8 0 0 0 5.5 4.8"/></svg>
+              <p class="text-[9.5px] text-[var(--alt-muted)] leading-tight">Easy Returns</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       STEP 4 — PROCESSING / SUCCESS / FAILURE (full-width takeover)
+       ============================================================ -->
+  <div id="checkout-complete" class="min-h-[70vh] items-center justify-center px-6 py-20">
+
+    <div class="state-view active flex-col items-center text-center" id="view-processing">
+      <div class="success-ring mb-8" style="border-style:dashed;">
+        <div class="processing-track" style="position:absolute; width:40px; height:40px; border-radius:999px; overflow:hidden; display:none;"></div>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--alt-black)" stroke-width="1.5"><path d="M12 3l8 3v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V6l8-3z"/></svg>
+      </div>
+      <h2 class="font-display text-2xl font-medium">Processing your order</h2>
+      <p class="mt-2 text-sm text-[var(--alt-muted)]">Just a moment — confirming payment and reserving your items.</p>
+      <div class="processing-track mt-8"><div class="processing-fill"></div></div>
+    </div>
+
+    <div class="state-view flex-col items-center text-center max-w-md" id="view-success">
+      <div class="success-ring mb-8">
+        <svg class="success-check" viewBox="0 0 24 18" fill="none"><path d="M2 9l7 7L22 2"/></svg>
+      </div>
+      <p class="font-mono text-xs tracking-[0.2em] text-[var(--alt-muted)] uppercase mb-3">Order Confirmed</p>
+      <h2 class="font-display text-3xl font-medium">Thank you for your order.</h2>
+      <p class="mt-3 text-sm text-[var(--alt-muted)]">We're getting it ready — you'll get a confirmation shortly.</p>
+
+      <div class="mt-8 w-full border border-[var(--alt-border)] rounded-[18px] p-6 text-left">
+        <div class="flex items-center justify-between text-sm"><span class="text-[var(--alt-muted)]">Order Number</span><span id="order-number" class="font-mono"></span></div>
+        <div class="flex items-center justify-between text-sm mt-3"><span class="text-[var(--alt-muted)]">Estimated Delivery</span><span id="order-eta" class="font-mono"></span></div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 w-full mt-8">
+        <button id="download-invoice-btn" class="py-3.5 rounded-full border border-[var(--alt-black)] text-sm font-medium">Download Invoice</button>
+        <button id="track-order-btn" class="py-3.5 rounded-full border border-[var(--alt-black)] text-sm font-medium">Track Order</button>
+      </div>
+      <button id="continue-shopping-btn" class="btn-primary font-display bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium tracking-wide py-4 rounded-full w-full mt-3">Continue Shopping</button>
+      <button id="share-order-btn" class="mt-4 text-xs text-[var(--alt-muted)] underline underline-offset-4">Share Order</button>
+    </div>
+
+    <div class="state-view flex-col items-center text-center max-w-md" id="view-failure">
+      <div class="success-ring mb-8" style="border-color:var(--alt-bad);">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--alt-bad)" stroke-width="1.8"><path d="M12 8v5M12 16.5h.01"/><circle cx="12" cy="12" r="9"/></svg>
+      </div>
+      <p class="font-mono text-xs tracking-[0.2em] uppercase mb-3" style="color:var(--alt-bad);">Payment Not Completed</p>
+      <h2 class="font-display text-2xl font-medium">That didn't go through.</h2>
+      <p class="mt-3 text-sm text-[var(--alt-muted)]">Your payment couldn't be processed, and you haven't been charged. Your cart is safe — you can try again.</p>
+
+      <div class="grid grid-cols-1 gap-3 w-full mt-8">
+        <button id="retry-payment-btn" class="btn-primary font-display bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium tracking-wide py-4 rounded-full w-full">Retry Payment</button>
+        <button id="change-payment-btn" class="py-4 rounded-full border border-[var(--alt-black)] text-sm font-medium">Change Payment Method</button>
+        <a id="contact-support-btn" href="mailto:support@aestheticlifestyletouch.com" class="py-4 rounded-full text-sm font-medium text-[var(--alt-muted)] underline underline-offset-4">Contact Support</a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================================================================
+     MOBILE STICKY ACTION BAR (steps 1–3 only)
+     ================================================================ -->
+<div id="checkout-mobile-bar" class="lg:hidden px-5 py-3 flex items-center justify-between gap-4">
+  <span id="mobile-total" class="font-mono text-base"></span>
+  <button id="mobile-cta" class="btn-primary flex-1 max-w-[220px] py-3.5 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium">Continue</button>
+</div>
+
+<!-- ================================================================
+     MYSTERY REWARD — post-purchase reveal popup
+     ================================================================ -->
+<div id="reward-popup-backdrop">
+  <div id="reward-popup-panel">
+    <p class="font-mono text-xs tracking-[0.2em] text-[var(--alt-muted)] uppercase mb-1">🎉 Congratulations</p>
+    <h3 id="reward-popup-title" class="font-display text-xl font-medium mb-5">You received a Mystery Reward!</h3>
+    <div id="reward-popup-card" class="sc-card"></div>
+    <button id="reward-popup-continue" style="display:none;">Continue</button>
+  </div>
+</div>
+
+<script>
+/* BD_DIVISIONS now lives in products-data.js (shared with the Dashboard's
+   saved addresses) — this page just consumes it. */
+
+/* Standard/Express pricing + ETA now come from admin Settings (order-
+   service.js's getDeliveryMethods(), backed by alt_store_settings_v1) —
+   Pickup stays a fixed future placeholder, not yet admin-editable. */
+const DELIVERY_METHODS = [
+  ...getDeliveryMethods(),
+  { id: "pickup", label: "Pickup Point", eta: "Coming soon", priceDhaka: 0, priceOutside: 0, etaDays: 5, disabled: true },
+];
+
+/* Delivery pricing depends on the shipping district — "Dhaka" district
+   (inside the capital) vs everywhere else, matching how real BD couriers
+   price. districtSelect is declared further down this same script, but
+   these are only ever called from event handlers, by which point it's
+   already initialized. */
+function currentZone(){
+  return (districtSelect.value || "").trim() === "Dhaka" ? "dhaka" : "outside";
+}
+function zonePrice(m){
+  return currentZone() === "dhaka" ? (m.priceDhaka ?? 0) : (m.priceOutside ?? 0);
+}
+
+/* Shipping is waived once the post-discount subtotal clears the admin-
+   configured free-shipping threshold (0 = disabled). */
+function computeShipping(deliveryPrice, afterDiscount){
+  const threshold = getFreeShippingThreshold();
+  if (threshold > 0 && afterDiscount >= threshold) return 0;
+  return deliveryPrice;
+}
+
+const PAYMENT_METHODS = [
+  { id: "cod",     label: "Cash on Delivery",       group: "cod",    icon: `<path d="M3 8h18v10H3zM3 8l3-4h12l3 4"/><circle cx="12" cy="13" r="2.2"/>` },
+  { id: "online",  label: "Pay Online — Card / bKash / Nagad / Rocket", group: "online", icon: `<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/>` },
+  { id: "bkash",   label: "bKash (Manual Transfer)",  group: "wallet", icon: `<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 17h6"/>` },
+  { id: "nagad",   label: "Nagad (Manual Transfer)",  group: "wallet", icon: `<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 17h6"/>` },
+  { id: "rocket",  label: "Rocket (Manual Transfer)", group: "wallet", icon: `<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 17h6"/>` },
+  { id: "gpay",    label: "Google Pay",       group: "card",   icon: `<circle cx="12" cy="12" r="8"/>`, disabled: true },
+  { id: "apay",    label: "Apple Pay",        group: "card",   icon: `<path d="M12 3l8 3v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V6l8-3z"/>`, disabled: true },
+];
+
+/* Where the payment backend (server/) is reachable — see that folder's
+   README/`.env.example` for the one-time SSLCommerz sandbox signup this
+   needs. Swap this to your deployed backend's URL once it's hosted. */
+const PAYMENT_SERVER_URL = "http://localhost:4000";
+
+/* ================================================================
+   STATE
+   ================================================================ */
+let checkoutState = {
+  step: "shipping",
+  delivery: "standard",
+  payment: "cod",
+  submitting: false,
+  redeemPoints: false,
+};
+
+/* Shared by renderSummary(), syncPaymentFields(), and buildCheckoutPayload()
+   so the three never drift out of sync with each other — a real bug this
+   page hit before (delivery pricing computed one way at review, another
+   at submit) is exactly what this avoids. */
+function computeCheckoutTotals(){
+  const { subtotal, discount } = Cart.totals();
+  const delivery = DELIVERY_METHODS.find(m => m.id === checkoutState.delivery);
+  const afterDiscount = subtotal - discount;
+  const shipping = computeShipping(zonePrice(delivery), afterDiscount);
+  const tax = afterDiscount * 0.08;
+  const preRewardTotal = afterDiscount + shipping + tax;
+
+  let redeemedPoints = 0;
+  let pointsDiscount = 0;
+  if (checkoutState.redeemPoints && typeof Auth !== "undefined" && Auth.isLoggedIn() && typeof maxRedeemablePoints === "function"){
+    redeemedPoints = maxRedeemablePoints(Auth.currentUser().id, preRewardTotal);
+    pointsDiscount = pointsToBDT(redeemedPoints);
+  }
+  const total = Math.max(0, preRewardTotal - pointsDiscount);
+  return { subtotal, discount, shipping, tax, redeemedPoints, pointsDiscount, total };
+}
+
+document.getElementById("bf-same-as-shipping").addEventListener("change", (e) => {
+  document.getElementById("bf-address-wrap").style.display = e.target.checked ? "none" : "block";
+});
+
+/* ================================================================
+   GUARD: nothing to check out
+   ================================================================ */
+function refreshEmptyGuard(){
+  const empty = Cart.count() === 0;
+  document.getElementById("checkout-empty").classList.toggle("show", empty);
+  document.getElementById("checkout-layout").style.display = empty ? "none" : "grid";
+  document.getElementById("stepper").style.display = empty ? "none" : "block";
+  // "flex" here isn't safe — it's an inline style, so it would override
+  // the bar's own lg:hidden class and force it to show on desktop too.
+  // Clearing the inline override instead lets that responsive class
+  // decide, same as it already does for every other viewport-based show/hide.
+  document.getElementById("checkout-mobile-bar").style.display = empty ? "none" : "";
+  return empty;
+}
+
+/* ================================================================
+   STEPPER
+   ================================================================ */
+function renderStepper(){
+  const order = ["shipping", "payment", "review"];
+  const currentIndex = order.indexOf(checkoutState.step);
+  document.querySelectorAll("#stepper .step-item[data-step-id]").forEach(el => {
+    const id = el.dataset.stepId;
+    if (id === "cart" || id === "complete") return;
+    const idx = order.indexOf(id);
+    el.classList.toggle("active", idx === currentIndex);
+    el.classList.toggle("done", idx < currentIndex);
+  });
+}
+
+function goToStep(step){
+  checkoutState.step = step;
+  document.querySelectorAll(".step-panel").forEach(p => p.classList.toggle("active", p.dataset.step === step));
+  renderStepper();
+  updateContextualCTA();
+  renderSummary(); // also fills the Review panel when step === "review"
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function updateContextualCTA(){
+  const ctaMap = { shipping: "Continue to Payment", payment: "Continue to Review", review: "Place Order" };
+  document.getElementById("summary-cta").textContent = ctaMap[checkoutState.step];
+  document.getElementById("mobile-cta").textContent = ctaMap[checkoutState.step];
+  document.getElementById("summary-cta").style.display = checkoutState.step === "review" ? "none" : "";
+}
+
+/* ================================================================
+   VALIDATION
+   ================================================================ */
+const VALIDATORS = {
+  "cf-first": v => v.trim().length > 0,
+  "cf-last":  v => v.trim().length > 0,
+  "cf-phone": v => /^(\+?880|0)1[3-9]\d{8}$/.test(v.trim()),
+  "cf-email": v => v.trim() === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()),
+  "sf-division": v => v.trim().length > 0,
+  "sf-district": v => v.trim().length > 0,
+  "sf-upazila":  v => v.trim().length > 0,
+  "sf-area":     v => v.trim().length > 0,
+  "sf-street":   v => v.trim().length > 0,
+  "sf-postal":   v => /^\d{4}$/.test(v.trim()),
+  "wallet-number": v => /^(\+?880|0)1[3-9]\d{8}$/.test(v.trim()),
+  "wallet-txn":    v => /^[A-Za-z0-9]{5,20}$/.test(v.trim()),
+};
+
+function validateFieldById(id){
+  const el = document.getElementById(id);
+  const errorEl = document.querySelector(`.field-error[data-error-for="${id}"]`);
+  if (!el || !VALIDATORS[id]) return true;
+  const ok = VALIDATORS[id](el.value);
+  el.classList.toggle("invalid", !ok);
+  if (errorEl) errorEl.classList.toggle("show", !ok);
+  return ok;
+}
+
+function wireLiveValidation(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener("blur", () => validateFieldById(id));
+  el.addEventListener("input", () => {
+    if (el.classList.contains("invalid")) validateFieldById(id);
+  });
+}
+["cf-first","cf-last","cf-phone","cf-email","sf-division","sf-district","sf-upazila","sf-area","sf-street","sf-postal","wallet-number","wallet-txn"]
+  .forEach(wireLiveValidation);
+
+function validateGroup(ids){
+  let firstInvalid = null;
+  let allValid = true;
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el || el.offsetParent === null) return; // skip hidden/conditional fields
+    const ok = validateFieldById(id);
+    if (!ok){ allValid = false; if (!firstInvalid) firstInvalid = el; }
+  });
+  if (firstInvalid){ firstInvalid.focus(); firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  return allValid;
+}
+
+/* ================================================================
+   SHIPPING STEP — divisions, districts, delivery cards
+   ================================================================ */
+const divisionSelect = document.getElementById("sf-division");
+const districtSelect = document.getElementById("sf-district");
+
+divisionSelect.innerHTML = `<option value="">Select division</option>` + Object.keys(BD_DIVISIONS).map(d => `<option value="${d}">${d}</option>`).join("");
+function populateDistricts(division){
+  const districts = BD_DIVISIONS[division] || [];
+  districtSelect.innerHTML = `<option value="">Select district</option>` + districts.map(d => `<option value="${d}">${d}</option>`).join("");
+}
+populateDistricts("");
+divisionSelect.addEventListener("change", () => { populateDistricts(divisionSelect.value); validateFieldById("sf-division"); renderDeliveryCards(); renderSummary(); });
+districtSelect.addEventListener("change", () => { renderDeliveryCards(); renderSummary(); });
+
+function renderDeliveryCards(){
+  const zone = currentZone();
+  document.getElementById("delivery-cards").innerHTML = DELIVERY_METHODS.map(m => {
+    const price = zonePrice(m);
+    return `
+    <button type="button" class="select-card flex items-center gap-3 text-left ${m.id === checkoutState.delivery ? "selected" : ""} ${m.disabled ? "disabled" : ""}" data-method="${m.id}" ${m.disabled ? "disabled" : ""}>
+      <span class="select-radio"></span>
+      <span class="flex-1">
+        <span class="block text-sm font-medium">${m.label}${m.disabled ? ` <span class="font-mono text-[10px] text-[var(--alt-muted)]">(Future)</span>` : ""}</span>
+        <span class="block text-xs text-[var(--alt-muted)] mt-0.5">${m.eta}${price > 0 ? ` · ${bdt(price)}` : (m.disabled ? "" : " · Free")}</span>
+      </span>
+    </button>
+  `;
+  }).join("");
+  const zoneNote = document.getElementById("delivery-zone-note");
+  if (zoneNote) zoneNote.textContent = districtSelect.value ? (zone === "dhaka" ? "Pricing shown for delivery inside Dhaka." : "Pricing shown for delivery outside Dhaka.") : "";
+  document.querySelectorAll("#delivery-cards .select-card:not(.disabled)").forEach(btn => {
+    btn.addEventListener("click", () => {
+      checkoutState.delivery = btn.dataset.method;
+      renderDeliveryCards();
+      renderSummary();
+    });
+  });
+}
+
+document.getElementById("shipping-continue-btn").addEventListener("click", () => {
+  const ok = validateGroup(["cf-first","cf-last","cf-phone","cf-email","sf-division","sf-district","sf-upazila","sf-area","sf-street","sf-postal"]);
+  if (!ok) return;
+  if (document.getElementById("sf-save-address").checked){
+    localStorage.setItem("alt_saved_address", JSON.stringify(collectShipping()));
+  }
+  goToStep("payment");
+});
+
+/* ================================================================
+   PAYMENT STEP — method cards, conditional fields
+   ================================================================ */
+function renderPaymentCards(){
+  document.getElementById("payment-cards").innerHTML = PAYMENT_METHODS.map(m => `
+    <button type="button" class="select-card flex flex-col items-center gap-2 text-center ${m.id === checkoutState.payment ? "selected" : ""} ${m.disabled ? "disabled" : ""}" data-method="${m.id}" ${m.disabled ? "disabled" : ""}>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--alt-black)" stroke-width="1.5">${m.icon}</svg>
+      <span class="text-xs font-medium">${m.label}${m.disabled ? ` <span class="font-mono text-[9px] text-[var(--alt-muted)] block">(Future)</span>` : ""}</span>
+    </button>
+  `).join("");
+  document.querySelectorAll("#payment-cards .select-card:not(.disabled)").forEach(btn => {
+    btn.addEventListener("click", () => {
+      checkoutState.payment = btn.dataset.method;
+      renderPaymentCards();
+      syncPaymentFields();
+    });
+  });
+}
+
+function syncPaymentFields(){
+  const method = PAYMENT_METHODS.find(m => m.id === checkoutState.payment);
+  document.getElementById("online-fields").style.display = method.group === "online" ? "block" : "none";
+  document.getElementById("wallet-fields").style.display = method.group === "wallet" ? "block" : "none";
+  document.getElementById("cod-note").style.display = method.group === "cod" ? "block" : "none";
+  if (method.group === "wallet"){
+    document.getElementById("wallet-method-name").textContent = method.label;
+    document.getElementById("wallet-send-number").textContent = getWalletNumber(method.id) || "Number not set yet — contact support.";
+    document.getElementById("wallet-amount-hint").textContent = bdt(computeCheckoutTotals().total);
+  }
+}
+
+document.getElementById("payment-back-btn").addEventListener("click", () => goToStep("shipping"));
+document.getElementById("payment-continue-btn").addEventListener("click", () => {
+  const method = PAYMENT_METHODS.find(m => m.id === checkoutState.payment);
+  let ok = true;
+  if (method.group === "wallet") ok = validateGroup(["wallet-number", "wallet-txn"]);
+  if (!ok) return;
+  goToStep("review");
+});
+
+/* ================================================================
+   REVIEW STEP
+   ================================================================ */
+function collectShipping(){
+  return {
+    firstName: document.getElementById("cf-first").value.trim(),
+    lastName: document.getElementById("cf-last").value.trim(),
+    phone: document.getElementById("cf-phone").value.trim(),
+    email: document.getElementById("cf-email").value.trim(),
+    division: divisionSelect.value,
+    district: districtSelect.value,
+    upazila: document.getElementById("sf-upazila").value.trim(),
+    area: document.getElementById("sf-area").value.trim(),
+    street: document.getElementById("sf-street").value.trim(),
+    apartment: document.getElementById("sf-apartment").value.trim(),
+    postal: document.getElementById("sf-postal").value.trim(),
+  };
+}
+
+/* Maps this page's own form state into the shape order-service.js's
+   createOrder() expects — the one place checkout talks to the shared
+   order pipeline. */
+function buildCheckoutPayload(){
+  const s = collectShipping();
+  const billingSameAsShipping = document.getElementById("bf-same-as-shipping").checked;
+  const shippingAddress = { division: s.division, district: s.district, upazila: s.upazila, area: s.area, street: s.street, apartment: s.apartment, postal: s.postal };
+  const delivery = DELIVERY_METHODS.find(m => m.id === checkoutState.delivery);
+  const method = PAYMENT_METHODS.find(m => m.id === checkoutState.payment);
+  const { subtotal, discount, shipping, tax, redeemedPoints, pointsDiscount, total } = computeCheckoutTotals();
+  return {
+    userId: (typeof Auth !== "undefined" && Auth.isLoggedIn()) ? Auth.currentUser().id : "guest",
+    customer: { name: `${s.firstName} ${s.lastName}`.trim(), email: s.email, phone: s.phone },
+    shippingAddress,
+    billingSameAsShipping,
+    billingAddress: billingSameAsShipping ? shippingAddress : { text: document.getElementById("bf-address").value.trim() },
+    lines: Cart.lines(),
+    coupon: Cart.coupon,
+    totals: { subtotal, discount, shipping, tax, pointsDiscount, total },
+    redeemedPoints,
+    paymentMethod: method.label,
+    paymentStatus: method.group === "cod" ? "Cash on Delivery" : method.group === "wallet" ? "Pending Verification" : method.group === "online" ? "Awaiting Online Payment" : "Paid",
+    paymentVerification: method.group === "wallet" ? {
+      status: "pending",
+      walletNumber: document.getElementById("wallet-number").value.trim(),
+      customerTxnId: document.getElementById("wallet-txn").value.trim(),
+      submittedAt: Date.now(),
+    } : null,
+    deliveryMethod: delivery.id,
+    deliveryEtaDays: delivery.etaDays || 5,
+    notes: document.getElementById("order-notes").value.trim(),
+  };
+}
+
+function renderReview(){
+  const s = collectShipping();
+  document.getElementById("review-contact").textContent = `${s.firstName} ${s.lastName} · ${s.phone}${s.email ? " · " + s.email : ""}`;
+  document.getElementById("review-address").textContent = [s.street, s.apartment, s.area, s.upazila, s.district, s.division, s.postal].filter(Boolean).join(", ");
+  const delivery = DELIVERY_METHODS.find(m => m.id === checkoutState.delivery);
+  document.getElementById("review-delivery").textContent = `${delivery.label} — ${delivery.eta}`;
+
+  const method = PAYMENT_METHODS.find(m => m.id === checkoutState.payment);
+  let paymentLine = method.label;
+  if (method.group === "wallet") paymentLine += ` — ${document.getElementById("wallet-number").value} (Txn: ${document.getElementById("wallet-txn").value.trim() || "—"})`;
+  document.getElementById("review-payment").textContent = paymentLine;
+  const notes = document.getElementById("order-notes").value.trim();
+  document.getElementById("review-notes").textContent = notes ? `Note: ${notes}` : "";
+
+  document.getElementById("review-items").innerHTML = Cart.lines().map(({ line, product }) => `
+    <div class="flex items-center gap-4">
+      <div class="w-14 h-14 rounded-xl overflow-hidden bg-[var(--alt-surface)] flex-shrink-0">
+        <img src="${product.img}" alt="${product.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium">${product.name}</p>
+        <p class="text-xs text-[var(--alt-muted)] mt-0.5">Qty ${line.qty}${line.size ? " · Size " + line.size : ""}</p>
+      </div>
+      <span class="font-mono text-sm">${bdt((product.salePrice || product.price) * line.qty)}</span>
+    </div>
+  `).join("");
+}
+
+document.querySelectorAll(".edit-link[data-edit-step]").forEach(btn => {
+  btn.addEventListener("click", () => goToStep(btn.dataset.editStep));
+});
+document.getElementById("review-edit-items").addEventListener("click", () => Cart.open());
+
+/* ================================================================
+   ORDER SUMMARY (persists across steps 1–3)
+   ================================================================ */
+function renderSummary(){
+  document.getElementById("summary-items").innerHTML = Cart.lines().map(({ line, product }) => `
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-lg overflow-hidden bg-[var(--alt-surface)] flex-shrink-0">
+        <img src="${product.img}" alt="${product.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-[13px] font-medium truncate">${product.name}</p>
+        <p class="text-[11px] text-[var(--alt-muted)]">Qty ${line.qty}${line.size ? " · " + line.size : ""}</p>
+      </div>
+      <span class="font-mono text-[13px]">${bdt((product.salePrice || product.price) * line.qty)}</span>
+    </div>
+  `).join("");
+
+  const delivery = DELIVERY_METHODS.find(m => m.id === checkoutState.delivery);
+  const { subtotal, discount, shipping, tax, redeemedPoints, pointsDiscount, total } = computeCheckoutTotals();
+
+  document.getElementById("summary-subtotal").textContent = bdt(subtotal);
+  document.getElementById("summary-discount").textContent = discount > 0 ? `-${bdt(discount)}` : bdt(0);
+  document.getElementById("summary-points-row").style.display = pointsDiscount > 0 ? "flex" : "none";
+  document.getElementById("summary-points").textContent = pointsDiscount > 0 ? `-${bdt(pointsDiscount)}` : bdt(0);
+  document.getElementById("summary-shipping").textContent = shipping === 0 ? "Free" : bdt(shipping);
+  document.getElementById("summary-tax").textContent = bdt(tax);
+  document.getElementById("summary-total").textContent = bdt(total);
+  document.getElementById("summary-delivery-estimate").textContent = `Estimated delivery: ${delivery.eta}`;
+  document.getElementById("mobile-total").textContent = bdt(total);
+
+  renderRewardsRedeemToggle();
+  if (checkoutState.step === "review") renderReview();
+}
+
+/* The redeem checkbox only appears once the customer actually has
+   enough points to redeem — nothing to distract with otherwise. */
+function renderRewardsRedeemToggle(){
+  const wrap = document.getElementById("rewards-redeem-wrap");
+  if (typeof Auth === "undefined" || !Auth.isLoggedIn() || typeof maxRedeemablePoints !== "function"){
+    wrap.style.display = "none";
+    return;
+  }
+  const { subtotal, discount, shipping, tax } = computeCheckoutTotals();
+  const preRewardTotal = subtotal - discount + shipping + tax;
+  const available = maxRedeemablePoints(Auth.currentUser().id, preRewardTotal);
+  if (available <= 0){
+    wrap.style.display = "none";
+    checkoutState.redeemPoints = false;
+    return;
+  }
+  wrap.style.display = "block";
+  document.getElementById("rewards-redeem-label").textContent = `Use ${available} reward points (${bdt(pointsToBDT(available))} off)`;
+  document.getElementById("rewards-redeem-toggle").checked = checkoutState.redeemPoints;
+}
+document.getElementById("rewards-redeem-toggle").addEventListener("change", (e) => {
+  checkoutState.redeemPoints = e.target.checked;
+  renderSummary();
+});
+
+function applyCheckoutCoupon(code){
+  Cart.applyCoupon(code);
+  // Cart.applyCoupon writes its feedback into the drawer's own
+  // #cart-coupon-feedback element (injected by cart.js on every page) —
+  // mirror that text/state onto this page's copy next to the summary.
+  const source = document.getElementById("cart-coupon-feedback");
+  const target = document.getElementById("checkout-coupon-feedback");
+  if (source && target){ target.textContent = source.textContent; target.className = source.className; }
+  renderSummary();
+}
+document.getElementById("checkout-coupon-apply").addEventListener("click", () => {
+  applyCheckoutCoupon(document.getElementById("checkout-coupon-input").value);
+});
+document.getElementById("checkout-coupon-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") applyCheckoutCoupon(e.target.value);
+});
+
+/* Contextual CTA buttons (summary + mobile bar mirror the left column's own button) */
+document.getElementById("summary-cta").addEventListener("click", () => {
+  if (checkoutState.step === "shipping") document.getElementById("shipping-continue-btn").click();
+  else if (checkoutState.step === "payment") document.getElementById("payment-continue-btn").click();
+});
+document.getElementById("mobile-cta").addEventListener("click", () => {
+  if (checkoutState.step === "review") document.getElementById("place-order-btn").click();
+  else document.getElementById("summary-cta").click();
+});
+
+/* ================================================================
+   PLACE ORDER -> PROCESSING -> SUCCESS / FAILURE
+   Order id / ETA are now generated by order-service.js's createOrder()
+   so every page agrees on the same numbering and delivery estimate.
+   ================================================================ */
+
+let lastOrder = null;
+
+function placeOrder(){
+  if (checkoutState.submitting) return; // prevent duplicate submissions
+
+  // Retrying an online payment that just failed/was cancelled reuses the
+  // exact payload from before the SSLCommerz redirect — the checkout form
+  // itself reset when the browser navigated away and back, so rebuilding
+  // it from the (now-empty) fields would fail validation instead of
+  // actually retrying the payment.
+  if (pendingOnlineRetryPayload){
+    checkoutState.submitting = true;
+    const btn = document.getElementById("place-order-btn");
+    btn.disabled = true;
+    document.getElementById("place-order-label").innerHTML = `<span class="spinner"></span> Redirecting…`;
+    startOnlinePayment(pendingOnlineRetryPayload);
+    return;
+  }
+
+  // Real validation (stock, required fields) runs before we even show the
+  // processing animation — a failure here isn't a "payment declined", so
+  // it surfaces inline on the Review step instead of the failure screen.
+  const payload = buildCheckoutPayload();
+  const precheck = validateCheckoutPayload(payload);
+  const errorEl = document.getElementById("checkout-order-error");
+  if (!precheck.ok){
+    errorEl.textContent = precheck.errors[0];
+    errorEl.style.display = "block";
+    return;
+  }
+  errorEl.style.display = "none";
+
+  const method = PAYMENT_METHODS.find(m => m.id === checkoutState.payment);
+  checkoutState.submitting = true;
+  const btn = document.getElementById("place-order-btn");
+  btn.disabled = true;
+
+  if (method.group === "online"){
+    // Nothing is created yet — createOrder() (and its stock decrement)
+    // only runs once handlePaymentReturn() confirms SSLCommerz actually
+    // cleared the payment, so an abandoned gateway session never reserves
+    // stock for a sale that didn't happen.
+    document.getElementById("place-order-label").innerHTML = `<span class="spinner"></span> Redirecting to secure payment…`;
+    startOnlinePayment(payload);
+    return;
+  }
+
+  document.getElementById("place-order-label").innerHTML = `<span class="spinner"></span> Processing…`;
+  document.getElementById("checkout-layout").style.display = "none";
+  document.getElementById("stepper").style.display = "none";
+  document.getElementById("checkout-mobile-bar").style.display = "none";
+  document.getElementById("checkout-complete").classList.add("show");
+  showStateView("view-processing");
+
+  setTimeout(() => {
+    // Query param ?simulate=fail lets the failure screen be demoed on
+    // cash-on-delivery / manual-wallet orders without a backend involved.
+    const forceFail = new URLSearchParams(window.location.search).get("simulate") === "fail";
+    if (forceFail){
+      showStateView("view-failure");
+    } else {
+      const result = createOrder(payload);
+      if (!result.ok){
+        // Stock or another shopper beat us to it between review and submit.
+        showStateView("view-failure");
+      } else {
+        lastOrder = result.order;
+        document.getElementById("order-number").textContent = lastOrder.id;
+        document.getElementById("order-eta").textContent = new Date(lastOrder.eta).toLocaleDateString(undefined, { month: "long", day: "numeric" });
+        showStateView("view-success");
+        Cart.items = [];
+        Cart.coupon = null;
+        Cart.save();
+        Cart.syncBadges();
+        maybeShowRewardPopup(lastOrder);
+      }
+    }
+    checkoutState.submitting = false;
+    btn.disabled = false;
+    document.getElementById("place-order-label").textContent = "Place Order";
+  }, 1700);
+}
+function showStateView(id){
+  document.querySelectorAll(".state-view").forEach(v => v.classList.toggle("active", v.id === id));
+}
+
+/* ================================================================
+   ONLINE PAYMENT — SSLCommerz round-trip via server/ (see that
+   folder's .env.example for the one-time sandbox signup it needs).
+   The order itself is only ever created after handlePaymentReturn()
+   confirms success — see the comment in placeOrder() above.
+   ================================================================ */
+const PENDING_ONLINE_KEY = "alt_pending_online_checkout_v1";
+let pendingOnlineRetryPayload = null;
+
+function startOnlinePayment(payload){
+  localStorage.setItem(PENDING_ONLINE_KEY, JSON.stringify(payload));
+  const pendingRef = "PEND-" + Date.now();
+  fetch(`${PAYMENT_SERVER_URL}/api/payment/init`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      orderId: pendingRef,
+      amount: payload.totals.total,
+      customerName: payload.customer.name,
+      customerEmail: payload.customer.email,
+      customerPhone: payload.customer.phone,
+      purpose: "order",
+    }),
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (!data.ok){ onlinePaymentInitFailed(data.error); return; }
+      window.location.href = data.gatewayUrl;
+    })
+    .catch(err => onlinePaymentInitFailed(err.message));
+}
+
+function onlinePaymentInitFailed(message){
+  checkoutState.submitting = false;
+  const btn = document.getElementById("place-order-btn");
+  btn.disabled = false;
+  document.getElementById("place-order-label").textContent = "Place Order";
+  // The error lives in the Payment step's markup, so jump back there even
+  // if the customer had already moved on to Review — otherwise the
+  // message renders into a hidden panel and never actually shows.
+  goToStep("payment");
+  const err = document.getElementById("online-error");
+  err.textContent = message || "Online payment isn't available right now — please choose another method or try again shortly.";
+  err.style.display = "block";
+}
+
+/* Called once on load — picks up where the browser left off after
+   SSLCommerz redirects back from its hosted payment page. */
+function handlePaymentReturn(){
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("payment_return") !== "1") return;
+  const tranId = params.get("tran_id");
+  history.replaceState(null, "", window.location.pathname); // a refresh shouldn't replay this
+
+  const savedPayload = JSON.parse(localStorage.getItem(PENDING_ONLINE_KEY) || "null");
+  document.getElementById("checkout-layout").style.display = "none";
+  document.getElementById("stepper").style.display = "none";
+  document.getElementById("checkout-mobile-bar").style.display = "none";
+  document.getElementById("checkout-complete").classList.add("show");
+  showStateView("view-processing");
+
+  if (!tranId || !savedPayload){
+    showStateView("view-failure");
+    return;
+  }
+
+  fetch(`${PAYMENT_SERVER_URL}/api/payment/status/${encodeURIComponent(tranId)}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.ok && data.status === "success"){
+        savedPayload.paymentStatus = "Paid";
+        savedPayload.paymentVerification = { status: "verified", gateway: "SSLCommerz", tranId, verifiedAt: Date.now() };
+        const result = createOrder(savedPayload);
+        if (!result.ok){ showStateView("view-failure"); return; }
+        advanceOrderStatus(result.order, "confirmed", "Paid online via SSLCommerz.");
+        localStorage.removeItem(PENDING_ONLINE_KEY);
+        lastOrder = result.order;
+        document.getElementById("order-number").textContent = lastOrder.id;
+        document.getElementById("order-eta").textContent = new Date(lastOrder.eta).toLocaleDateString(undefined, { month: "long", day: "numeric" });
+        showStateView("view-success");
+        Cart.items = [];
+        Cart.coupon = null;
+        Cart.save();
+        Cart.syncBadges();
+        maybeShowRewardPopup(lastOrder);
+      } else {
+        pendingOnlineRetryPayload = savedPayload;
+        showStateView("view-failure");
+      }
+    })
+    .catch(() => {
+      pendingOnlineRetryPayload = savedPayload;
+      showStateView("view-failure");
+    });
+}
+
+document.getElementById("place-order-btn").addEventListener("click", placeOrder);
+document.getElementById("retry-payment-btn").addEventListener("click", placeOrder);
+document.getElementById("change-payment-btn").addEventListener("click", () => {
+  document.getElementById("checkout-complete").classList.remove("show");
+  document.getElementById("checkout-layout").style.display = "grid";
+  document.getElementById("stepper").style.display = "block";
+  document.getElementById("checkout-mobile-bar").style.display = ""; // let lg:hidden govern, not an inline override
+  goToStep("payment");
+});
+document.getElementById("continue-shopping-btn").addEventListener("click", () => { window.location.href = "store.html"; });
+document.getElementById("track-order-btn").addEventListener("click", () => {
+  if (!lastOrder) return;
+  if (typeof Auth !== "undefined" && Auth.isLoggedIn()) window.location.href = `dashboard.html?view=orders&order=${lastOrder.id}`;
+  else showCartToast("Create an account next time to track orders from My Orders — for now, keep your invoice handy.");
+});
+document.getElementById("download-invoice-btn").addEventListener("click", () => {
+  if (!lastOrder) return;
+  downloadInvoice(lastOrder);
+});
+document.getElementById("share-order-btn").addEventListener("click", async () => {
+  if (!lastOrder) return;
+  const text = `I just ordered from Aesthetic Lifestyle Touch — order ${lastOrder.id}.`;
+  try {
+    if (navigator.share) await navigator.share({ text });
+    else { await navigator.clipboard.writeText(text); showCartToast("Copied to clipboard."); }
+  } catch (e) { /* user cancelled share — no-op */ }
+});
+
+/* Magnetic hover — Place Order (desktop only) */
+if (window.matchMedia("(min-width: 1024px)").matches && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const placeBtn = document.getElementById("place-order-btn");
+  placeBtn.addEventListener("mousemove", (e) => {
+    const rect = placeBtn.getBoundingClientRect();
+    const x = (e.clientX - rect.left - rect.width / 2) * 0.12;
+    placeBtn.style.transform = `translateX(${x}px) scale(1.015)`;
+  });
+  placeBtn.addEventListener("mouseleave", () => { placeBtn.style.transform = "translate(0,0) scale(1)"; });
+}
+
+/* ================================================================
+   INIT
+   ================================================================ */
+function initCheckout(){
+  /* Checkout now requires an account — no more guest orders. Bounce
+     straight to login before rendering anything; account.html sends
+     them right back here (and hides its own Guest option) once signed in. */
+  if (typeof Auth === "undefined" || !Auth.isLoggedIn()){
+    window.location.href = "account.html?redirect=checkout.html";
+    return;
+  }
+
+  Cart.load();
+  Cart.syncBadges();
+  if (refreshEmptyGuard()) { document.getElementById("checkout-root").classList.add("settled"); return; }
+
+  renderDeliveryCards();
+  renderPaymentCards();
+  syncPaymentFields();
+  renderStepper();
+  updateContextualCTA();
+  renderSummary();
+
+  const saved = JSON.parse(localStorage.getItem("alt_saved_address") || "null");
+  if (saved){
+    document.getElementById("cf-first").value = saved.firstName || "";
+    document.getElementById("cf-last").value = saved.lastName || "";
+    document.getElementById("cf-phone").value = saved.phone || "";
+    document.getElementById("cf-email").value = saved.email || "";
+    divisionSelect.value = saved.division || "";
+    populateDistricts(saved.division || "");
+    districtSelect.value = saved.district || "";
+    document.getElementById("sf-upazila").value = saved.upazila || "";
+    document.getElementById("sf-area").value = saved.area || "";
+    document.getElementById("sf-street").value = saved.street || "";
+    document.getElementById("sf-apartment").value = saved.apartment || "";
+    document.getElementById("sf-postal").value = saved.postal || "";
+    document.getElementById("sf-save-address").checked = true;
+    // Setting districtSelect.value directly above doesn't fire its own
+    // "change" listener, so zone-priced delivery cards would otherwise
+    // still show pricing computed before the saved address was applied.
+    renderDeliveryCards();
+    renderSummary();
+  }
+
+  handlePaymentReturn();
+
+  window.addEventListener("load", () => {
+    document.getElementById("checkout-root").classList.add("settled");
+    document.querySelectorAll("[data-enter]").forEach(el => el.classList.add("in"));
+  });
+}
+initCheckout();
+
+/* ================================================================
+   MYSTERY REWARD — post-purchase reveal popup. issueScratchCard()
+   already ran inside createOrder() itself; this just shows whatever
+   card that produced, right after the order succeeds.
+   ================================================================ */
+function maybeShowRewardPopup(order){
+  if (!order || order.userId === "guest") return;
+  const card = scratchCardsForUser(order.userId).find(c => c.source === "order" && c.sourceRef === order.id);
+  if (!card || card.scratched) return;
+  document.getElementById("reward-popup-backdrop").classList.add("open");
+  mountScratchCard(document.getElementById("reward-popup-card"), Object.assign({ userId: order.userId }, card), () => {
+    document.getElementById("reward-popup-title").textContent = "Nice pull!";
+    document.getElementById("reward-popup-continue").style.display = "block";
+  });
+}
+document.getElementById("reward-popup-continue").addEventListener("click", () => {
+  document.getElementById("reward-popup-backdrop").classList.remove("open");
+});
+</script>
+
+</body>
+</html>
