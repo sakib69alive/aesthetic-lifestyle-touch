@@ -76,12 +76,28 @@
 
   /* ================= INCOMING TRANSITION (from Cart drawer) ================= */
   #checkout-root{
+    /* The header is position:fixed (out of flow) at 64px tall, so
+       #stepper's sticky top:64px has to shift it down by 64px from the
+       very first paint just to clear the header — but that shift is
+       visual only; the space reserved for #stepper in normal flow is
+       still its un-shifted position, so the next sibling started 64px
+       too early and rendered underneath the stepper. Reserving that
+       same 64px here up front means #stepper needs no rescue-shift at
+       rest, and flow position matches paint position again. */
+    padding-top: 64px;
     opacity: 0;
     transform: scale(1.04);
     filter: blur(6px);
     transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1), filter 0.9s cubic-bezier(0.16,1,0.3,1);
   }
-  #checkout-root.settled{ opacity: 1; transform: scale(1); filter: blur(0px); }
+  /* transform/filter values other than the literal keywords "none" —
+     even a no-op scale(1) or blur(0px) — still establish a new
+     containing block for position:sticky/fixed descendants per spec.
+     That silently broke #stepper's sticky-to-viewport behavior after
+     this entrance animation finished, since #checkout-root wraps it —
+     use the real "none" keyword once settled so sticky resolves
+     against the actual scrolling viewport again. */
+  #checkout-root.settled{ opacity: 1; transform: none; filter: none; }
 
   [data-enter]{
     opacity: 0; transform: translateY(20px);

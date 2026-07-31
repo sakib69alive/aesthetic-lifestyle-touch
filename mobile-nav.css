@@ -74,6 +74,7 @@
   color: var(--alt-black); padding: 10px 4px;
   opacity: 0; transform: translateY(14px);
   transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1), color 0.25s ease;
+  display: inline-block;
 }
 #mnav-overlay.open .mnav-link{ opacity: 1; transform: translateY(0); }
 #mnav-overlay.open .mnav-link:nth-child(1){ transition-delay: 0.08s; }
@@ -82,6 +83,10 @@
 #mnav-overlay.open .mnav-link:nth-child(4){ transition-delay: 0.26s; }
 #mnav-overlay.open .mnav-link:nth-child(5){ transition-delay: 0.32s; }
 .mnav-link.active{ color: var(--alt-muted); text-decoration: line-through; text-decoration-color: var(--alt-border); text-decoration-thickness: 2px; }
+/* :active fires identically on a mouse press (desktop) and a touch
+   (mobile) — unlike :hover, which only exists on desktop — so this is
+   the one feedback state guaranteed to show up on every device. */
+#mnav-overlay.open .mnav-link:active{ transform: translateY(0) scale(0.94); color: var(--alt-muted); }
 
 .mnav-divider{
   width: 40px; height: 1px; background: var(--alt-border); margin: 26px 0 22px;
@@ -100,9 +105,11 @@
 .mnav-quick-link{
   font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.06em;
   text-transform: uppercase; color: var(--alt-muted);
-  padding: 10px 6px; transition: color 0.2s ease;
+  padding: 10px 6px; transition: color 0.2s ease, transform 0.15s ease;
+  display: inline-block;
 }
 .mnav-quick-link:hover{ color: var(--alt-black); }
+.mnav-quick-link:active{ color: var(--alt-black); transform: scale(0.92); }
 button.mnav-quick-link{ background: none; border: none; cursor: pointer; font: inherit; }
 
 .theme-label-dark{ display: none; }
@@ -117,11 +124,23 @@ button.mnav-quick-link{ background: none; border: none; cursor: pointer; font: i
 }
 #mnav-overlay.open .mnav-tag{ opacity: 1; }
 .mnav-tag span{ color: var(--alt-muted); }
+/* --alt-border/--alt-muted both flip toward near-black in dark mode,
+   landing on the (also-flipped, near-black) overlay background — two
+   dark tones on dark, unreadable. Pin both to a translucent white here
+   instead, scoped to dark mode only. */
+:root[data-theme="dark"] .mnav-tag{ color: rgba(255,255,255,0.3); }
+:root[data-theme="dark"] .mnav-tag span{ color: rgba(255,255,255,0.55); }
 
 /* ================= FLOATING BOTTOM NAV ================= */
+/* Dynamic-Island-style: pinned to a full-screen-height page like this
+   one, an always-on bar blocks whatever sits below the fold (footer
+   links, the last row of content) for the entire visit. It now shows
+   itself on scroll movement, then eases back down after 4s of no
+   further scrolling — same frosted "water crystal" glass either way,
+   just not permanently in the way. */
 #mnav-bottombar{
   position: fixed; left: 50%; bottom: calc(16px + var(--sab));
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(0);
   z-index: 80;
   display: flex; align-items: center;
   gap: 2px;
@@ -132,6 +151,13 @@ button.mnav-quick-link{ background: none; border: none; cursor: pointer; font: i
   box-shadow: 0 20px 50px -18px rgba(10,10,10,0.28);
   padding: 6px;
   max-width: calc(100vw - 24px);
+  opacity: 1;
+  transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease;
+}
+#mnav-bottombar.mnav-bb-hidden{
+  transform: translateX(-50%) translateY(calc(100% + 24px + var(--sab)));
+  opacity: 0;
+  pointer-events: none;
 }
 .mnav-bb-item{
   position: relative;

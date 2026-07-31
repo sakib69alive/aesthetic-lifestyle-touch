@@ -63,6 +63,14 @@
     border-bottom: 1px solid rgba(255,255,255,0.08);
   }
   :root[data-theme="dark"] img{ filter: brightness(0.92); }
+  /* Plain 100vh (Tailwind's h-screen) is measured against the mobile
+     browser's largest possible viewport (address bar hidden) — while
+     the bar is still showing, this hero renders taller than the true
+     visible area, so its bottom edge (scroll cue + imagery) overlaps
+     the section right after it. 100dvh tracks the real viewport. */
+  @supports (height: 100dvh){
+    #co-hero{ height: 100dvh; }
+  }
   * { -webkit-font-smoothing: antialiased; }
   body{ background: var(--alt-white); font-family:'Inter', sans-serif; color: var(--alt-black); overflow-x: hidden; }
   .font-display{ font-family:'Space Grotesk', sans-serif; }
@@ -219,7 +227,7 @@
   <!-- ============================================================
        HERO
        ============================================================ -->
-  <section class="relative h-screen min-h-[640px] w-full flex items-center overflow-hidden bg-[var(--alt-white)]">
+  <section id="co-hero" class="relative h-screen min-h-[640px] w-full flex items-center overflow-hidden bg-[var(--alt-white)]">
     <div class="ambient-light" style="width:640px; height:640px; top:-160px; right:-160px; background: radial-gradient(circle, rgba(201,194,180,0.32), transparent 70%);"></div>
     <div class="ambient-light" style="width:520px; height:520px; bottom:-140px; left:-120px; background: radial-gradient(circle, rgba(245,244,241,0.9), transparent 70%);"></div>
 

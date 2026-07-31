@@ -169,6 +169,18 @@
     box-shadow: 0 16px 40px -10px rgba(10,10,10,0.45);
   }
 
+  /* Tailwind's h-screen is a plain 100vh, which on mobile browsers is
+     measured against the LARGEST possible viewport (address bar
+     hidden) — while the bar is still showing (e.g. right after the
+     page loads), the actual visible area is shorter than that, so the
+     hero's bottom edge (and the scroll indicator + product photos
+     pinned to it) render past the true fold, overlapping whatever
+     content starts right after this section. 100dvh tracks the real,
+     current viewport instead. */
+  @supports (height: 100dvh){
+    #home{ height: 100dvh; }
+  }
+
   /* ================= SCROLL INDICATOR ================= */
   .scroll-indicator{
     width: 22px;

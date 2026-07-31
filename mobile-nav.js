@@ -150,6 +150,30 @@ function initMobileNav(){
 
     if (typeof Cart !== "undefined" && typeof Cart.syncBadges === "function") Cart.syncBadges();
     if (typeof syncWishlistBadge === "function") syncWishlistBadge();
+
+    wireBottomNavAutoHide();
+  }
+
+  /* Dynamic-Island-style auto-hide: a bar pinned to the bottom of the
+     screen for the entire visit blocks whatever sits at the true
+     bottom of the page (footer links, last content row) — especially
+     bad on pages that are mostly scrolling. Show it on any scroll
+     movement, then ease it back down after 4s of no further scrolling.
+     Reduced-motion users get the bar permanently visible instead of a
+     motion-based show/hide they didn't ask for. */
+  function wireBottomNavAutoHide(){
+    const bar = document.getElementById("mnav-bottombar");
+    if (!bar) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let hideTimer = null;
+    function reveal(){
+      bar.classList.remove("mnav-bb-hidden");
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => bar.classList.add("mnav-bb-hidden"), 4000);
+    }
+    window.addEventListener("scroll", reveal, { passive: true });
+    reveal();
   }
 
   /* ================================================================

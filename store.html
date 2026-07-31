@@ -60,6 +60,20 @@
     border-bottom: 1px solid rgba(255,255,255,0.08);
   }
   :root[data-theme="dark"] img{ filter: brightness(0.92); }
+  /* .glass-input's rgba(245,244,241,...) background is the fixed light
+     value only — never flipped for dark mode — so it read as a washed
+     grey there while its icon/typed text (inherited body color) flipped
+     to white, disappearing against it. Keep the whole thing fixed-light
+     in dark mode too, same as the other fixed chips/surfaces on the
+     site — never pair a fixed surface with flipping text. */
+  :root[data-theme="dark"] .glass-input{
+    background: rgba(255,255,255,0.92);
+    border-color: rgba(10,10,10,0.14);
+  }
+  :root[data-theme="dark"] .glass-input,
+  :root[data-theme="dark"] .glass-input input,
+  :root[data-theme="dark"] .glass-input svg{ color: #0A0A0A; }
+  :root[data-theme="dark"] .glass-input input::placeholder{ color: rgba(10,10,10,0.55); }
 
   * { -webkit-font-smoothing: antialiased; }
   body{
