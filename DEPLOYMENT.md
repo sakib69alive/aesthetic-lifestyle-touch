@@ -37,10 +37,11 @@ work fine, since those don't need a server at all.
   GitHub's free plan only serves Pages sites publicly from a *public*
   repo — private-repo Pages needs a paid GitHub plan. Netlify does it
   for free, which is why the site actually lives there.)
-- **Live URL**: https://aesthetic-lifestyle-touch.netlify.app
-  (renamed from Netlify's auto-generated name — can be changed again
-  any time in Netlify → Project configuration → Change project name,
-  or replaced entirely once you attach a custom domain — see below.)
+- **Live URL**: https://aestheticlifestyletouch.netlify.app
+  (renamed from Netlify's auto-generated name to reserve this exact
+  subdomain — can be changed again any time in Netlify → Project
+  configuration → Change project name, or replaced entirely once you
+  attach a custom domain — see below.)
 - The Netlify project itself is set to **Public** access (Project
   overview → the visibility toggle next to the project name) — this is
   what makes the live site visible to ordinary visitors, separate from
