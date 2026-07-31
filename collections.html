@@ -55,7 +55,7 @@
     --alt-bad:     #E0655C;
   }
   :root[data-theme="dark"] .nav-glass{
-    background: rgba(10,9,7,0.72);
+    background: rgba(10,9,7,0.55);
     border-bottom: 1px solid rgba(255,255,255,0.08);
   }
   :root[data-theme="dark"] #co-subnav{
@@ -80,7 +80,7 @@
   .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
 
   .nav-glass{
-    background: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.55);
     backdrop-filter: blur(16px) saturate(160%);
     -webkit-backdrop-filter: blur(16px) saturate(160%);
     border-bottom: 1px solid rgba(232,230,225,0.6);
@@ -134,6 +134,14 @@
   .p-stage img{ width:100%; height:100%; object-fit:cover; transition: transform .7s cubic-bezier(0.16,1,0.3,1); }
   .p-card:hover .p-stage img{ transform: scale(1.08); }
   .badge{ font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; color:#0A0A0A; }
+  /* Tailwind's bg-white/90|95 reads as a near-solid white block —
+     softened to a lightly grey-tinted, more transparent, blurrier
+     glass chip instead (same fixed-light surface, less "solid box"). */
+  .bg-white\/90, .bg-white\/95{
+    background-color: rgba(245,244,241,0.7) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+  }
   .p-actions button[data-action="quickview"]{ color:#0A0A0A; }
   .p-actions{ position:absolute; left:10px; right:10px; bottom:10px; display:flex; gap:6px; opacity:0; transform: translateY(8px); transition: opacity .3s ease, transform .3s cubic-bezier(0.16,1,0.3,1); }
   .p-card:hover .p-actions{ opacity:1; transform: translateY(0); }

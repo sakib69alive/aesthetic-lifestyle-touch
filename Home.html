@@ -59,7 +59,7 @@
     --alt-bad:     #E0655C;
   }
   :root[data-theme="dark"] .nav-glass{
-    background: rgba(10,9,7,0.72);
+    background: rgba(10,9,7,0.55);
     border-bottom: 1px solid rgba(255,255,255,0.08);
   }
   :root[data-theme="dark"] img{ filter: brightness(0.92); }
@@ -78,7 +78,7 @@
 
   /* ================= NAV ================= */
   .nav-glass{
-    background: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.55);
     backdrop-filter: blur(16px) saturate(160%);
     -webkit-backdrop-filter: blur(16px) saturate(160%);
     border-bottom: 1px solid rgba(232,230,225,0.6);
@@ -179,6 +179,14 @@
      current viewport instead. */
   @supports (height: 100dvh){
     #home{ height: 100dvh; }
+  }
+
+  /* Mobile-only: the floating product composition + its "Scroll" cue
+     stay exactly as-is on desktop (already good there, per feedback) —
+     this is a deliberate skip of the animation-collision work on small
+     screens rather than a redesign, so hides cleanly instead. */
+  @media (max-width: 767px){
+    #product-stage, #hero-scroll-cue{ display: none; }
   }
 
   /* ================= SCROLL INDICATOR ================= */
@@ -460,7 +468,7 @@
   </div>
 
   <!-- Scroll indicator -->
-  <div data-enter class="absolute bottom-9 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3" style="transition-delay: 0.5s;">
+  <div id="hero-scroll-cue" data-enter class="absolute bottom-9 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3" style="transition-delay: 0.5s;">
     <span class="font-mono text-[10px] tracking-[0.2em] text-[var(--alt-muted)] uppercase">Scroll</span>
     <span class="scroll-indicator"></span>
   </div>

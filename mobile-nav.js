@@ -170,7 +170,7 @@ function initMobileNav(){
     function reveal(){
       bar.classList.remove("mnav-bb-hidden");
       clearTimeout(hideTimer);
-      hideTimer = setTimeout(() => bar.classList.add("mnav-bb-hidden"), 4000);
+      hideTimer = setTimeout(() => bar.classList.add("mnav-bb-hidden"), 2000);
     }
     window.addEventListener("scroll", reveal, { passive: true });
     reveal();

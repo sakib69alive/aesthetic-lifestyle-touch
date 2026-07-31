@@ -144,8 +144,11 @@ button.mnav-quick-link{ background: none; border: none; cursor: pointer; font: i
   z-index: 80;
   display: flex; align-items: center;
   gap: 2px;
-  background: rgba(255,255,255,0.86);
-  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+  /* Same glass material as the header (.nav-glass): a light, slightly
+     grey-tinted translucency rather than a near-solid white block, and
+     ~10% less blur than the header's 16px. */
+  background: rgba(245,244,241,0.75);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(232,230,225,0.9);
   border-radius: 999px;
   box-shadow: 0 20px 50px -18px rgba(10,10,10,0.28);
@@ -167,7 +170,13 @@ button.mnav-quick-link{ background: none; border: none; cursor: pointer; font: i
   transition: color 0.25s ease, background-color 0.25s ease, transform 0.15s ease;
 }
 .mnav-bb-item:active{ transform: scale(0.9); }
-.mnav-bb-item.active{ color: var(--alt-black); background: var(--alt-surface); }
+/* The bar itself is a fixed light-glass surface in both themes (by
+   design, like real frosted glass) — but this highlight used the
+   flipping --alt-surface/--alt-black pair, so in dark mode it flipped
+   to a dark chip sitting inside that same light bar instead of the
+   subtle light-on-light highlight it shows in light mode. Fixed tones
+   here keep the highlight consistent with the bar in either theme. */
+.mnav-bb-item.active{ color: #0A0A0A; background: rgba(10,10,10,0.08); }
 .mnav-bb-icon{ position: relative; display: flex; }
 .mnav-bb-label{ font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.02em; }
 .mnav-bb-badge{
