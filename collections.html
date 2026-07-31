@@ -138,7 +138,10 @@
   .co-insp-img{ position:relative; border-radius: 26px; overflow:hidden; aspect-ratio: 16/10; background: var(--alt-surface); }
   .co-insp-img img{ width:100%; height:100%; object-fit:cover; }
   .co-shop-look{ position:absolute; bottom:18px; left:18px; right:18px; display:flex; gap:10px; overflow-x:auto; }
-  .co-look-chip{ display:flex; align-items:center; gap:8px; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); border-radius:999px; padding:6px 12px 6px 6px; flex-shrink:0; cursor:pointer; }
+  /* Fixed light "pin" bubble over a photo, in either theme — its text
+     must stay a fixed dark color too, never the flipping --alt-black
+     (which turns light-on-light here the moment dark mode swaps it). */
+  .co-look-chip{ display:flex; align-items:center; gap:8px; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); border-radius:999px; padding:6px 12px 6px 6px; flex-shrink:0; cursor:pointer; color: #0A0A0A; }
   .co-look-chip img{ width:26px; height:26px; border-radius:999px; object-fit:cover; }
 
   /* ================= LIMITED EDITION ================= */
@@ -322,13 +325,13 @@
       <div class="co-insp-img" data-reveal>
         <img src="https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=1000&q=80&auto=format&fit=crop" alt="Minimal home office" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';">
         <div class="co-overlay" style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(10,10,10,0) 55%, rgba(10,10,10,0.55) 100%);"></div>
-        <p class="absolute top-4 left-4 text-[var(--alt-white)] font-display text-lg font-medium">Minimal Home Office</p>
+        <p class="absolute top-4 left-4 font-display text-lg font-medium" style="color:#F5F4F1;">Minimal Home Office</p>
         <div class="co-shop-look" id="co-look-office"></div>
       </div>
       <div class="co-insp-img" data-reveal style="transition-delay:0.08s;">
         <img src="https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=1000&q=80&auto=format&fit=crop" alt="Relaxed room styling" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';">
         <div class="co-overlay" style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(10,10,10,0) 55%, rgba(10,10,10,0.55) 100%);"></div>
-        <p class="absolute top-4 left-4 text-[var(--alt-white)] font-display text-lg font-medium">Relax &amp; Unwind</p>
+        <p class="absolute top-4 left-4 font-display text-lg font-medium" style="color:#F5F4F1;">Relax &amp; Unwind</p>
         <div class="co-shop-look" id="co-look-relax"></div>
       </div>
     </div>
@@ -687,7 +690,7 @@ function renderCoLimited(){
       <img src="${candidate.img}" alt="${candidate.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';">
     </div>
     <div>
-      <span class="badge inline-block uppercase bg-[var(--alt-surface)] px-3 py-1.5 rounded-full mb-4">Limited Edition</span>
+      <span class="badge inline-block uppercase bg-white/90 backdrop-blur px-3 py-1.5 rounded-full mb-4">Limited Edition</span>
       <h2 class="font-display text-2xl md:text-3xl font-medium tracking-tight mb-3">${candidate.name}</h2>
       <p class="text-[var(--alt-muted)] leading-relaxed mb-5">${candidate.desc}</p>
       <p class="text-sm font-medium mb-6" style="color:var(--alt-warn);">Only ${candidate.stock} left in stock.</p>

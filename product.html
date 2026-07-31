@@ -347,6 +347,10 @@
     transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
   }
   #mobile-bar.show{ transform: translateY(0); }
+  :root[data-theme="dark"] #mobile-bar{
+    background: rgba(10,9,7,0.92);
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
 
   @media (prefers-reduced-motion: reduce){
     [data-enter], [data-reveal], .gallery-stage img, .p-card, .p-stage img, #pdp-root, #pdp-curtain, #lightbox, #lightbox img, #mobile-bar, .feature-card, .icon-btn{

@@ -2025,7 +2025,7 @@ function renderTickets(){
         <p class="text-sm font-medium">${escapeHTML(t.subject)}</p>
         <p class="text-xs text-[var(--alt-muted)] font-mono mt-1">${t.id} · ${new Date(t.at).toLocaleDateString()}</p>
       </div>
-      <span class="badge px-2.5 py-1 rounded-full bg-[var(--alt-surface)]">${t.status}</span>
+      <span class="badge px-2.5 py-1 rounded-full bg-white/90">${t.status}</span>
     </div>
   `).join("");
 }
