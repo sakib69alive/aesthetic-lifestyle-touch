@@ -319,9 +319,15 @@
      softened to a lightly grey-tinted, more transparent, blurrier
      glass chip instead (same fixed-light surface, less "solid box"). */
   .bg-white\/90, .bg-white\/95{
-    background-color: rgba(245,244,241,0.7) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
+    /* No backdrop-filter here on purpose: these repeat per product
+       card (badge + wishlist heart + quick-view button, times every
+       card in the grid) — blur is one of the most GPU-expensive CSS
+       properties on mobile, and multiplying it across a whole
+       scrolling grid is a real jank source. The colour softening
+       alone still fixes the solid-white-block look; blur stays
+       reserved for the header/bottom bar/search box, where it's paid
+       for once, not per card. */
+    background-color: rgba(245,244,241,0.75) !important;
   }
 
   /* ================= RESTOCK REQUEST ================= */
