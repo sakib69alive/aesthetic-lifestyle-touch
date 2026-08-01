@@ -1974,9 +1974,53 @@ function renderProductsTable(){
 }
 function idOf(rawId){ const n = Number(rawId); return Number.isNaN(n) ? rawId : n; }
 
-function openProductEditor(id){
+/* ================================================================
+   IMAGE UPLOAD / MEDIA LIBRARY (shared store with cms.html's Media
+   Library — same key, same shape — so a photo picked here shows up
+   there too, and vice versa). No server exists to upload files to, so
+   this stores the picked file as a data URL directly in localStorage,
+   same approach the CMS's own uploader already uses.
+   ================================================================ */
+const MEDIA_KEY = "alt_cms_media_v1";
+function allMedia(){ try { return JSON.parse(localStorage.getItem(MEDIA_KEY) || "[]"); } catch (e) { return []; } }
+function saveMedia(list){ localStorage.setItem(MEDIA_KEY, JSON.stringify(list)); }
+function addMediaItem(item){ saveMedia([item, ...allMedia()]); }
+
+function openMediaPicker(onPick){
+  const items = allMedia().filter(m => m.type !== "video");
+  const body = `
+    <div class="grid grid-cols-3 gap-3">
+      ${items.length ? items.map(m => `
+        <div class="media-tile amp-pick" data-url="${m.url}" style="cursor:pointer;border-radius:10px;overflow:hidden;aspect-ratio:1/1;">
+          <img src="${m.url}" loading="lazy" decoding="async" alt="${escapeHTML(m.alt || "")}" style="width:100%;height:100%;object-fit:cover;">
+        </div>
+      `).join("") : `<p class="text-sm text-[var(--alt-muted)] col-span-3">No images uploaded yet — use "Upload New Image" first.</p>`}
+    </div>
+  `;
+  openDrawer("Choose Image", body, null);
+  document.querySelectorAll(".amp-pick").forEach(el => el.addEventListener("click", () => { onPick(el.dataset.url); closeDrawer(); }));
+}
+
+/* Reads a picked file straight into a data URL — no size/type dialog
+   needed beyond this basic guard, matching the CMS uploader's cap. */
+function handleProductImageFile(file, onDone){
+  if (!/^image\//.test(file.type)){ adminToast("Please choose an image file."); return; }
+  if (file.size > 4 * 1024 * 1024){ adminToast("Image is too large — please choose one under 4MB."); return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    addMediaItem({ id: "med_" + Date.now(), name: file.name, type: "image", url: reader.result, alt: "", folder: "Uploads", uploadedAt: Date.now(), size: file.size });
+    onDone(reader.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+function openProductEditor(id, draftOverride){
   const isNew = id === null;
-  const p = isNew ? { name: "", price: 0, stock: 0, tags: [], desc: "", img: "" } : effectiveProducts().find(x => x.id === id);
+  // draftOverride carries the in-progress form values back in when this
+  // drawer is being re-opened after a detour through the media picker
+  // (which takes over the same drawer element) — without it, picking an
+  // image would discard whatever name/price/etc. the admin had already typed.
+  const p = draftOverride || (isNew ? { name: "", price: 0, stock: 0, tags: [], desc: "", img: "" } : effectiveProducts().find(x => x.id === id));
   const body = `
     <div class="mb-4"><label class="field-label">Name</label><input id="pe-name" class="field-input" value="${p.name || ""}"></div>
     <div class="grid grid-cols-2 gap-3 mb-4">
@@ -1984,11 +2028,53 @@ function openProductEditor(id){
       <div><label class="field-label">Stock</label><input id="pe-stock" type="number" min="0" class="field-input" value="${p.stock || 0}"></div>
     </div>
     <div class="mb-4"><label class="field-label">Category tags (comma separated)</label><input id="pe-tags" class="field-input" value="${(p.tags || []).join(", ")}"></div>
-    <div class="mb-4"><label class="field-label">Image URL</label><input id="pe-img" class="field-input" value="${p.img || ""}"></div>
+    <div class="mb-4">
+      <label class="field-label">Image</label>
+      <div id="pe-img-preview-wrap" style="${p.img ? "" : "display:none;"} margin-bottom:8px;">
+        <img id="pe-img-preview" src="${p.img || ""}" style="width:100%;max-height:160px;object-fit:cover;border-radius:12px;" alt="">
+      </div>
+      <div class="flex items-center gap-2 mb-2 flex-wrap">
+        <button type="button" id="pe-upload-btn" class="adm-btn adm-btn-ghost">Upload New Image</button>
+        <button type="button" id="pe-library-btn" class="adm-btn adm-btn-ghost">Choose from Media Library</button>
+        <input type="file" id="pe-img-file" accept="image/*" style="display:none;">
+      </div>
+      <input id="pe-img" class="field-input" placeholder="…or paste an image URL directly" value="${p.img || ""}">
+    </div>
     <div><label class="field-label">Description</label><textarea id="pe-desc" rows="3" class="field-input">${p.desc || ""}</textarea></div>
   `;
   const foot = `<button id="pe-save" class="adm-btn adm-btn-primary flex-1">${isNew ? "Add Product" : "Save Changes"}</button>`;
   openDrawer(isNew ? "Add Product" : `Edit — ${p.name}`, body, foot);
+
+  function setImage(url){
+    document.getElementById("pe-img").value = url;
+    document.getElementById("pe-img-preview").src = url;
+    document.getElementById("pe-img-preview-wrap").style.display = url ? "" : "none";
+  }
+  document.getElementById("pe-img").addEventListener("input", e => setImage(e.target.value));
+  document.getElementById("pe-upload-btn").addEventListener("click", () => document.getElementById("pe-img-file").click());
+  document.getElementById("pe-img-file").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    handleProductImageFile(file, (url) => { setImage(url); adminToast("Image uploaded."); });
+  });
+  document.getElementById("pe-library-btn").addEventListener("click", () => {
+    // openMediaPicker takes over the same drawer element, so capture
+    // whatever's currently in the form before it's gone, and restore
+    // all of it (not just the image) once a photo is picked.
+    const draft = {
+      name: document.getElementById("pe-name").value,
+      price: document.getElementById("pe-price").value,
+      stock: document.getElementById("pe-stock").value,
+      tags: document.getElementById("pe-tags").value.split(",").map(s => s.trim()).filter(Boolean),
+      img: document.getElementById("pe-img").value,
+      desc: document.getElementById("pe-desc").value,
+    };
+    openMediaPicker(url => {
+      draft.img = url;
+      openProductEditor(id, draft);
+    });
+  });
+
   document.getElementById("pe-save").addEventListener("click", () => {
     const patch = {
       name: document.getElementById("pe-name").value.trim(),
