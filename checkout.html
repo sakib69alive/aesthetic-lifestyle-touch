@@ -686,7 +686,12 @@
    Pickup stays a fixed future placeholder, not yet admin-editable. */
 const DELIVERY_METHODS = [
   ...getDeliveryMethods(),
-  { id: "pickup", label: "Pickup Point", eta: "Coming soon", priceDhaka: 0, priceOutside: 0, etaDays: 5, disabled: true },
+  /* Self-collect, free — meant for people close enough to arrange
+     pickup directly rather than a public drop-off network. Nothing
+     stops any customer from picking it at checkout (there's no way to
+     restrict it to specific people on a static site), so the label
+     itself sets the expectation. */
+  { id: "pickup", label: "Pickup Point (Self Collect)", eta: "We'll contact you to arrange a pickup time", priceDhaka: 0, priceOutside: 0, etaDays: 2 },
 ];
 
 /* Delivery pricing depends on the shipping district — "Dhaka" district

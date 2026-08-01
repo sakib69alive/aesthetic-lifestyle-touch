@@ -869,53 +869,7 @@ function showToast(msg){
   toastTimeout = setTimeout(() => { t.style.opacity = "0"; t.style.transform = "translate(-50%,16px)"; }, 2200);
 }
 
-/* ================================================================
-   SEED DEMO DATA (first visit only)
-   TIMELINE_STEPS / ORDER_STATUSES / nextOrderId now live in
-   order-service.js — the same file checkout.html writes real orders
-   through and admin.js reads them from.
-   ================================================================ */
 const DAY = 86400000;
-
-function seedOrders(){
-  const now = Date.now();
-  const specs = [
-    { items: [1, 4], through: 6, status: "delivered", payment: "Paid", daysAgo: 18, delivery: "standard" },
-    { items: [6],    through: 4, status: "shipped",   payment: "Paid", daysAgo: 4,  delivery: "express" },
-    { items: [8, 13],through: 2, status: "confirmed",  payment: "Cash on Delivery", daysAgo: 1, delivery: "standard" },
-    { items: [9],    through: 1, status: "cancelled", payment: "Refunded", daysAgo: 30, delivery: "standard" },
-  ];
-  return specs.map(s => {
-    const placedAt = now - s.daysAgo * DAY;
-    const spanDays = s.delivery === "express" ? 2 : 5;
-    const gap = (spanDays * DAY) / (TIMELINE_STEPS.length - 1);
-    return {
-      id: nextOrderId(),
-      demo: true,
-      placedAt,
-      status: s.status,
-      paymentStatus: s.payment,
-      deliveryMethod: s.delivery,
-      items: s.items.map(id => { const p = PRODUCTS.find(x => x.id === id); return { productId: id, name: p.name, img: p.img, qty: 1, unitPrice: p.salePrice || p.price }; }),
-      timeline: TIMELINE_STEPS.map((label, i) => ({ label, done: i < s.through, at: i < s.through ? placedAt + i * gap : null })),
-      eta: placedAt + spanDays * DAY,
-    };
-  }).sort((a, b) => b.placedAt - a.placedAt);
-}
-
-function seedNotifications(){
-  const now = Date.now();
-  return [
-    { id: "n1", category: "Order Updates",  title: "Your order has shipped",       body: "It's on its way and should arrive soon.", at: now - 4 * DAY, read: false },
-    { id: "n2", category: "Promotions",     title: "10% off with WELCOME10",        body: "Use code WELCOME10 at checkout this week.", at: now - 6 * DAY, read: false },
-    { id: "n3", category: "Restock Alerts", title: "Orbit Watch is running low",    body: "Only a few left — grab one before it sells out.", at: now - 9 * DAY, read: true },
-    { id: "n4", category: "Delivery",       title: "Order delivered",               body: "Your recent order was delivered. Hope you love it.", at: now - 18 * DAY, read: true },
-    { id: "n5", category: "System",         title: "Welcome to Aesthetic Lifestyle Touch", body: "Your account is ready — explore the collection.", at: now - 20 * DAY, read: true },
-  ];
-}
-
-if (getUserList("alt_orders_v1").length === 0 && !hasAnyRealOrders()) setUserList("alt_orders_v1", seedOrders());
-if (getUserList("alt_notifications_v1").length === 0) setUserList("alt_notifications_v1", seedNotifications());
 
 // One-time migration from Checkout's single saved address into the
 // Dashboard's multi-address store.
@@ -1012,7 +966,7 @@ function renderHome(){
   const activity = [];
   orders.slice(0, 3).forEach(o => activity.push({ at: o.placedAt, text: `Order ${o.id} ${o.status === "delivered" ? "was delivered" : o.status === "shipped" ? "shipped" : o.status === "cancelled" ? "was cancelled" : "was placed"}.` }));
   Wishlist.ids().slice(0, 2).forEach(id => {
-    const p = PRODUCTS.find(x => x.id === id);
+    const p = getProduct(id);
     if (p) activity.push({ at: Date.now() - DAY, text: `You saved ${p.name} to your wishlist.` });
   });
   activity.sort((a, b) => b.at - a.at);
@@ -1069,7 +1023,7 @@ function renderOrders(){
   if (orders.length === 0){ list.innerHTML = `<p class="text-sm text-[var(--alt-muted)] py-10 text-center">No orders match your filters.</p>`; return; }
 
   list.innerHTML = orders.map(o => {
-    const items = (o.items || []).map(it => it.name ? it : Object.assign({}, it, { name: (PRODUCTS.find(p => p.id === it.productId) || {}).name, img: (PRODUCTS.find(p => p.id === it.productId) || {}).img, unitPrice: it.unitPrice ?? ((PRODUCTS.find(p => p.id === it.productId) || {}).salePrice || (PRODUCTS.find(p => p.id === it.productId) || {}).price || 0) }));
+    const items = (o.items || []).map(it => it.name ? it : Object.assign({}, it, { name: (getProduct(it.productId) || {}).name, img: (getProduct(it.productId) || {}).img, unitPrice: it.unitPrice ?? ((getProduct(it.productId) || {}).salePrice || (getProduct(it.productId) || {}).price || 0) }));
     const total = orderAmount(o);
     const meta = orderStatusMeta(o.status);
     const isDelivered = o.status === "delivered";

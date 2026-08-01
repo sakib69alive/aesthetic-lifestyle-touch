@@ -133,110 +133,6 @@ function setTicketMeta(id, patch){
 }
 
 /* ================================================================
-   DEMO DATA SEEDING (first admin visit only, and only if sparse)
-   ================================================================ */
-async function seedDemoDataIfNeeded(){
-  const existingOrders = allOrders();
-  // Once a real order exists, demo data is frozen (never grows) and is
-  // hidden from every order view anyway — see filteredOrders()'s
-  // hasAnyRealOrders() check.
-  if (existingOrders.length >= 6 || hasAnyRealOrders()) { seedCouponsIfNeeded(); seedReviewsIfNeeded(); return; }
-
-  const demoCustomers = [
-    { first: "Amelia", last: "Reyes", email: "amelia.reyes@example.com" },
-    { first: "Noah", last: "Kim", email: "noah.kim@example.com" },
-    { first: "Farah", last: "Ahmed", email: "farah.ahmed@example.com" },
-    { first: "Lucas", last: "Bennett", email: "lucas.bennett@example.com" },
-    { first: "Sana", last: "Malik", email: "sana.malik@example.com" },
-  ];
-  const users = Auth.users();
-  const seededUsers = [];
-  for (const c of demoCustomers){
-    let u = users.find(x => x.email === c.email);
-    if (!u){
-      u = {
-        id: "u_demo_" + c.first.toLowerCase(),
-        firstName: c.first, lastName: c.last, email: c.email, phone: "",
-        passwordHash: await Auth.hash("demo-customer"),
-        newsletter: Math.random() > 0.5, avatar: null, emailVerified: true, twoFA: false,
-        marketingPrefs: { promotions: true, restock: true, orderUpdates: true },
-        createdAt: Date.now() - Math.floor(Math.random() * 90) * 86400000,
-      };
-      users.push(u);
-    }
-    seededUsers.push(u);
-  }
-  Auth.saveUsers(users);
-
-  const STATUSES = ["pending", "confirmed", "packed", "shipped", "delivered", "delivered", "delivered", "cancelled"];
-  const store = readUserStore("alt_orders_v1");
-  const DAY = 86400000;
-  seededUsers.forEach((u, ui) => {
-    const list = store[u.id] || [];
-    const orderCount = 2 + (ui % 3);
-    for (let i = 0; i < orderCount; i++){
-      const daysAgo = Math.floor(Math.random() * 60);
-      const status = STATUSES[Math.floor(Math.random() * STATUSES.length)];
-      const itemCount = 1 + Math.floor(Math.random() * 3);
-      const items = [];
-      for (let j = 0; j < itemCount; j++){
-        const p = PRODUCTS[Math.floor(Math.random() * PRODUCTS.length)];
-        items.push({ productId: p.id, name: p.name, img: p.img, qty: 1 + Math.floor(Math.random() * 2), unitPrice: p.salePrice || p.price });
-      }
-      const placedAt = Date.now() - daysAgo * DAY;
-      const stepIndex = STATUS_TIMELINE_INDEX[status] ?? 0;
-      list.push({
-        id: "ALT-" + Math.random().toString(36).slice(2, 8).toUpperCase(),
-        demo: true,
-        placedAt,
-        status,
-        paymentStatus: status === "cancelled" ? "Refunded" : "Paid",
-        deliveryMethod: Math.random() > 0.7 ? "express" : "standard",
-        items,
-        timeline: TIMELINE_STEPS.map((label, idx) => ({ label, done: idx <= stepIndex, at: idx <= stepIndex ? placedAt + idx * DAY : null })),
-        eta: placedAt + 5 * DAY,
-      });
-    }
-    store[u.id] = list;
-  });
-  writeUserStore("alt_orders_v1", store);
-
-  seedCouponsIfNeeded();
-  seedReviewsIfNeeded();
-}
-
-function seedCouponsIfNeeded(){
-  if (allCoupons().length) return;
-  saveCoupons([
-    { code: "WELCOME10", type: "percentage", value: 10, minPurchase: 0, expiry: null, usageLimit: null, usedCount: 38, active: true },
-    { code: "FREESHIP", type: "free-shipping", value: 0, minPurchase: 6000, expiry: null, usageLimit: 200, usedCount: 54, active: true },
-    { code: "FLASH25", type: "fixed", value: 2500, minPurchase: 12000, expiry: Date.now() + 7 * 86400000, usageLimit: 100, usedCount: 12, active: true },
-  ]);
-}
-function seedReviewsIfNeeded(){
-  if (allReviews().length) return;
-  const now = Date.now();
-  const picks = [PRODUCTS[0], PRODUCTS[2], PRODUCTS[5], PRODUCTS[7], PRODUCTS[10], PRODUCTS[3]];
-  const texts = [
-    { author: "Priya S.", rating: 5, text: "Genuinely feels like a ৳40,000 product. The packaging alone was a moment." },
-    { author: "Marcus T.", rating: 4, text: "Beautiful design, battery life is solid. Wish it came in one more colorway." },
-    { author: "Elena V.", rating: 5, text: "Bought this as a gift and ended up ordering a second one for myself." },
-    { author: "Daniel K.", rating: 2, text: "Nice look but mine arrived with a small scuff on the base. Support hasn't replied yet." },
-    { author: "Hana W.", rating: 5, text: "Quiet, considered, exactly the aesthetic I was after for my desk setup." },
-    { author: "Omar R.", rating: 3, text: "It's fine — good but not life-changing for the price." },
-  ];
-  saveReviews(picks.map((p, i) => Object.assign({
-    id: "rev_" + i,
-    productId: p.id,
-    productName: p.name,
-    at: now - (i + 1) * 3 * 86400000,
-    status: i === 3 ? "pending" : "approved",
-    pinned: i === 0,
-    reply: i === 2 ? "Thank you so much, Elena — this made our week." : null,
-  }, texts[i])));
-}
-
-/* ================================================================
    TOAST / CONFIRM / DRAWER
    ================================================================ */
 function adminToast(msg){ showCartToast(msg); }
@@ -751,7 +647,7 @@ function renderAnalyticsCharts(){
 
   const categoryTotals = {};
   orders.forEach(o => (o.items || []).forEach(it => {
-    const p = PRODUCTS.find(pp => pp.id === it.productId);
+    const p = getProduct(it.productId);
     if (!p) return;
     (p.tags || []).forEach(tag => { categoryTotals[tag] = (categoryTotals[tag] || 0) + it.qty; });
   }));
@@ -762,7 +658,7 @@ function renderAnalyticsCharts(){
   const productTotals = {};
   orders.forEach(o => (o.items || []).forEach(it => { productTotals[it.productId] = (productTotals[it.productId] || 0) + it.qty; }));
   const prodPoints = Object.keys(productTotals).map(id => {
-    const p = PRODUCTS.find(pp => pp.id === Number(id));
+    const p = getProduct(id) || getProduct(Number(id));
     return { label: p ? p.name : `#${id}`, value: productTotals[id] };
   }).sort((a, b) => b.value - a.value).slice(0, 6);
   rankedList("an-top-products", prodPoints);
@@ -1463,7 +1359,7 @@ VIEW_RENDERERS["reward-vault"] = function(){
   document.getElementById("view-reward-vault").innerHTML = `
     <div class="mb-5" data-enter><h2 class="font-display text-2xl font-medium">Reward Vault</h2><p class="text-sm text-[var(--alt-muted)] mt-1">Manage the Mystery Reward scratch-card system — templates, promotional codes, issued cards, and how it's performing.</p></div>
     <div class="flex items-center gap-2 mb-5 flex-wrap" data-enter>
-      ${[["templates","Reward Templates"],["promo","Promotional Codes"],["cards","Scratch Cards"],["analytics","Analytics"]].map(([slug, label]) => `<button class="adm-chip rv-tab-chip ${rvState.tab === slug ? "active" : ""}" data-tab="${slug}">${label}</button>`).join("")}
+      ${[["templates","Reward Templates"],["promo","Promotional Codes"],["cards","Scratch Cards"],["coins","Coins"],["analytics","Analytics"]].map(([slug, label]) => `<button class="adm-chip rv-tab-chip ${rvState.tab === slug ? "active" : ""}" data-tab="${slug}">${label}</button>`).join("")}
     </div>
     <div id="rv-tab-content" data-enter></div>
   `;
@@ -1471,8 +1367,45 @@ VIEW_RENDERERS["reward-vault"] = function(){
   if (rvState.tab === "templates") renderRvTemplatesTab();
   else if (rvState.tab === "promo") renderRvPromoTab();
   else if (rvState.tab === "cards") renderRvCardsTab();
+  else if (rvState.tab === "coins") renderRvCoinsTab();
   else renderRvAnalyticsTab();
 };
+
+/* ---------------- Coins (same underlying settings as Settings ->
+   Loyalty Points; surfaced here too since "Coins" is the name
+   customers actually see in their Reward Vault) ---------------- */
+function renderRvCoinsTab(){
+  const s = siteSettings();
+  document.getElementById("rv-tab-content").innerHTML = `
+    <div class="panel" style="max-width:520px;">
+      <div class="flex items-center justify-between mb-3">
+        <p class="panel-title">Coins</p>
+        <button class="toggle st-toggle ${s.loyaltyEnabled ? "on" : ""}" data-key="loyaltyEnabled"><span class="toggle-knob"></span></button>
+      </div>
+      <p class="text-sm text-[var(--alt-muted)] mb-4">Customers earn coins automatically once an order is delivered, and can redeem them for a discount at checkout. This is the same balance shown in their Reward Vault.</p>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div><label class="field-label">Spend (৳) to earn 1 coin</label><input id="rv-coin-earn" type="number" min="1" class="field-input" value="${s.loyaltyEarnRateBDT}"></div>
+        <div><label class="field-label">Each coin worth (৳)</label><input id="rv-coin-value" type="number" min="0.01" step="0.01" class="field-input" value="${s.loyaltyPointValueBDT}"></div>
+      </div>
+      <label class="field-label">Minimum coin balance to redeem</label>
+      <input id="rv-coin-min" type="number" min="0" class="field-input max-w-xs mb-4" value="${s.loyaltyMinRedeemPoints}">
+      <p class="text-xs text-[var(--alt-muted)] mb-4">Example: at ৳${s.loyaltyEarnRateBDT} per coin, a ৳${(s.loyaltyEarnRateBDT * 10).toLocaleString()} order earns 10 coins, worth ${bdt ? bdt(10 * s.loyaltyPointValueBDT) : "৳" + (10 * s.loyaltyPointValueBDT)} toward a future order.</p>
+      <button id="rv-coin-save" class="adm-btn adm-btn-primary">Save</button>
+    </div>
+  `;
+  document.querySelectorAll("#rv-tab-content .st-toggle").forEach(btn => btn.addEventListener("click", () => btn.classList.toggle("on")));
+  document.getElementById("rv-coin-save").addEventListener("click", () => {
+    saveSettings({
+      loyaltyEnabled: document.querySelector('#rv-tab-content .st-toggle[data-key="loyaltyEnabled"]').classList.contains("on"),
+      loyaltyEarnRateBDT: Math.max(1, Number(document.getElementById("rv-coin-earn").value) || 100),
+      loyaltyPointValueBDT: Math.max(0.01, Number(document.getElementById("rv-coin-value").value) || 1),
+      loyaltyMinRedeemPoints: Math.max(0, Number(document.getElementById("rv-coin-min").value) || 0),
+    });
+    logAudit("Coins settings updated", "");
+    adminToast("Coins settings saved.");
+    renderRvCoinsTab();
+  });
+}
 
 /* ---------------- Reward Templates ---------------- */
 function renderRvTemplatesTab(){
@@ -2979,15 +2912,6 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && document.g
 /* ================================================================
    LOGIN GATE + INIT
    ================================================================ */
-document.querySelectorAll(".demo-cred-copy").forEach(btn => {
-  btn.addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(btn.dataset.value); }
-    catch (e){ /* clipboard permission denied — the value is still visible to copy by hand */ }
-    const original = btn.textContent;
-    btn.textContent = "Copied";
-    setTimeout(() => { btn.textContent = original; }, 1200);
-  });
-});
 
 document.getElementById("admin-login-submit").addEventListener("click", async () => {
   const email = document.getElementById("admin-login-email").value;
@@ -3006,7 +2930,6 @@ async function bootAdminShell(){
   document.getElementById("admin-login-root").style.display = "none";
   document.getElementById("admin-shell-root").style.display = "block";
   requestAnimationFrame(() => document.getElementById("admin-shell-root").classList.add("settled"));
-  await seedDemoDataIfNeeded();
   const rec = AdminAuth.record();
   document.getElementById("admin-avatar").textContent = (rec.name || "O")[0].toUpperCase();
   renderSidebar();

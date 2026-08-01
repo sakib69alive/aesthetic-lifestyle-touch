@@ -108,21 +108,10 @@
       <p id="admin-login-error" class="text-xs text-[var(--alt-bad)] mb-3" style="display:none;">Incorrect email or password.</p>
       <button id="admin-login-submit" class="adm-btn adm-btn-primary w-full mt-4" style="padding-top:13px;padding-bottom:13px;">Sign In</button>
       <div class="mt-6 pt-5 border-t border-[var(--alt-border)]">
-        <div class="rounded-2xl border border-[var(--alt-border)] bg-[var(--alt-surface)] p-4">
-          <div class="flex items-center gap-2 mb-3">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--alt-muted)" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <p class="font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--alt-muted)]">Demo Credentials</p>
-          </div>
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs text-[var(--alt-muted)]">Email</span>
-            <button type="button" class="demo-cred-copy font-mono text-xs text-[var(--alt-black)] hover:opacity-60 transition-opacity" data-value="owner@aestheticlifestyletouch.com" title="Click to copy">owner@aestheticlifestyletouch.com</button>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-xs text-[var(--alt-muted)]">Password</span>
-            <button type="button" class="demo-cred-copy font-mono text-xs text-[var(--alt-black)] hover:opacity-60 transition-opacity" data-value="Owner@2026" title="Click to copy">Owner@2026</button>
-          </div>
+        <div class="flex items-center gap-2 text-[var(--alt-muted)]">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <p class="text-xs">Private access — store owner and administrators only.</p>
         </div>
-        <p class="text-[10.5px] text-[var(--alt-muted)] leading-relaxed mt-3">Prototype auth only, hashed client-side — no real backend or server session exists behind this gate.</p>
       </div>
     </div>
   </div>

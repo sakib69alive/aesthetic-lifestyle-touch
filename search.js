@@ -79,7 +79,7 @@ function getSearchResults(){
   const parsed = parseNaturalQuery(q);
   const words = q.replace(/[.,!?]/g, "").split(/\s+/).filter(w => w.length > 2 && !SEARCH_STOPWORDS.has(w));
 
-  let list = PRODUCTS.filter(p => {
+  let list = getStorefrontProducts().filter(p => {
     // Brand is identical for every product, so it's deliberately excluded
     // here — otherwise it would make broad queries match the whole catalog.
     const haystack = `${p.name} ${p.desc} ${p.tags.join(" ")} ${categoryLabel(p.tags[0])}`.toLowerCase();
@@ -119,7 +119,7 @@ function clearRecentSearches(){ localStorage.removeItem(RECENT_SEARCHES_KEY); }
 function getRecentlyViewed(){
   try {
     const ids = JSON.parse(localStorage.getItem(RECENTLY_VIEWED_KEY) || "[]");
-    return ids.map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean);
+    return ids.map(id => getProduct(id)).filter(Boolean);
   } catch (e) { return []; }
 }
 // Exposed so product.html can record a view — see recordProductView() call there.
@@ -386,7 +386,7 @@ function wireResultRows(){
     row.querySelector('[data-action="quickview"]').addEventListener("click", (e) => { e.stopPropagation(); openMiniQuickView(id); });
     row.querySelector('[data-action="addcart"]').addEventListener("click", (e) => {
       e.stopPropagation();
-      const p = PRODUCTS.find(x => x.id === id);
+      const p = getProduct(id);
       if (p.stock === 0) return;
       Cart.add(id, {}, 1);
       showSearchToast("Added to your cart.");
@@ -403,7 +403,7 @@ function updateActiveHighlight(){
 }
 
 function goToProductFromSearch(id){
-  addRecentSearch(searchState.query || PRODUCTS.find(p => p.id === id)?.name || "");
+  addRecentSearch(searchState.query || getProduct(id)?.name || "");
   Search.close();
   window.location.href = `product.html?id=${id}`;
 }
@@ -412,7 +412,7 @@ function goToProductFromSearch(id){
    MINI QUICK VIEW
    ================================================================ */
 function openMiniQuickView(id){
-  const p = PRODUCTS.find(x => x.id === id);
+  const p = getProduct(id);
   if (!p) return;
   document.getElementById("sp-qv-thumb").innerHTML = `<img src="${p.img}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.opacity='0.3';">`;
   document.getElementById("sp-qv-name").textContent = p.name;

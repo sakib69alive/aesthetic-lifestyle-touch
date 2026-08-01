@@ -3,8 +3,10 @@
    One drawer, injected into every page (Home, Store, Product) that
    includes this file. State lives in localStorage so the cart
    survives navigation and refresh. Depends on products-data.js
-   (PRODUCTS, starString) being loaded first.
-   ================================================================ */
+   (getProduct/getStorefrontProducts, starString) being loaded first —
+   always look products up through those, never PRODUCTS directly, or
+   anything an admin added after the fact (everything not in the
+   original seed catalog) silently can't be added to cart/wishlist. */
 
 const CART_STORAGE_KEY = "alt_cart_v1";
 const FREE_SHIPPING_THRESHOLD = 15000;
@@ -81,12 +83,12 @@ const Wishlist = {
   },
   remove(productId){ this._save(this._entries().filter(e => e.id !== productId)); syncWishlistBadge(); },
   count(){ return this.ids().length; },
-  products(){ return this.ids().map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean); },
+  products(){ return this.ids().map(id => getProduct(id)).filter(Boolean); },
 
   // Dashboard-only: same products, sorted by when they were saved or by price.
   productsSorted(sort){
     let list = this._entries()
-      .map(e => ({ ...e, product: PRODUCTS.find(p => p.id === e.id) }))
+      .map(e => ({ ...e, product: getProduct(e.id) }))
       .filter(x => x.product);
     if (sort === "price-asc") list.sort((a, b) => (a.product.salePrice || a.product.price) - (b.product.salePrice || b.product.price));
     else if (sort === "price-desc") list.sort((a, b) => (b.product.salePrice || b.product.price) - (a.product.salePrice || a.product.price));
@@ -98,7 +100,7 @@ const Wishlist = {
   // more sort options than productsSorted() covers.
   entries(){
     return this._entries()
-      .map(e => ({ ...e, product: PRODUCTS.find(p => p.id === e.id) }))
+      .map(e => ({ ...e, product: getProduct(e.id) }))
       .filter(x => x.product);
   },
 };
@@ -168,7 +170,7 @@ const Cart = {
   // A line for a product removed from the catalog is silently dropped.
   lines(){
     return this.items
-      .map(line => ({ line, product: PRODUCTS.find(p => p.id === line.productId) }))
+      .map(line => ({ line, product: getProduct(line.productId) }))
       .filter(x => x.product);
   },
   count(){
@@ -201,7 +203,7 @@ const Cart = {
 
   /* ---------------- mutations ---------------- */
   add(productId, variant = {}, qty = 1){
-    const product = PRODUCTS.find(p => p.id === productId);
+    const product = getProduct(productId);
     if (!product || product.stock === 0) return;
     const color = variant.color || (product.colors ? product.colors[0] : null);
     const size = variant.size || (product.sizes ? product.sizes[0] : null);
@@ -219,7 +221,7 @@ const Cart = {
   setQty(lineId, qty){
     const line = this.items.find(l => l.lineId === lineId);
     if (!line) return;
-    const product = PRODUCTS.find(p => p.id === line.productId);
+    const product = getProduct(line.productId);
     const max = product ? product.stock : 99;
     line.qty = Math.max(1, Math.min(qty, max));
     this.save();
@@ -344,7 +346,7 @@ const Cart = {
 
   updateLineUI(lineId){
     const line = this.items.find(l => l.lineId === lineId);
-    const product = line && PRODUCTS.find(p => p.id === line.productId);
+    const product = line && getProduct(line.productId);
     if (!line || !product) return;
     const row = document.querySelector(`.cart-item[data-line-id="${lineId}"]`);
     if (!row) return;
@@ -448,7 +450,7 @@ function wireItemEvents(){
 
 function renderRecommended(excludeIds){
   const excluded = new Set(excludeIds);
-  let picks = PRODUCTS.filter(p => !excluded.has(p.id) && p.stock > 0);
+  let picks = getStorefrontProducts().filter(p => !excluded.has(p.id) && p.stock > 0);
   const cartTags = new Set(Cart.lines().flatMap(({ product }) => product.tags));
   picks.sort((a, b) => {
     const aMatch = a.tags.some(t => cartTags.has(t)) ? 1 : 0;
