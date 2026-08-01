@@ -1318,7 +1318,7 @@ VIEW_RENDERERS.website = function(){
             const current = (w.heroFeaturedProductIds || [])[i];
             return `<select class="field-input wc-hero-product mb-2" data-i="${i}">
               <option value="">— None —</option>
-              ${products.map(p => `<option value="${p.id}" ${Number(current) === p.id ? "selected" : ""}>${escapeHTML(p.name)}</option>`).join("")}
+              ${products.map(p => `<option value="${p.id}" ${String(current) === String(p.id) ? "selected" : ""}>${escapeHTML(p.name)}</option>`).join("")}
             </select>`;
           }).join("")}
         </div>
@@ -1357,7 +1357,10 @@ VIEW_RENDERERS.website = function(){
   document.querySelectorAll(".wc-nav-remove").forEach(btn => btn.addEventListener("click", () => { w.navLinks.splice(Number(btn.dataset.i), 1); saveWebsiteContent({ navLinks: w.navLinks }); VIEW_RENDERERS.website(); }));
   document.getElementById("wc-save").addEventListener("click", () => {
     const navLinks = Array.from(document.querySelectorAll(".wc-nav-label")).map((inp, i) => ({ label: inp.value, href: document.querySelectorAll(".wc-nav-href")[i].value }));
-    const heroFeaturedProductIds = Array.from(document.querySelectorAll(".wc-hero-product")).map(sel => sel.value ? Number(sel.value) : null);
+    // Product ids are strings now (e.g. "a_1785...") for anything added
+    // through the admin/CMS — Number()'ing one silently turns it into
+    // NaN, so the saved id would never match any real product again.
+    const heroFeaturedProductIds = Array.from(document.querySelectorAll(".wc-hero-product")).map(sel => sel.value || null);
     saveWebsiteContent({
       heroHeadline: document.getElementById("wc-hero-headline").value,
       heroSubtext: document.getElementById("wc-hero-subtext").value,
