@@ -51,7 +51,7 @@ body{ background: var(--alt-surface); font-family:'Inter', sans-serif; color: va
   display:flex; flex-direction:column; height:100vh; position:sticky; top:0;
   border-right: 1px solid rgba(255,255,255,0.06);
 }
-#admin-sidebar-scroll{ flex:1; overflow-y:auto; padding: 6px 14px 20px; }
+#admin-sidebar-scroll{ flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; padding: 6px 14px 20px; }
 .side-group-title{ font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.09em; text-transform:uppercase; color: rgba(255,255,255,0.35); padding: 18px 14px 8px; }
 .side-link{
   display:flex; align-items:center; gap: 12px; width:100%; text-align:left;
@@ -66,9 +66,19 @@ body{ background: var(--alt-surface); font-family:'Inter', sans-serif; color: va
 .side-badge{ margin-left:auto; font-family:'JetBrains Mono', monospace; font-size:10px; background: var(--alt-beige); color: var(--alt-black); border-radius:999px; padding:1px 7px; }
 .side-link.active .side-badge{ background: rgba(255,255,255,0.2); color:#fff; }
 
+/* Keep the complete dark rail pinned while the main content scrolls.
+   The navigation area remains its own scroll container, so long menus
+   never hide the sign-out control. */
+@media (min-width: 1024px){
+  #admin-shell{ display:block; }
+  #admin-sidebar{ position:fixed; inset:0 auto 0 0; height:100dvh; z-index:40; }
+  #admin-main{ margin-left:268px; min-height:100vh; }
+}
+
 @media (max-width: 1023px){
   #admin-sidebar{ position:fixed; top:0; left:0; bottom:0; z-index:70; transform: translateX(-100%); transition: transform 0.45s cubic-bezier(0.16,1,0.3,1); width: min(280px, 86vw); }
   #admin-sidebar.open{ transform: translateX(0); }
+  #admin-main{ margin-left:0; }
 }
 #admin-sidebar-overlay{ position:fixed; inset:0; z-index:69; background:rgba(10,10,10,0.5); opacity:0; pointer-events:none; transition:opacity .3s ease; }
 #admin-sidebar-overlay.open{ opacity:1; pointer-events:all; }
@@ -236,23 +246,4 @@ body{ background: var(--alt-surface); font-family:'Inter', sans-serif; color: va
 
 @media (prefers-reduced-motion: reduce){
   *{ transition: none !important; animation: none !important; }
-#admin-sidebar-scroll{
-  min-height: 0;
-  overscroll-behavior: contain;
-}
-
-@media (min-width: 1024px){
-  #admin-shell{ display: block; }
-
-  #admin-sidebar{
-    position: fixed;
-    inset: 0 auto 0 0;
-    height: 100dvh;
-    z-index: 40;
-  }
-
-  #admin-main{
-    margin-left: 268px;
-    min-height: 100vh;
-  }
 }
