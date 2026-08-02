@@ -236,4 +236,23 @@ body{ background: var(--alt-surface); font-family:'Inter', sans-serif; color: va
 
 @media (prefers-reduced-motion: reduce){
   *{ transition: none !important; animation: none !important; }
+#admin-sidebar-scroll{
+  min-height: 0;
+  overscroll-behavior: contain;
+}
+
+@media (min-width: 1024px){
+  #admin-shell{ display: block; }
+
+  #admin-sidebar{
+    position: fixed;
+    inset: 0 auto 0 0;
+    height: 100dvh;
+    z-index: 40;
+  }
+
+  #admin-main{
+    margin-left: 268px;
+    min-height: 100vh;
+  }
 }
