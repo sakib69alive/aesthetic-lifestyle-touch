@@ -825,7 +825,7 @@ function renderGrid(){
 
   // wire up card interactions
   grid.querySelectorAll(cardSelector).forEach(card => {
-    const id = Number(card.dataset.id);
+    const id = idOf(card.dataset.id);
 
     card.querySelector('[data-action="wishlist"]').addEventListener("click", (e) => {
       e.stopPropagation();

@@ -114,6 +114,12 @@ function getStorefrontProducts(){
    they used to be duplicated) so checkout — which needs to decrement
    stock on every order — can use the exact same functions without
    pulling in the whole admin app. */
+/* Product IDs from the URL/DOM arrive as strings, but admin/CMS-added
+   products keep string IDs (e.g. "a_1735993528123") while the older
+   demo catalog used numeric ones — so a blind Number(id) turns a new
+   product's ID into NaN and every lookup silently fails. Try Number()
+   first (for legacy numeric IDs) and fall back to the raw string. */
+function idOf(rawId){ const n = Number(rawId); return Number.isNaN(n) ? rawId : n; }
 function getProduct(id){ return getAllProductsWithOverrides().find(p => p.id === id); }
 function isExtraProduct(id){ return productExtras().some(p => p.id === id); }
 function updateProduct(id, patch){

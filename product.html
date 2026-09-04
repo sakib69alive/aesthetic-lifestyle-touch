@@ -695,7 +695,7 @@
    RESOLVE PRODUCT FROM URL
    ================================================================ */
 const params = new URLSearchParams(window.location.search);
-const productId = Number(params.get("id"));
+const productId = idOf(params.get("id"));
 const product = getStorefrontProducts().find(p => p.id === productId);
 
 if (!product) {
@@ -1354,7 +1354,7 @@ const relatedFinal = related.length >= 4 ? related : storefrontProductsForRelate
 
 document.getElementById("related-grid").innerHTML = relatedFinal.map(relatedCardHTML).join("");
 document.querySelectorAll("#related-grid .p-card").forEach(card => {
-  card.addEventListener("click", () => goToProduct(Number(card.dataset.id)));
+  card.addEventListener("click", () => goToProduct(idOf(card.dataset.id)));
 });
 
 /* ================================================================

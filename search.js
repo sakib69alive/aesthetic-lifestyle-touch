@@ -270,7 +270,7 @@ function renderIdle(){
       <p class="text-[10px] mt-1.5 truncate">${p.name}</p>
     </div>
   `).join("");
-  document.querySelectorAll("#sp-recently-viewed .sp-thumb-card").forEach(card => card.addEventListener("click", () => goToProductFromSearch(Number(card.dataset.id))));
+  document.querySelectorAll("#sp-recently-viewed .sp-thumb-card").forEach(card => card.addEventListener("click", () => goToProductFromSearch(idOf(card.dataset.id))));
 
   document.getElementById("sp-ai-chips").innerHTML = AI_PROMPTS.map(p => `<button class="sp-chip" data-prompt="${p}">${p}</button>`).join("");
   document.querySelectorAll("#sp-ai-chips .sp-chip").forEach(btn => btn.addEventListener("click", () => {
@@ -375,7 +375,7 @@ function renderActive(){
 
 function wireResultRows(){
   document.querySelectorAll(".sp-result").forEach(row => {
-    const id = Number(row.dataset.id);
+    const id = idOf(row.dataset.id);
     row.addEventListener("click", (e) => { if (!e.target.closest("[data-action]")) goToProductFromSearch(id); });
     row.querySelector('[data-action="wishlist"]').addEventListener("click", (e) => {
       e.stopPropagation();
@@ -520,7 +520,7 @@ function initSearch(){
       updateActiveHighlight();
     } else if (e.key === "Enter" && searchState.activeIndex >= 0){
       e.preventDefault();
-      goToProductFromSearch(Number(results[searchState.activeIndex].dataset.id));
+      goToProductFromSearch(idOf(results[searchState.activeIndex].dataset.id));
     }
   });
 

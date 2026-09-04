@@ -521,7 +521,7 @@ function coProductCardHTML(p){
 
 function wireCoProductCards(containerEl){
   containerEl.querySelectorAll(".p-card").forEach(card => {
-    const id = Number(card.dataset.id);
+    const id = idOf(card.dataset.id);
     const p = getStorefrontProducts().find(x => x.id === id);
     card.querySelector('[data-action="wishlist"]').addEventListener("click", (e) => {
       e.stopPropagation();
