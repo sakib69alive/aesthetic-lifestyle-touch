@@ -24,12 +24,28 @@ function escapeHTML(str){
 const CONTEXT_IMG = "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1000&q=80&auto=format&fit=crop";
 const DETAIL_IMG  = "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=1000&q=80&auto=format&fit=crop";
 
-/* Empty on purpose — this was sample/demo inventory for building and
-   testing the storefront. Add your real catalog from Admin → Products
-   (or CMS → Products); it's stored separately (see productExtras()
-   below) and works exactly the same as everything that used to be
-   listed here. */
-const PRODUCTS = [];
+/* Demo/test inventory — for trying out the storefront and admin panel.
+   Replace or remove these from Admin → Products (or CMS → Products)
+   once real inventory is ready; admin-added products are stored
+   separately (see productExtras() below) and work exactly the same. */
+const PRODUCTS = [
+  { id: 1,  name: "Aura Headphones",     brand: "Aesthetic Lifestyle Touch", price: 20790, rating: 4.8, reviews: 124, stock: 32, tags: ["tech","new-arrivals"],            badge: "New",      desc: "Matte ceramic shell with adaptive spatial audio, tuned for long, quiet listening.", img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=900&q=80&auto=format&fit=crop", colors: ["#0A0A0A","#C9C2B4","#E8E6E1"],
+    specs: { Dimensions: "18 × 16 × 7 cm", Weight: "270 g", Material: "Ceramic composite, memory foam", Compatibility: "Bluetooth 5.3, USB-C", "Country of Origin": "Assembled in Vietnam", Warranty: "2-Year Limited" } },
+  { id: 2,  name: "Halo Desk Lamp",      brand: "Aesthetic Lifestyle Touch", price: 10560,  rating: 4.6, reviews: 98,  stock: 41, tags: ["desk-setup","trending"],          badge: "Trending", desc: "Anodized aluminum arm with three warmth settings and a weighted, silent base.", img: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=900&q=80&auto=format&fit=crop", colors: ["#0A0A0A","#8A8A8A"],
+    specs: { Dimensions: "48 cm height, 22 cm base", Weight: "1.1 kg", Material: "Anodized aluminum, weighted steel base", Compatibility: "USB-C powered, 100–240V", "Country of Origin": "Assembled in Taiwan", Warranty: "2-Year Limited" } },
+  { id: 3,  name: "Orbit Watch",         brand: "Aesthetic Lifestyle Touch", price: 27390, rating: 4.9, reviews: 210, stock: 4,  tags: ["tech","new-arrivals","best-sellers"], badge: "New",  desc: "Sapphire face, ten-day battery, and a clasp machined from a single block of steel.", img: "https://images.unsplash.com/photo-1544117519-31a4b719223d?w=900&q=80&auto=format&fit=crop", colors: ["#0A0A0A","#C9C2B4"],
+    specs: { Dimensions: "42 mm case", Weight: "58 g", Material: "Sapphire crystal, stainless steel", Compatibility: "iOS & Android", "Country of Origin": "Assembled in Switzerland", Warranty: "2-Year Limited" } },
+  { id: 4,  name: "Dune Vase",           brand: "Aesthetic Lifestyle Touch", price: 7480,  rating: 4.7, reviews: 56,  stock: 19, tags: ["room-decor","lifestyle"],         badge: null,       desc: "Hand-poured stoneware with a soft matte finish, no two exactly alike.", img: "https://images.unsplash.com/photo-1602874801007-bd458bb1b8b6?w=900&q=80&auto=format&fit=crop", colors: ["#E8E6E1","#C9C2B4"],
+    specs: { Dimensions: "24 × 14 cm", Weight: "820 g", Material: "Hand-poured stoneware", Compatibility: "—", "Country of Origin": "Handmade in Portugal", Warranty: "30-Day Quality Guarantee" } },
+  { id: 5,  name: "Tray Charger",        brand: "Aesthetic Lifestyle Touch", price: 8690,  rating: 4.5, reviews: 77,  stock: 27, tags: ["desk-setup","gadgets","new-arrivals"], badge: "New", desc: "Three-in-one wireless charging tray finished in woven performance fabric.", img: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=900&q=80&auto=format&fit=crop", colors: ["#0A0A0A","#E8E6E1"],
+    specs: { Dimensions: "20 × 12 × 1.2 cm", Weight: "180 g", Material: "Woven performance fabric, aluminum core", Compatibility: "Qi wireless, 3-in-1", "Country of Origin": "Assembled in Vietnam", Warranty: "1-Year Limited" } },
+  { id: 6,  name: "Echo Speaker",        brand: "Aesthetic Lifestyle Touch", price: 14190, salePrice: 10890, rating: 4.6, reviews: 143, stock: 22, tags: ["tech","trending","best-sellers"], badge: "Trending", desc: "360° sound from a compact woven shell that looks at home anywhere.", img: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=900&q=80&auto=format&fit=crop", colors: ["#C9C2B4","#0A0A0A"],
+    specs: { Dimensions: "16 × 16 × 18 cm", Weight: "980 g", Material: "Woven acoustic fabric, aluminum", Compatibility: "Bluetooth 5.3, Wi-Fi", "Country of Origin": "Assembled in Vietnam", Warranty: "2-Year Limited" } },
+  { id: 7,  name: "Fold Wallet",         brand: "Aesthetic Lifestyle Touch", price: 5940,  rating: 4.4, reviews: 61,  stock: 38, tags: ["accessories","lifestyle"],        badge: null,       desc: "Full-grain leather, RFID-shielded, breaks in beautifully over the first month.", img: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=900&q=80&auto=format&fit=crop", colors: ["#0A0A0A","#8A8A8A","#C9C2B4"],
+    specs: { Dimensions: "11 × 8.5 × 1.5 cm", Weight: "70 g", Material: "Full-grain leather, RFID shield", Compatibility: "Holds up to 8 cards", "Country of Origin": "Handmade in Italy", Warranty: "1-Year Craftsmanship" } },
+  { id: 8,  name: "Ember Candle",        brand: "Aesthetic Lifestyle Touch", price: 4620,  rating: 4.8, reviews: 189, stock: 54, tags: ["room-decor","best-sellers"],     badge: null,       desc: "Poured into a matte concrete vessel; sixty hours of clean, quiet burn.", img: "https://images.unsplash.com/photo-1602928321679-560bb453f190?w=900&q=80&auto=format&fit=crop", colors: ["#E8E6E1"],
+    specs: { Dimensions: "9 × 9 × 10 cm", Weight: "620 g", Material: "Concrete vessel, soy-coconut wax", Compatibility: "60-hour burn time", "Country of Origin": "Hand-poured in-house", Warranty: "Satisfaction Guarantee" } },
+];
 
 // Every product borrows the same two neutral "in context" / "detail" shots
 // for gallery slots 2–3 until real multi-angle photography is available.
