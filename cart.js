@@ -329,6 +329,8 @@ const Cart = {
       document.getElementById("cart-recommended-block").style.display = "none";
       emptyEl.classList.add("show");
       footerEl.style.display = "none";
+      const ship = document.getElementById("cart-ship-progress");
+      if (ship) ship.dataset.hasItems = "";
       return;
     }
 
@@ -365,6 +367,20 @@ const Cart = {
     set("cart-shipping", shipping === 0 ? "Free" : bdt(shipping));
     set("cart-tax", bdt(tax));
     set("cart-total", bdt(total));
+    // phones: sticky-footer total, "Checkout · ৳X" label and the free-shipping progress bar
+    set("cart-footer-total-amt", bdt(total));
+    set("cart-co-amt", ` · ${bdt(total)}`);
+    const progress = document.getElementById("cart-ship-progress");
+    if (progress){
+      const afterDiscount = subtotal - discount;
+      const unlocked = shipping === 0;
+      const left = Math.max(0, FREE_SHIPPING_THRESHOLD - afterDiscount);
+      set("cart-ship-text", unlocked ? "You've unlocked free shipping." : `Add ${bdt(left)} more for free shipping`);
+      const fill = document.getElementById("cart-ship-fill");
+      if (fill) fill.style.width = `${unlocked ? 100 : Math.min(100, (afterDiscount / FREE_SHIPPING_THRESHOLD) * 100)}%`;
+      progress.classList.toggle("done", unlocked);
+      progress.dataset.hasItems = this.count() > 0 ? "1" : "";
+    }
   },
 
   animateRemoveLine(lineId){
@@ -402,10 +418,11 @@ function cartItemHTML(line, product){
       <div class="flex-1 min-w-0">
         <div class="flex items-start justify-between gap-2">
           <h4 class="cart-font-display text-[14px] font-medium leading-snug">${product.name}</h4>
-          <button class="cart-icon-btn shrink-0" data-action="remove" aria-label="Remove ${product.name} from cart">
+          <button class="cart-icon-btn cart-remove-btn shrink-0" data-action="remove" aria-label="Remove ${product.name} from cart">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
               <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>
             </svg>
+            <span class="cart-remove-label">Remove</span>
           </button>
         </div>
         <div class="cart-item-variant mt-1">
@@ -537,6 +554,9 @@ function buildCartDrawerDOM(){
     <div id="cart-overlay"></div>
     <div id="cart-drawer" role="dialog" aria-modal="true" aria-label="Shopping cart">
 
+      <!-- phones: grab handle (the drawer is a bottom sheet there) -->
+      <div class="cart-grab" aria-hidden="true"><span></span></div>
+
       <div id="cart-drawer-header">
         <div>
           <h2 class="cart-font-display text-lg font-medium">Shopping Cart</h2>
@@ -545,6 +565,12 @@ function buildCartDrawerDOM(){
         <button id="cart-drawer-close" class="cart-close-btn" aria-label="Close cart">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
+      </div>
+
+      <!-- phones: free-shipping progress (threshold = FREE_SHIPPING_THRESHOLD) -->
+      <div id="cart-ship-progress" class="cart-ship-progress" style="display:none;">
+        <p id="cart-ship-text" class="cart-ship-text"></p>
+        <div class="cart-ship-track"><span id="cart-ship-fill" class="cart-ship-fill"></span></div>
       </div>
 
       <div id="cart-drawer-body" class="no-scrollbar">
@@ -566,12 +592,15 @@ function buildCartDrawerDOM(){
         <!-- Summary -->
         <div id="cart-summary-block" class="mt-2">
           <div class="mt-6">
+           <details class="cart-promo" open>
+            <summary class="cart-promo-sum">Have a promo code?</summary>
             <p class="cart-font-mono text-[11px] tracking-widest uppercase text-[var(--alt-muted)] mb-3">Promo Code</p>
             <div class="cart-coupon-row">
               <input id="cart-coupon-input" type="text" placeholder="Enter code (try WELCOME10)" aria-label="Promo code" />
               <button id="cart-coupon-apply" class="cart-coupon-apply">Apply</button>
             </div>
             <p id="cart-coupon-feedback" class="cart-coupon-feedback" role="status"></p>
+           </details>
           </div>
 
           <div class="mt-7 pt-2">
@@ -584,7 +613,7 @@ function buildCartDrawerDOM(){
 
           <p class="mt-4 text-xs text-[var(--alt-muted)]">Estimated delivery: 2–5 business days</p>
 
-          <div class="mt-7 grid grid-cols-4 gap-2">
+          <div class="cart-trust-grid mt-7 grid grid-cols-4 gap-2">
             <div class="cart-trust-item">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--alt-black)" stroke-width="1.5"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.4"/><circle cx="17.5" cy="18" r="1.4"/></svg>
               <p class="text-[10px] text-[var(--alt-muted)] leading-tight">Fast Shipping</p>
@@ -613,8 +642,9 @@ function buildCartDrawerDOM(){
       </div>
 
       <div id="cart-drawer-footer">
+        <div class="cart-footer-total"><span>Total</span><span id="cart-footer-total-amt" class="cart-font-mono">৳0</span></div>
         <button id="cart-continue-btn" class="cart-btn-secondary">Continue Shopping</button>
-        <button id="cart-checkout-btn" class="cart-btn-primary">Proceed to Checkout</button>
+        <button id="cart-checkout-btn" class="cart-btn-primary"><span class="cart-co-full">Proceed to Checkout</span><span class="cart-co-short">Checkout</span><span id="cart-co-amt" class="cart-co-amt"></span></button>
       </div>
     </div>
     <div id="checkout-curtain"></div>
@@ -650,6 +680,38 @@ function initCart(){
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && document.getElementById("cart-drawer").classList.contains("open")) Cart.close();
   });
+
+  /* ---------------- phones: bottom-sheet behaviour (≤767px) ----------------
+     The drawer is styled as a bottom sheet there (cart.css). Swipe down on
+     the grab handle / header closes it; the promo field starts collapsed
+     behind "Have a promo code?" (open on desktop, where its summary is hidden). */
+  const phone = window.matchMedia("(max-width: 767px)");
+  const drawer = document.getElementById("cart-drawer");
+  let swipeStartY = null, swipeDy = 0, swipeT0 = 0;
+  [drawer.querySelector(".cart-grab"), document.getElementById("cart-drawer-header")].forEach(zone => {
+    zone.addEventListener("touchstart", (e) => {
+      if (!phone.matches) return;
+      swipeStartY = e.touches[0].clientY; swipeDy = 0; swipeT0 = Date.now();
+      drawer.style.transition = "none";
+    }, { passive: true });
+    zone.addEventListener("touchmove", (e) => {
+      if (swipeStartY == null) return;
+      swipeDy = Math.max(0, e.touches[0].clientY - swipeStartY);
+      drawer.style.transform = `translateY(${swipeDy}px)`;
+    }, { passive: true });
+    zone.addEventListener("touchend", () => {
+      if (swipeStartY == null) return;
+      const fast = swipeDy / Math.max(1, Date.now() - swipeT0) > 0.5;
+      drawer.style.transition = "";
+      swipeStartY = null;
+      drawer.style.transform = "";
+      if (swipeDy > 110 || (fast && swipeDy > 30)) Cart.close();
+    });
+  });
+  const promo = document.querySelector(".cart-promo");
+  function syncPromo(){ if (promo) promo.open = !phone.matches; }
+  syncPromo();
+  phone.addEventListener("change", syncPromo);
 
   // Magnetic hover on "Proceed to Checkout" (desktop only), same feel as Home's Shop Now
   if (window.matchMedia("(min-width: 1024px)").matches && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
