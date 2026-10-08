@@ -182,6 +182,12 @@
     [data-enter], [data-reveal]{ opacity:1 !important; transform:none !important; }
     #co-root{ opacity:1 !important; transform:none !important; filter:none !important; }
   }
+
+  /* ===== MOBILE (≤767px) ===== */
+  @media (max-width: 767px){
+    /* sticky jump-chip row sits directly under the 56px mobile header */
+    #co-subnav{ top: var(--m-header-h, 64px); }
+  }
 </style>
 <link rel="stylesheet" href="tailwind.css">
 </head>

@@ -153,3 +153,70 @@ body{ overflow-x: hidden; max-width: 100vw; }
     --m-fs-input: 16px;               /* prevents iOS focus-zoom */
   }
 }
+
+/* ================================================================
+   PHASE 1 — GLOBAL SHELL  (MOBILE_PLAN.md §Phase 1)
+   Guard: body:has(#mnav-overlay) = a customer page that runs
+   mobile-nav.js (Home, store, collections, product, about, contact,
+   wishlist, request-product, terms, privacy). That keeps dashboard,
+   admin, cms, checkout and account out of the header / rhythm rules.
+   ================================================================ */
+@media (max-width: 767px){
+
+  /* ---- 1.2 header: 56px, gutter-aligned, single-line wordmark ---- */
+  body:has(#mnav-overlay) header.nav-glass > div:first-child{
+    height: var(--m-header-h);
+    padding-inline: var(--m-gutter);
+  }
+  body:has(#mnav-overlay) header a[href="Home.html"],
+  body:has(#mnav-overlay) header a[href="#home"]{
+    font-size: clamp(12px, 3.6vw, 15px) !important;
+    max-width: calc(100vw - 2 * var(--m-gutter) - 104px);
+    /* 44px tap height without moving anything: pad out, pull back in */
+    display: inline-block; padding-block: 12px; margin-block: -12px;
+  }
+
+  /* product.html has no bottom bar (it has its own sticky buy bar), so
+     its header is the compact one: wordmark + cart + menu. Search lives
+     in the menu; account / wishlist were already there. */
+  body:has(#mobile-bar) header #search-trigger,
+  body:has(#mobile-bar) header #account-icon,
+  body:has(#mobile-bar) header #messages-icon,
+  body:has(#mobile-bar) header #wishlist-icon{
+    display: none !important;
+  }
+  body:has(#mobile-bar) header .flex.items-center.gap-5{ gap: 4px; }
+  body:has(#mobile-bar) header #cart-icon{
+    min-width: 44px; min-height: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+
+  /* ---- 1.5 section rhythm ---- */
+  body:has(#mnav-overlay) section:is(.py-16, .py-20, .py-24){ padding-block: var(--m-section); }
+  body:has(#mnav-overlay) section.px-6{ padding-inline: var(--m-gutter); }
+
+  /* ---- 1.6 overflow: page-level decorative blobs (account.html) were
+     640px / 520px wide and pushed scrollWidth to 530px ---- */
+  body > .ambient-light{
+    width: 120vw !important; height: 120vw !important;
+    left: -30vw !important; right: auto !important;
+  }
+
+  /* the closed cart drawer is parked just off-screen (translateX(100%)) and
+     its 80px box-shadow was bleeding a grey smear into the right edge of
+     every page */
+  #cart-drawer:not(.open){ box-shadow: none; }
+
+  /* search quick-view buttons are inline-styled 30px — lift to 44px */
+  #sp-qv-wishlist, #sp-qv-close{ width: 44px !important; height: 44px !important; min-width: 44px; flex-shrink: 0; }
+  #sp-qv-addcart, #sp-qv-viewfull{ min-height: 44px; }
+
+  /* ---- 1.8 minimum text size: 11px ---- */
+  body:not(:has(#sidebar-toggle, #admin-topbar)) :is(
+    [class*="text-[9px]"], [class*="text-[9.5px]"], [class*="text-[10px]"], [class*="text-[10.5px]"],
+    .badge, .ab-soon, .ct-soon, .rp-soon, .sc-fineprint
+  ){ font-size: 11px !important; }
+  body:not(:has(#sidebar-toggle, #admin-topbar)) :is(#wishlist-badge, #messages-badge, #cart-badge){
+    min-width: 18px; height: 18px;
+  }
+}

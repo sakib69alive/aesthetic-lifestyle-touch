@@ -215,3 +215,21 @@ button.mnav-quick-link{ background: none; border: none; cursor: pointer; font: i
     transition: none !important; animation: none !important;
   }
 }
+
+/* ================================================================
+   ===== MOBILE (≤767px) — bottom bar refinement (Phase 1.3) =====
+   10px labels, 22px icons; the active item gets a small beige dot
+   under it instead of the grey chip. Hide-on-idle is unchanged.
+   ================================================================ */
+@media (max-width: 767px){
+  .mnav-bb-item{ min-height: 54px; }
+  .mnav-bb-icon svg{ width: 22px; height: 22px; }
+  .mnav-bb-label{ font-size: 10px; }
+  .mnav-bb-item.active{ background: none; }
+  .mnav-bb-item.active::after{
+    content: ""; position: absolute; bottom: 3px; left: 50%;
+    width: 5px; height: 5px; margin-left: -2.5px;
+    border-radius: 50%; background: var(--alt-beige);
+  }
+  .mnav-bb-badge{ font-size: 11px; width: 17px; height: 17px; top: -6px; right: -9px; }
+}
