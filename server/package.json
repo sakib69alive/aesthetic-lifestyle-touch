@@ -1,0 +1,16 @@
+{
+  "name": "alt-payment-server",
+  "version": "1.0.0",
+  "description": "Payment backend for Aesthetic Lifestyle Touch — handles SSLCommerz (bKash/Nagad/Rocket/card) checkout, keeping the rest of the site's data (cart, orders, auth) exactly as it is in localStorage.",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}

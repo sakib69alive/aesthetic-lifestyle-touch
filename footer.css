@@ -1,0 +1,157 @@
+/* ================================================================
+   SITE FOOTER + SCROLL-TO-TOP
+   Injected by footer.js at the end of <body> on every page — same
+   content everywhere, so it's a shared component rather than
+   duplicated markup like the per-page hero/story sections.
+   ================================================================ */
+
+:root{
+  --alt-white:   #FFFFFF;
+  --alt-surface: #F5F4F1;
+  --alt-black:   #0A0A0A;
+  --alt-border:  #E8E6E1;
+  --alt-beige:   #C9C2B4;
+  --alt-muted:   #8A8A8A;
+}
+
+/* ================= ANNOUNCEMENT BAR ================= */
+/* Only ever appears when the CMS turns it on — see footer.js, which
+   also nudges the fixed header and body padding down by this bar's
+   real height once it's rendered, so every page adapts automatically
+   without per-page tuning. Sits above the header (z-index 60 > 50)
+   for the brief moment before that JS repositioning runs. */
+#site-announcement{
+  position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+  background: var(--alt-black); color: var(--alt-white);
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px 44px; text-align: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.02em;
+}
+#site-announcement p{ margin: 0; }
+#site-announcement button{
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--alt-white); opacity: 0.55; width: 22px; height: 22px; font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.2s ease;
+}
+#site-announcement button:hover{ opacity: 1; }
+
+#site-footer{
+  background: var(--alt-white);
+  border-top: 1px solid var(--alt-border);
+  font-family: 'Inter', sans-serif;
+  color: var(--alt-black);
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+}
+#site-footer.in{ opacity: 1; transform: translateY(0); }
+
+.ft-font-display{ font-family: 'Space Grotesk', sans-serif; }
+.ft-font-mono{ font-family: 'JetBrains Mono', monospace; }
+
+/* ================= NEWSLETTER ================= */
+.ft-news-input{
+  background: var(--alt-surface);
+  border: 1px solid var(--alt-border);
+  border-radius: 999px;
+  padding: 13px 20px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+.ft-news-input:focus{ border-color: var(--alt-black); background: var(--alt-white); }
+.ft-news-input.invalid{ border-color: #B23B3B; }
+
+/* ================= NAV GROUPS ================= */
+.ft-group-title{
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--alt-muted);
+}
+.ft-link{
+  display: block;
+  font-size: 14px; color: var(--alt-muted);
+  padding: 7px 0;
+  transition: color 0.2s ease, transform 0.2s ease;
+  width: fit-content;
+}
+.ft-link:hover{ color: var(--alt-black); transform: translateX(2px); }
+
+.ft-group summary{
+  cursor: pointer;
+  list-style: none;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0;
+  border-top: 1px solid var(--alt-border);
+}
+.ft-group summary::-webkit-details-marker{ display: none; }
+.ft-group .ft-chevron{ transition: transform 0.3s ease; color: var(--alt-muted); }
+.ft-group[open] .ft-chevron{ transform: rotate(180deg); }
+.ft-group .ft-group-body{ padding-bottom: 10px; }
+
+/* ================= SOCIAL / PAYMENT / TRUST ICONS ================= */
+.ft-icon-btn{
+  width: 38px; height: 38px; border-radius: 999px;
+  border: 1px solid var(--alt-border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--alt-muted);
+  transition: color 0.2s ease, background-color 0.2s ease, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.ft-icon-btn:hover{ color: var(--alt-black); background: var(--alt-surface); transform: translateY(-2px); }
+
+.ft-pay-chip{
+  border: 1px solid var(--alt-border);
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-size: 11px; font-weight: 500;
+  color: var(--alt-muted);
+  display: flex; align-items: center; gap: 6px;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.ft-pay-chip:hover{ border-color: var(--alt-black); color: var(--alt-black); }
+
+.ft-trust-item{ display: flex; align-items: center; gap: 10px; }
+.ft-trust-item svg{ flex-shrink: 0; }
+
+/* ================= REGION SELECTOR (future-ready) ================= */
+.ft-region-select{
+  background: var(--alt-surface);
+  border: 1px solid var(--alt-border);
+  border-radius: 999px;
+  padding: 8px 32px 8px 14px;
+  font-size: 12px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A8A8A' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+}
+.ft-region-select:disabled{ opacity: 0.6; cursor: not-allowed; }
+
+.ft-soon{
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.05em;
+  color: var(--alt-muted); border: 1px solid var(--alt-border); border-radius: 999px;
+  padding: 2px 8px;
+}
+
+/* ================= SCROLL TO TOP ================= */
+#scroll-to-top{
+  position: fixed; right: 24px; bottom: 24px; z-index: 60;
+  width: 44px; height: 44px; border-radius: 999px;
+  background: var(--alt-black); color: var(--alt-white);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 12px 28px -10px rgba(10,10,10,0.4);
+  opacity: 0; transform: translateY(12px) scale(0.9);
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+#scroll-to-top.show{ opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+#scroll-to-top:hover{ transform: translateY(-2px) scale(1.05); }
+
+@media (prefers-reduced-motion: reduce){
+  #site-footer, .ft-link, .ft-icon-btn, .ft-group .ft-chevron, #scroll-to-top{
+    transition: none !important;
+  }
+  #site-footer{ opacity: 1 !important; transform: none !important; }
+}

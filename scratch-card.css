@@ -1,0 +1,100 @@
+/* ================================================================
+   MYSTERY REWARD — scratch card + reveal popup
+   Shared by dashboard.html (Reward Vault) and checkout.html (the
+   post-purchase reveal popup) — same component, same styling either
+   place it appears.
+   ================================================================ */
+:root{
+  --alt-white:   #FFFFFF;
+  --alt-surface: #F5F4F1;
+  --alt-black:   #0A0A0A;
+  --alt-border:  #E8E6E1;
+  --alt-beige:   #C9C2B4;
+  --alt-muted:   #8A8A8A;
+}
+:root[data-theme="dark"] .sc-card{
+  background: rgba(23,22,15,0.6);
+}
+
+.sc-card{
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 16/10;
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--alt-surface);
+  border: 1px solid var(--alt-border);
+  margin: 0 auto;
+  box-shadow: 0 20px 45px -20px rgba(10,10,10,0.25);
+}
+.sc-face-wrap{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+.sc-face{ text-align:center; padding: 16px; width:100%; }
+.sc-face svg{ display:block; margin:0 auto; }
+.sc-coupon-row{
+  display:flex; align-items:center; gap:14px; margin: 10px auto 0;
+  background: var(--alt-white); border:1px solid var(--alt-border); border-radius:999px;
+  padding: 6px 6px 6px 20px; font-size: 14px; letter-spacing: 0.06em;
+  width:100%; max-width: 240px;
+}
+.sc-coupon-row span{ flex:1; text-align:left; }
+.sc-copy-btn{
+  font-family:'JetBrains Mono', monospace; font-size: 11px; font-weight:500;
+  background: var(--alt-black); color: var(--alt-white); border-radius:999px; padding: 6px 14px;
+  transition: opacity 0.2s ease; flex-shrink:0;
+}
+.sc-copy-btn:hover{ opacity: 0.85; }
+.sc-fineprint{ font-family:'JetBrains Mono', monospace; font-size: 10.5px; color: var(--alt-muted); margin-top: 8px; }
+
+.sc-canvas{
+  position:absolute; inset:0; width:100%; height:100%; cursor: grab; touch-action: none;
+}
+.sc-canvas:active{ cursor: grabbing; }
+
+.sc-hint{
+  /* The scratch foil is a fixed light-grey gradient, never theme-flipping
+     (it's meant to look like real foil, in any theme) — so this text/icon
+     needs a fixed dark color to match, same as the badges/icons that sit
+     on the site's other permanently-light glass surfaces. A flipping
+     var(--alt-white) here went near-black in dark mode, and combined with
+     mix-blend-mode:difference against the light foil that math produced
+     ANOTHER light color — text invisible against the foil either way.
+     Faded out on the first scratch stroke (see hideHint() in
+     scratch-card-ui.js) so it never sits over the reward text being
+     revealed underneath as the foil clears. */
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+  pointer-events:none; color: #0A0A0A;
+  transition: opacity 0.35s ease;
+}
+.sc-hint svg{ animation: sc-hint-pulse 1.8s ease-in-out infinite; }
+@keyframes sc-hint-pulse{ 0%,100%{ opacity:0.5; transform:scale(1); } 50%{ opacity:1; transform:scale(1.1); } }
+.sc-hint p{ font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.04em; text-align:center; max-width: 200px; }
+/* Its own tab, pinned to the bottom edge — kept out of the hint's
+   center block so it never overlaps the reward text mid-scratch, and
+   stays put (fading only on reveal) even after the hint above fades. */
+.sc-reveal-fallback{
+  position:absolute; left:50%; bottom:14px; transform:translateX(-50%);
+  pointer-events: all; font-family:'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.05em;
+  background: rgba(245,244,241,0.92); color:#0A0A0A; backdrop-filter: blur(4px);
+  border: 1px solid rgba(10,10,10,0.15); border-radius: 999px; padding: 6px 16px;
+  transition: opacity 0.35s ease;
+}
+
+/* ================= POST-PURCHASE REVEAL POPUP ================= */
+#reward-popup-backdrop{ position:fixed; inset:0; z-index:200; background:rgba(10,10,10,0.55); backdrop-filter: blur(10px); opacity:0; pointer-events:none; transition: opacity 0.4s ease; display:flex; align-items:center; justify-content:center; padding: 20px; }
+#reward-popup-backdrop.open{ opacity:1; pointer-events:all; }
+#reward-popup-panel{
+  background: var(--alt-white); border-radius: 28px; padding: 36px 28px; max-width: 380px; width:100%;
+  text-align:center; transform: scale(0.92) translateY(14px); opacity:0;
+  transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease;
+}
+#reward-popup-backdrop.open #reward-popup-panel{ transform: scale(1) translateY(0); opacity:1; }
+#reward-popup-continue{
+  margin-top: 22px; width:100%; padding: 14px; border-radius:999px;
+  background: var(--alt-black); color: var(--alt-white); font-size: 14px; font-weight:500;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .sc-hint svg{ animation: none; }
+  #reward-popup-panel{ transition: none !important; }
+}

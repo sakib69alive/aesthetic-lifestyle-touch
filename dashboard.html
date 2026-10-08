@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<script>(function(){try{var t=localStorage.getItem("alt_theme_v1");if(t==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0A0A0A" />
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>My Account — Aesthetic Lifestyle Touch</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="products-data.js"></script>
+<script src="site-content.js"></script>
+<script src="cart.js"></script>
+<script src="auth.js"></script>
+<script src="theme.js"></script>
+<script src="order-service.js"></script>
+<script src="loyalty.js"></script>
+<script src="returns.js"></script>
+<script src="rewards-engine.js"></script>
+<script src="scratch-card-ui.js"></script>
+<script src="custom-requests.js"></script>
+<script src="search.js"></script>
+<link rel="stylesheet" href="cart.css">
+<link rel="stylesheet" href="scratch-card.css">
+<link rel="stylesheet" href="search.css">
+<script src="loader.js"></script>
+<link rel="stylesheet" href="loader.css">
+<script src="footer.js"></script>
+<link rel="stylesheet" href="footer.css">
+<script src="mobile-nav.js"></script>
+<link rel="stylesheet" href="mobile-nav.css">
+<link rel="stylesheet" href="mobile.css">
+<script src="smooth-scroll.js" defer></script>
+
+<style>
+  :root{
+    --alt-white:   #FFFFFF;
+    --alt-surface: #F5F4F1;
+    --alt-black:   #0A0A0A;
+    --alt-border:  #E8E6E1;
+    --alt-beige:   #C9C2B4;
+    --alt-muted:   #8A8A8A;
+    --alt-good:    #3F8F5F;
+    --alt-warn:    #B8863C;
+    --alt-bad:     #B23B3B;
+  }
+  /* ================= DARK MODE ================= */
+  :root[data-theme="dark"]{
+    --alt-white:   #0A0A0A;
+    --alt-surface: #17160F;
+    --alt-black:   #F5F4F1;
+    --alt-border:  #2C2A22;
+    --alt-beige:   #C9C2B4;
+    --alt-muted:   #9C9890;
+    --alt-good:    #4FAE73;
+    --alt-warn:    #D4A24F;
+    --alt-bad:     #E0655C;
+  }
+  :root[data-theme="dark"] .nav-glass{
+    background: rgba(10,9,7,0.55);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  :root[data-theme="dark"] .side-link.active .side-badge{ background: rgba(10,10,10,0.25); }
+  :root[data-theme="dark"] img{ filter: brightness(0.92); }
+  * { -webkit-font-smoothing: antialiased; }
+  body{ background: var(--alt-white); font-family:'Inter', sans-serif; color: var(--alt-black); overflow-x: hidden; }
+  .font-display{ font-family:'Space Grotesk', sans-serif; }
+  .font-mono{ font-family:'JetBrains Mono', monospace; }
+  :focus-visible{ outline: 2px solid var(--alt-black); outline-offset: 2px; }
+  .no-scrollbar::-webkit-scrollbar{ display:none; }
+  .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
+
+  .nav-glass{
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    border-bottom: 1px solid rgba(232,230,225,0.6);
+  }
+
+  #dash-root{ opacity:0; transform: scale(1.03); filter: blur(6px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1), filter 0.8s cubic-bezier(0.16,1,0.3,1); }
+  #dash-root.settled{ opacity:1; transform: none; filter: none; }
+
+  [data-enter]{ opacity:0; transform: translateY(16px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+  [data-enter].in{ opacity:1; transform: translateY(0); }
+
+  /* ================= SIDEBAR ================= */
+  .side-link{
+    display:flex; align-items:center; gap: 12px;
+    padding: 10px 14px; border-radius: 12px;
+    font-size: 14px; color: var(--alt-muted);
+    transition: background-color 0.25s ease, color 0.25s ease;
+    position: relative; width: 100%; text-align: left;
+  }
+  .side-link:hover{ background: var(--alt-surface); color: var(--alt-black); }
+  .side-link.active{ background: var(--alt-black); color: var(--alt-white); }
+  .side-badge{
+    margin-left: auto; font-family:'JetBrains Mono', monospace; font-size: 10px;
+    background: var(--alt-beige); color: var(--alt-black); border-radius: 999px;
+    padding: 1px 7px;
+  }
+  .side-link.active .side-badge{ background: rgba(255,255,255,0.25); color: var(--alt-white); }
+
+  #sidebar-overlay{
+    position: fixed; inset:0; z-index: 55; background: rgba(10,10,10,0.4);
+    opacity:0; pointer-events:none; transition: opacity 0.35s ease;
+  }
+  #sidebar-overlay.open{ opacity:1; pointer-events:all; }
+  @media (max-width: 1023px){
+    #sidebar{
+      position: fixed; top:0; left:0; bottom:0; z-index: 56;
+      width: min(300px, 86vw);
+      background: var(--alt-white);
+      transform: translateX(-100%);
+      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+      overflow-y: auto;
+    }
+    #sidebar.open{ transform: translateX(0); }
+  }
+
+  .avatar-circle{
+    width: 44px; height: 44px; border-radius: 999px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background: var(--alt-black); color: var(--alt-white); font-family:'Space Grotesk', sans-serif; font-weight:500;
+    overflow: hidden;
+  }
+  .avatar-circle img{ width:100%; height:100%; object-fit:cover; }
+
+  /* ================= VIEWS ================= */
+  .dash-view{ display:none; }
+  .dash-view.active{ display:block; }
+
+  /* ================= OVERVIEW CARDS ================= */
+  .overview-card{
+    border: 1px solid var(--alt-border); border-radius: 20px; padding: 20px;
+    transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s ease;
+  }
+  .overview-card:hover{ transform: translateY(-3px); box-shadow: 0 20px 40px -24px rgba(10,10,10,0.22); }
+
+  /* ================= CHIPS / TABS ================= */
+  .chip{ transition: transform 0.25s cubic-bezier(0.16,1,0.3,1), background-color 0.25s ease, color 0.25s ease; white-space: nowrap; }
+  .chip:active{ transform: scale(0.96); }
+
+  /* ================= ORDER CARD ================= */
+  .order-card{ border: 1px solid var(--alt-border); border-radius: 20px; padding: 20px; transition: box-shadow 0.3s ease; }
+  .order-card:hover{ box-shadow: 0 20px 45px -28px rgba(10,10,10,0.2); }
+  .status-dot{ width:7px; height:7px; border-radius:50%; display:inline-block; }
+  .order-thumb{ width:52px; height:52px; border-radius:12px; overflow:hidden; background:var(--alt-surface); flex-shrink:0; }
+  .order-thumb img{ width:100%; height:100%; object-fit:cover; }
+  .order-detail{ display:none; }
+  .order-detail.open{ display:block; }
+  .ghost-btn{ padding: 9px 16px; border-radius:999px; border:1px solid var(--alt-border); font-size:12.5px; font-weight:500; transition: border-color .2s ease, background-color .2s ease; }
+  .ghost-btn:hover{ border-color: var(--alt-black); background: var(--alt-surface); }
+
+  /* ================= TRACKING TIMELINE (modal) ================= */
+  #tracking-backdrop{ position:fixed; inset:0; z-index:90; background:rgba(10,10,10,0.45); backdrop-filter: blur(6px); opacity:0; pointer-events:none; transition: opacity .35s ease; }
+  #tracking-backdrop.open{ opacity:1; pointer-events:all; }
+  #tracking-panel{ transform: scale(0.94) translateY(10px); opacity:0; transition: transform .4s cubic-bezier(0.16,1,0.3,1), opacity .4s ease; }
+  #tracking-backdrop.open #tracking-panel{ transform: scale(1) translateY(0); opacity:1; }
+
+  #cr-detail-backdrop{ position:fixed; inset:0; z-index:90; background:rgba(10,10,10,0.45); backdrop-filter: blur(6px); opacity:0; pointer-events:none; transition: opacity .35s ease; }
+  #cr-detail-backdrop.open{ opacity:1; pointer-events:all; }
+  #cr-detail-panel{ transform: scale(0.94) translateY(10px); opacity:0; transition: transform .4s cubic-bezier(0.16,1,0.3,1), opacity .4s ease; }
+  #cr-detail-backdrop.open #cr-detail-panel{ transform: scale(1) translateY(0); opacity:1; }
+
+  #return-form-backdrop, #return-detail-backdrop{ position:fixed; inset:0; z-index:90; background:rgba(10,10,10,0.45); backdrop-filter: blur(6px); opacity:0; pointer-events:none; transition: opacity .35s ease; }
+  #return-form-backdrop.open, #return-detail-backdrop.open{ opacity:1; pointer-events:all; }
+  #return-form-panel, #return-detail-panel{ transform: scale(0.94) translateY(10px); opacity:0; transition: transform .4s cubic-bezier(0.16,1,0.3,1), opacity .4s ease; }
+  #return-form-backdrop.open #return-form-panel, #return-detail-backdrop.open #return-detail-panel{ transform: scale(1) translateY(0); opacity:1; }
+  .return-item-row{ display:flex; align-items:center; gap:10px; border:1px solid var(--alt-border); border-radius:14px; padding:10px 14px; }
+  .return-photo-thumb{ position:relative; width:56px; height:56px; border-radius:12px; overflow:hidden; flex-shrink:0; }
+  .return-photo-thumb img{ width:100%; height:100%; object-fit:cover; }
+  .return-photo-thumb button{ position:absolute; top:2px; right:2px; width:18px; height:18px; border-radius:999px; background:rgba(10,10,10,0.65); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; line-height:1; }
+
+  #scratch-modal-backdrop{ position:fixed; inset:0; z-index:90; background:rgba(10,10,10,0.55); backdrop-filter: blur(10px); opacity:0; pointer-events:none; transition: opacity .35s ease; }
+  #scratch-modal-backdrop.open{ opacity:1; pointer-events:all; }
+  #scratch-modal-panel{ transform: scale(0.92) translateY(10px); opacity:0; transition: transform .4s cubic-bezier(0.16,1,0.3,1), opacity .4s ease; }
+  #scratch-modal-backdrop.open #scratch-modal-panel{ transform: scale(1) translateY(0); opacity:1; }
+  .reward-locked-card{ position:relative; aspect-ratio:16/10; border-radius:18px; background: linear-gradient(155deg, var(--alt-border), var(--alt-surface)); border:1px solid var(--alt-border); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; cursor:pointer; transition: transform .3s cubic-bezier(0.16,1,0.3,1); }
+  .reward-locked-card:hover{ transform: translateY(-3px); }
+  .cr-step{ display:flex; gap:14px; position:relative; padding-bottom: 22px; }
+  .cr-step:last-child{ padding-bottom:0; }
+  .cr-step-dot{ width:20px; height:20px; border-radius:999px; flex-shrink:0; border:1.5px solid var(--alt-border); background:var(--alt-white); display:flex; align-items:center; justify-content:center; font-size:9px; z-index:1; }
+  .cr-step.done .cr-step-dot{ background: var(--alt-black); border-color: var(--alt-black); color: var(--alt-white); }
+  .cr-step.current .cr-step-dot{ border-color: var(--alt-black); }
+  .cr-step::before{ content:""; position:absolute; left:9.5px; top:20px; bottom:0; width:1.5px; background: var(--alt-border); }
+  .cr-step:last-child::before{ display:none; }
+  .cr-step.done::before{ background: var(--alt-black); }
+
+  .timeline-row{ display:flex; gap: 14px; position:relative; padding-bottom: 26px; }
+  .timeline-row:last-child{ padding-bottom:0; }
+  .timeline-dot{
+    width: 22px; height: 22px; border-radius:999px; flex-shrink:0;
+    border: 1.5px solid var(--alt-border); background: var(--alt-white);
+    display:flex; align-items:center; justify-content:center; font-size: 10px; z-index:1;
+    transition: background-color .4s ease, border-color .4s ease;
+  }
+  .timeline-row.done .timeline-dot{ background: var(--alt-black); border-color: var(--alt-black); color: var(--alt-white); }
+  .timeline-row.current .timeline-dot{ border-color: var(--alt-black); animation: pulse-dot 1.6s ease-in-out infinite; }
+  @keyframes pulse-dot{ 0%,100%{ box-shadow:0 0 0 0 rgba(10,10,10,0.25); } 50%{ box-shadow:0 0 0 6px rgba(10,10,10,0.06); } }
+  .timeline-row::before{
+    content:""; position:absolute; left:10.5px; top:22px; bottom:0; width:1.5px; background: var(--alt-border);
+  }
+  .timeline-row:last-child::before{ display:none; }
+  .timeline-row.done::before{ background: var(--alt-black); }
+
+  .badge{ font-family:'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; }
+  /* Tailwind's bg-white/90|95 reads as a near-solid white block —
+     softened to a lightly grey-tinted, more transparent, blurrier
+     glass chip instead (same fixed-light surface, less "solid box"). */
+  .bg-white\/90, .bg-white\/95{
+    /* No backdrop-filter here on purpose: these repeat per card in a
+       scrolling list — blur is one of the most GPU-expensive CSS
+       properties on mobile, multiplying it per row is a real jank
+       source. The colour softening alone still fixes the solid-white-
+       block look; blur stays reserved for the header/bottom bar. */
+    background-color: rgba(245,244,241,0.75) !important;
+  }
+
+  /* ================= ADDRESS / PAYMENT CARDS ================= */
+  .info-card{ border: 1px solid var(--alt-border); border-radius: 18px; padding: 18px; position: relative; }
+  .default-badge{ font-family:'JetBrains Mono', monospace; font-size: 10px; letter-spacing:.05em; background: var(--alt-surface); border:1px solid var(--alt-border); border-radius:999px; padding:2px 9px; }
+
+  /* ================= FORM FIELDS ================= */
+  .field-label{ font-size: 12px; color: var(--alt-muted); margin-bottom: 6px; display:block; }
+  .field-input{
+    width:100%; background: var(--alt-surface); border:1px solid var(--alt-border); border-radius:14px;
+    padding: 13px 16px; font-size:14px; outline:none;
+    transition: border-color .25s ease, background-color .25s ease, box-shadow .25s ease;
+  }
+  .field-input:focus{ border-color: var(--alt-black); background: var(--alt-white); box-shadow: 0 0 0 3px rgba(10,10,10,0.06); }
+  select.field-input{ appearance:none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A8A8A' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position: right 14px center; background-size:14px; padding-right:40px; }
+  .field-input:disabled{ opacity:0.55; cursor:not-allowed; }
+  .form-error-banner{ opacity:0; max-height:0; overflow:hidden; transition: opacity .3s ease, max-height .3s ease; }
+  .form-error-banner.show{ opacity:1; max-height:40px; }
+
+  /* ================= TOGGLE SWITCH ================= */
+  .switch{ position: relative; width: 42px; height: 24px; border-radius: 999px; background: var(--alt-border); flex-shrink:0; transition: background-color .3s ease; cursor:pointer; }
+  .switch::after{ content:""; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:999px; background: var(--alt-white); box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform .3s cubic-bezier(0.34,1.56,0.64,1); }
+  .switch.on{ background: var(--alt-black); }
+  .switch.on::after{ transform: translateX(18px); }
+  .switch.disabled{ opacity:0.45; cursor:not-allowed; }
+
+  /* ================= FAQ ================= */
+  .faq-item{ border-bottom: 1px solid var(--alt-border); }
+  .faq-q{ width:100%; text-align:left; padding: 18px 0; display:flex; align-items:center; justify-content:space-between; font-size:14px; font-weight:500; }
+  .faq-a{ max-height:0; overflow:hidden; transition: max-height .35s cubic-bezier(0.16,1,0.3,1); }
+  .faq-a-inner{ padding-bottom: 18px; font-size: 13.5px; color: var(--alt-muted); line-height:1.7; }
+  .faq-chevron{ transition: transform .3s ease; }
+  .faq-item.open .faq-chevron{ transform: rotate(180deg); }
+
+  /* ================= NOTIFICATIONS ================= */
+  .notif-row{ display:flex; gap:14px; padding: 16px 0; border-bottom:1px solid var(--alt-border); cursor:pointer; }
+  .notif-row:last-child{ border-bottom:none; }
+  .notif-dot{ width:8px; height:8px; border-radius:50%; background: var(--alt-black); flex-shrink:0; margin-top:6px; }
+  .notif-row.read .notif-dot{ background: transparent; }
+  .notif-row.read h4{ font-weight:400; color: var(--alt-muted); }
+
+  /* ================= EMPTY STATES ================= */
+  .empty-state{ display:flex; flex-direction:column; align-items:center; text-align:center; padding: 56px 20px; }
+
+  @media (prefers-reduced-motion: reduce){
+    [data-enter], #dash-root, .overview-card, .order-card, .p-card, .p-stage img, #tracking-backdrop, #tracking-panel, .timeline-dot, .switch, .switch::after, .faq-a, #sidebar{
+      transition:none !important; animation:none !important;
+    }
+    [data-enter]{ opacity:1 !important; transform:none !important; }
+    #dash-root{ opacity:1 !important; transform:none !important; filter:none !important; }
+  }
+</style>
+<link rel="stylesheet" href="tailwind.css">
+</head>
+<body>
+
+<!-- ================================================================
+     INITIAL LOADING SCREEN -- see loader.js/loader.css
+     ================================================================ -->
+<div id="site-loader" aria-hidden="true">
+  <div class="sl-glow"></div>
+  <p class="sl-mark">AESTHETIC <span>LIFESTYLE TOUCH</span></p>
+  <div class="sl-progress-track"><div class="sl-progress-fill"></div></div>
+</div>
+
+<header class="nav-glass fixed top-0 left-0 right-0 z-50">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <button id="sidebar-toggle" class="lg:hidden" aria-label="Open menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <a href="Home.html" class="font-display text-[15px] font-medium tracking-tight">
+        AESTHETIC <span class="text-[var(--alt-muted)] font-normal">LIFESTYLE TOUCH</span>
+      </a>
+    </div>
+    <div class="flex items-center gap-5">
+      <a href="store.html" class="text-sm font-medium hover:opacity-60 transition-opacity hidden sm:inline">Continue Shopping</a>
+      <button id="search-trigger" aria-label="Search (Ctrl+K)" class="hover:opacity-60 transition-opacity">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="M21 21l-4.3-4.3"/>
+        </svg>
+      </button>
+      <a id="wishlist-icon" href="wishlist.html" aria-label="Wishlist" class="hover:opacity-60 transition-opacity relative">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4 6 4c2 0 3.5 1 4.5 2.6C11.5 5 13 4 15 4c4 0 5.6 4.1 4 7.7C19.5 16.1 12 21 12 21z"/>
+        </svg>
+        <span id="wishlist-badge" class="absolute -top-2 -right-2 bg-[var(--alt-black)] text-[var(--alt-white)] text-[10px] font-mono w-4 h-4 rounded-full flex items-center justify-center">0</span>
+      </a>
+      <button id="cart-icon" aria-label="Cart, 0 items" class="hover:opacity-60 transition-opacity relative">
+        <svg width="20" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L4.5 2.5H2"/>
+          <circle cx="9" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="17" cy="20" r="1.4" fill="currentColor" stroke="none"/>
+        </svg>
+        <span id="cart-badge" class="absolute -top-2 -right-2 bg-[var(--alt-black)] text-[var(--alt-white)] text-[10px] font-mono w-4 h-4 rounded-full flex items-center justify-center">0</span>
+      </button>
+      <button type="button" class="theme-toggle-btn theme-toggle-icon-btn" aria-label="Toggle dark mode">
+        <svg class="theme-icon-light" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="theme-icon-dark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="dash-root" class="max-w-[1400px] mx-auto px-6 md:px-10 pt-24 pb-16">
+  <div class="flex gap-10">
+
+    <div id="sidebar-overlay"></div>
+
+    <!-- ============================================================
+         SIDEBAR
+         ============================================================ -->
+    <aside id="sidebar" class="w-[260px] shrink-0 lg:pt-2 p-6 lg:p-0">
+      <div class="flex items-center gap-3 mb-8 pb-6 border-b border-[var(--alt-border)]">
+        <div class="avatar-circle" id="sidebar-avatar"></div>
+        <div class="min-w-0">
+          <p id="sidebar-name" class="font-display text-sm font-medium truncate"></p>
+          <p id="sidebar-email" class="text-xs text-[var(--alt-muted)] truncate"></p>
+        </div>
+      </div>
+      <nav class="space-y-1" id="sidebar-nav">
+        <button class="side-link active" data-view="home">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>
+          Dashboard
+        </button>
+        <button class="side-link" data-view="orders">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16l-1.5 13h-13z"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/></svg>
+          My Orders
+        </button>
+        <button class="side-link" data-view="custom-orders">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 3h6l1 4H8z"/><path d="M4 7h16l-1.5 13h-13z"/><path d="M12 11v6M9 11l.5 6M15 11l-.5 6"/></svg>
+          Custom Orders
+          <span class="side-badge" id="custom-orders-badge" style="display:none;">0</span>
+        </button>
+        <a class="side-link" href="wishlist.html">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4 6 4c2 0 3.5 1 4.5 2.6C11.5 5 13 4 15 4c4 0 5.6 4.1 4 7.7C19.5 16.1 12 21 12 21z"/></svg>
+          Wishlist
+        </a>
+        <button class="side-link" data-view="rewards">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 17.3l-5.4 3 1-6-4.6-4 6.1-.6L12 4l2.9 5.7 6.1.6-4.6 4 1 6z"/></svg>
+          Reward Vault
+          <span class="side-badge" id="rewards-vault-badge" style="display:none;">0</span>
+        </button>
+        <button class="side-link" data-view="returns">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M4.5 15a8 8 0 0 0 14 4.2M19.5 9A8 8 0 0 0 5.5 4.8"/></svg>
+          Returns
+          <span class="side-badge" id="returns-badge" style="display:none;">0</span>
+        </button>
+        <button class="side-link" data-view="addresses">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s7-6.5 7-11a7 7 0 1 0-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          Saved Addresses
+        </button>
+        <button class="side-link" data-view="payments">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+          Payment Methods
+        </button>
+        <button class="side-link" data-view="profile">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+          Profile
+        </button>
+        <button class="side-link" data-view="notifications">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8a6 6 0 1 1 12 0c0 4 1.5 5 1.5 6.5H4.5C4.5 13 6 12 6 8z"/><path d="M9.5 18a2.5 2.5 0 0 0 5 0"/></svg>
+          Notifications
+          <span class="side-badge" id="notif-badge" style="display:none;">0</span>
+        </button>
+        <button class="side-link" data-view="support">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.9.4-1.4 1-1.4 2.2M12 17h.01"/></svg>
+          Support
+        </button>
+        <button class="side-link" data-view="settings">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </button>
+      </nav>
+      <div class="mt-6 pt-6 border-t border-[var(--alt-border)]">
+        <button id="logout-btn" class="side-link" style="color:var(--alt-bad);">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- ============================================================
+         MAIN CONTENT
+         ============================================================ -->
+    <main class="flex-1 min-w-0">
+
+      <!-- ============ DASHBOARD HOME ============ -->
+      <section class="dash-view active" data-view="home">
+        <p class="font-mono text-xs tracking-[0.2em] text-[var(--alt-muted)] uppercase mb-3" data-enter>Dashboard</p>
+        <h1 id="welcome-heading" class="font-display text-3xl md:text-4xl font-medium tracking-tight mb-1" data-enter style="transition-delay:0.05s;"></h1>
+        <p id="welcome-sub" class="text-sm text-[var(--alt-muted)] mb-10" data-enter style="transition-delay:0.1s;"></p>
+
+        <div id="overview-cards" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <!-- Skeleton seed — renderHome() replaces this via innerHTML
+               once the signed-in user's data is resolved. -->
+          <div class="skel-card" aria-hidden="true"><div class="skeleton" style="width:18px;height:18px;border-radius:5px;"></div><div class="skeleton" style="height:20px;width:40%;border-radius:6px;margin-top:14px;"></div><div class="skeleton" style="height:11px;width:70%;border-radius:6px;margin-top:6px;"></div></div>
+          <div class="skel-card" aria-hidden="true"><div class="skeleton" style="width:18px;height:18px;border-radius:5px;"></div><div class="skeleton" style="height:20px;width:40%;border-radius:6px;margin-top:14px;"></div><div class="skeleton" style="height:11px;width:70%;border-radius:6px;margin-top:6px;"></div></div>
+          <div class="skel-card hidden md:block" aria-hidden="true"><div class="skeleton" style="width:18px;height:18px;border-radius:5px;"></div><div class="skeleton" style="height:20px;width:40%;border-radius:6px;margin-top:14px;"></div><div class="skeleton" style="height:11px;width:70%;border-radius:6px;margin-top:6px;"></div></div>
+        </div>
+
+        <h2 class="font-display text-lg font-medium mt-12 mb-4" data-enter style="transition-delay:0.3s;">Recent Activity</h2>
+        <div id="recent-activity" class="border border-[var(--alt-border)] rounded-[18px] divide-y divide-[var(--alt-border)]" data-enter style="transition-delay:0.35s;"></div>
+      </section>
+
+      <!-- ============ MY ORDERS ============ -->
+      <section class="dash-view" data-view="orders">
+        <h1 class="font-display text-2xl font-medium mb-6">My Orders</h1>
+        <div class="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between mb-6">
+          <div id="order-status-chips" class="flex items-center gap-2 overflow-x-auto no-scrollbar"></div>
+          <div class="relative shrink-0 sm:w-64">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--alt-muted)" stroke-width="1.8" class="absolute left-4 top-1/2 -translate-y-1/2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input id="order-search" type="text" placeholder="Search orders" class="field-input pl-10">
+          </div>
+        </div>
+        <div id="orders-list" class="space-y-4"></div>
+        <div id="orders-empty" class="empty-state" style="display:none;">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="var(--alt-muted)" stroke-width="1.3" class="mb-5"><path d="M4 7h16l-1.5 13h-13z"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/></svg>
+          <h3 class="font-display text-lg font-medium">No orders yet</h3>
+          <p class="mt-2 text-sm text-[var(--alt-muted)] max-w-xs">When you place an order, it'll show up here.</p>
+          <a href="store.html" class="mt-6 px-6 py-3 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium">Start Shopping</a>
+        </div>
+      </section>
+
+      <!-- ============ CUSTOM ORDERS ============ -->
+      <section class="dash-view" data-view="custom-orders">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+          <h1 class="font-display text-2xl font-medium">Custom Orders</h1>
+          <a href="request-product.html" class="ghost-btn">+ New Request</a>
+        </div>
+        <div id="custom-orders-list" class="space-y-4"></div>
+        <div id="custom-orders-empty" class="empty-state" style="display:none;">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="var(--alt-muted)" stroke-width="1.3" class="mb-5"><path d="M9 3h6l1 4H8z"/><path d="M4 7h16l-1.5 13h-13z"/></svg>
+          <h3 class="font-display text-lg font-medium">No custom requests yet</h3>
+          <p class="mt-2 text-sm text-[var(--alt-muted)] max-w-xs">Looking for something we don't carry? Send us a request and we'll source it for you.</p>
+          <a href="request-product.html" class="mt-6 px-6 py-3 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium">Request a Product</a>
+        </div>
+      </section>
+
+      <!-- ============ REWARDS ============ -->
+      <section class="dash-view" data-view="rewards">
+        <h1 class="font-display text-2xl font-medium mb-6">Reward Vault</h1>
+
+        <!-- Balance + Tier -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <div class="overview-card" style="padding:28px;">
+            <p class="font-mono text-xs tracking-widest uppercase text-[var(--alt-muted)] mb-2">Coin Balance</p>
+            <div class="flex items-end gap-3 flex-wrap">
+              <p id="rewards-balance" class="font-display text-4xl font-medium"></p>
+              <p id="rewards-balance-bdt" class="text-sm text-[var(--alt-muted)] mb-1"></p>
+            </div>
+            <p id="rewards-how-it-works" class="text-sm text-[var(--alt-muted)] mt-4"></p>
+          </div>
+          <div class="overview-card" style="padding:28px;">
+            <p class="font-mono text-xs tracking-widest uppercase text-[var(--alt-muted)] mb-2">Loyalty Level</p>
+            <p id="rewards-tier" class="font-display text-4xl font-medium"></p>
+            <p id="rewards-tier-progress" class="text-sm text-[var(--alt-muted)] mt-4"></p>
+          </div>
+        </div>
+
+        <!-- Available Mystery Reward cards -->
+        <div id="rewards-available-wrap" class="mb-8">
+          <h2 class="font-display text-lg font-medium mb-4">Available Rewards</h2>
+          <div id="rewards-available-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-5"></div>
+        </div>
+
+        <!-- Claim a promotional code -->
+        <div class="overview-card mb-8" style="padding:24px;">
+          <p class="font-mono text-xs tracking-widest uppercase text-[var(--alt-muted)] mb-3">Claim a Reward</p>
+          <p class="text-sm text-[var(--alt-muted)] mb-4">Saw a code in one of our posts or videos? Enter it here for a Mystery Reward.</p>
+          <div class="flex gap-2">
+            <input id="rewards-claim-input" class="field-input flex-1" placeholder="Enter promotional code" style="text-transform:uppercase;">
+            <button id="rewards-claim-btn" class="px-6 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium shrink-0">Claim</button>
+          </div>
+          <p id="rewards-claim-feedback" class="text-xs mt-2" style="display:none;"></p>
+        </div>
+
+        <!-- Coupons -->
+        <div class="mb-8">
+          <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <h2 class="font-display text-lg font-medium">My Coupons</h2>
+            <div id="rewards-coupon-chips" class="flex items-center gap-2"></div>
+          </div>
+          <div id="rewards-coupons-list" class="space-y-3"></div>
+          <p id="rewards-coupons-empty" class="text-sm text-[var(--alt-muted)] py-6 text-center" style="display:none;">No coupons in this category.</p>
+        </div>
+
+        <!-- History -->
+        <h2 class="font-display text-lg font-medium mb-4">Reward History</h2>
+        <div id="rewards-history" class="space-y-3"></div>
+        <div id="rewards-empty" class="empty-state" style="display:none;">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="var(--alt-muted)" stroke-width="1.3" class="mb-5"><path d="M12 17.3l-5.4 3 1-6-4.6-4 6.1-.6L12 4l2.9 5.7 6.1.6-4.6 4 1 6z"/></svg>
+          <h3 class="font-display text-lg font-medium">No rewards yet</h3>
+          <p class="mt-2 text-sm text-[var(--alt-muted)] max-w-xs">Place an order to receive your first Mystery Reward.</p>
+          <a href="store.html" class="mt-6 px-6 py-3 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium">Start Shopping</a>
+        </div>
+      </section>
+
+      <!-- ============ RETURNS & EXCHANGES ============ -->
+      <section class="dash-view" data-view="returns">
+        <h1 class="font-display text-2xl font-medium mb-6">Returns &amp; Exchanges</h1>
+        <div id="returns-list" class="space-y-4"></div>
+        <div id="returns-empty" class="empty-state" style="display:none;">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="var(--alt-muted)" stroke-width="1.3" class="mb-5"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M4.5 15a8 8 0 0 0 14 4.2M19.5 9A8 8 0 0 0 5.5 4.8"/></svg>
+          <h3 class="font-display text-lg font-medium">No return or exchange requests</h3>
+          <p class="mt-2 text-sm text-[var(--alt-muted)] max-w-xs">Delivered orders can be returned or exchanged from My Orders within the return window.</p>
+        </div>
+      </section>
+
+      <!-- ============ SAVED ADDRESSES ============ -->
+      <section class="dash-view" data-view="addresses">
+        <div class="flex items-center justify-between mb-6">
+          <h1 class="font-display text-2xl font-medium">Saved Addresses</h1>
+          <button id="add-address-btn" class="ghost-btn">+ Add Address</button>
+        </div>
+        <div id="addresses-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        <div id="addresses-empty" class="empty-state" style="display:none;">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="var(--alt-muted)" stroke-width="1.3" class="mb-5"><path d="M12 21s7-6.5 7-11a7 7 0 1 0-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          <h3 class="font-display text-lg font-medium">No saved addresses</h3>
+          <p class="mt-2 text-sm text-[var(--alt-muted)] max-w-xs">Add an address once so checkout is one step faster next time.</p>
+        </div>
+
+        <!-- Address form (add/edit) -->
+        <div id="address-form-wrap" class="mt-8 border border-[var(--alt-border)] rounded-[20px] p-6" style="display:none;">
+          <h3 class="font-display text-lg font-medium mb-5" id="address-form-title">Add Address</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-2">
+              <label class="field-label">Label</label>
+              <select id="af-label" class="field-input"><option>Home</option><option>Work</option><option>Other</option></select>
+            </div>
+            <div><label class="field-label">Recipient Name</label><input id="af-name" class="field-input"></div>
+            <div><label class="field-label">Phone Number</label><input id="af-phone" class="field-input" type="tel" placeholder="01XXXXXXXXX"></div>
+            <div><label class="field-label">Division</label><select id="af-division" class="field-input"></select></div>
+            <div><label class="field-label">District</label><select id="af-district" class="field-input"></select></div>
+            <div><label class="field-label">Upazila / Thana</label><input id="af-upazila" class="field-input"></div>
+            <div><label class="field-label">Area</label><input id="af-area" class="field-input"></div>
+            <div class="col-span-2"><label class="field-label">Street Address</label><input id="af-street" class="field-input"></div>
+            <div><label class="field-label">Apartment <span class="font-mono text-[10px]">(optional)</span></label><input id="af-apartment" class="field-input"></div>
+            <div><label class="field-label">Postal Code</label><input id="af-postal" class="field-input" inputmode="numeric"></div>
+          </div>
+          <label class="flex items-center gap-2 mt-4 text-sm text-[var(--alt-muted)]"><input type="checkbox" id="af-default" style="accent-color:var(--alt-black);"> Set as default address</label>
+          <div class="flex gap-3 mt-6">
+            <button id="address-form-cancel" class="w-full py-3.5 rounded-full border border-[var(--alt-black)] text-sm font-medium">Cancel</button>
+            <button id="address-form-save" class="w-full py-3.5 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium">Save Address</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PAYMENT METHODS ============ -->
+      <section class="dash-view" data-view="payments">
+        <div class="flex items-center justify-between mb-6">
+          <h1 class="font-display text-2xl font-medium">Payment Methods</h1>
+          <button id="add-payment-btn" class="ghost-btn">+ Add Method</button>
+        </div>
+        <div id="payments-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        <div id="payments-empty" class="empty-state" style="display:none;">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="var(--alt-muted)" stroke-width="1.3" class="mb-5"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+          <h3 class="font-display text-lg font-medium">No saved payment methods</h3>
+          <p class="mt-2 text-sm text-[var(--alt-muted)] max-w-xs">Save a method to check out faster. We only ever store the last few digits.</p>
+        </div>
+
+        <div id="payment-form-wrap" class="mt-8 border border-[var(--alt-border)] rounded-[20px] p-6" style="display:none;">
+          <h3 class="font-display text-lg font-medium mb-5">Add Payment Method</h3>
+          <div id="payment-type-cards" class="grid grid-cols-4 gap-2 mb-5"></div>
+          <div id="pf-card-fields" class="grid grid-cols-2 gap-4">
+            <div class="col-span-2"><label class="field-label">Name on Card</label><input id="pf-name" class="field-input"></div>
+            <div class="col-span-2"><label class="field-label">Card Number</label><input id="pf-number" class="field-input" inputmode="numeric" placeholder="0000 0000 0000 0000" maxlength="19"></div>
+            <div><label class="field-label">Expiry</label><input id="pf-expiry" class="field-input" placeholder="MM/YY" maxlength="5"></div>
+          </div>
+          <div id="pf-wallet-fields" style="display:none;">
+            <label class="field-label">Wallet Number</label><input id="pf-wallet-number" class="field-input max-w-xs" type="tel" placeholder="01XXXXXXXXX">
+          </div>
+          <p class="text-xs text-[var(--alt-muted)] font-mono mt-4">Only the last digits and a label are ever saved — never a full card or wallet number.</p>
+          <div class="flex gap-3 mt-6">
+            <button id="payment-form-cancel" class="w-full py-3.5 rounded-full border border-[var(--alt-black)] text-sm font-medium">Cancel</button>
+            <button id="payment-form-save" class="w-full py-3.5 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium">Save Method</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PROFILE ============ -->
+      <section class="dash-view" data-view="profile">
+        <h1 class="font-display text-2xl font-medium mb-6">Profile Settings</h1>
+
+        <div class="flex items-center gap-5 mb-8">
+          <div class="avatar-circle" id="profile-avatar" style="width:72px;height:72px;font-size:22px;"></div>
+          <div>
+            <label for="profile-avatar-input" class="ghost-btn cursor-pointer inline-block">Change Photo</label>
+            <input id="profile-avatar-input" type="file" accept="image/*" class="hidden">
+            <p class="text-xs text-[var(--alt-muted)] mt-2">JPG or PNG, kept only in this browser.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 max-w-xl">
+          <div><label class="field-label">First Name</label><input id="pr-first" class="field-input"></div>
+          <div><label class="field-label">Last Name</label><input id="pr-last" class="field-input"></div>
+          <div><label class="field-label">Email</label><input id="pr-email" class="field-input" type="email"></div>
+          <div><label class="field-label">Phone</label><input id="pr-phone" class="field-input" type="tel"></div>
+        </div>
+        <button id="profile-save-btn" class="mt-5 px-7 py-3.5 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium">Save Changes</button>
+
+        <h2 class="font-display text-lg font-medium mt-12 mb-4" id="password-section">Change Password</h2>
+        <div class="grid grid-cols-1 gap-4 max-w-xl">
+          <div><label class="field-label">Current Password</label><input id="pr-current-pw" class="field-input" type="password"></div>
+          <div class="grid grid-cols-2 gap-4">
+            <div><label class="field-label">New Password</label><input id="pr-new-pw" class="field-input" type="password"></div>
+            <div><label class="field-label">Confirm New Password</label><input id="pr-confirm-pw" class="field-input" type="password"></div>
+          </div>
+        </div>
+        <p class="form-error-banner text-xs mt-2" id="password-error" style="color:var(--alt-bad);"></p>
+        <button id="password-save-btn" class="mt-3 px-7 py-3.5 rounded-full border border-[var(--alt-black)] text-sm font-medium">Update Password</button>
+
+        <h2 class="font-display text-lg font-medium mt-12 mb-4">Preferences <span class="font-mono text-xs text-[var(--alt-muted)]">(some future-ready)</span></h2>
+        <div class="max-w-xl space-y-4">
+          <div class="flex items-center justify-between">
+            <div><p class="text-sm font-medium">Language</p><p class="text-xs text-[var(--alt-muted)]">More languages coming soon.</p></div>
+            <select class="field-input" style="width:auto;" disabled><option>English</option></select>
+          </div>
+          <div class="flex items-center justify-between">
+            <div><p class="text-sm font-medium">Theme</p><p class="text-xs text-[var(--alt-muted)]">Dark mode coming soon.</p></div>
+            <select class="field-input" style="width:auto;" disabled><option>Light</option></select>
+          </div>
+          <div class="flex items-center justify-between">
+            <div><p class="text-sm font-medium">Order Updates</p></div>
+            <div class="switch" id="pref-orderUpdates"></div>
+          </div>
+          <div class="flex items-center justify-between">
+            <div><p class="text-sm font-medium">Promotions &amp; Offers</p></div>
+            <div class="switch" id="pref-promotions"></div>
+          </div>
+          <div class="flex items-center justify-between">
+            <div><p class="text-sm font-medium">Restock Alerts</p></div>
+            <div class="switch" id="pref-restock"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ NOTIFICATIONS ============ -->
+      <section class="dash-view" data-view="notifications">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+          <h1 class="font-display text-2xl font-medium">Notifications</h1>
+          <button id="mark-all-read-btn" class="ghost-btn">Mark all as read</button>
+        </div>
+        <div id="notif-chips" class="flex items-center gap-2 overflow-x-auto no-scrollbar mb-6"></div>
+        <div id="notif-list" class="border border-[var(--alt-border)] rounded-[18px] px-5"></div>
+        <div id="notif-empty" class="empty-state" style="display:none;">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="var(--alt-muted)" stroke-width="1.3" class="mb-5"><path d="M6 8a6 6 0 1 1 12 0c0 4 1.5 5 1.5 6.5H4.5C4.5 13 6 12 6 8z"/><path d="M9.5 18a2.5 2.5 0 0 0 5 0"/></svg>
+          <h3 class="font-display text-lg font-medium">Nothing here yet</h3>
+          <p class="mt-2 text-sm text-[var(--alt-muted)] max-w-xs">We'll let you know about order updates, offers, and restocks here.</p>
+        </div>
+      </section>
+
+      <!-- ============ SUPPORT ============ -->
+      <section class="dash-view" data-view="support">
+        <h1 class="font-display text-2xl font-medium mb-6">Customer Support</h1>
+
+        <div class="border border-[var(--alt-border)] rounded-[20px] p-6 flex items-center justify-between gap-4 mb-10">
+          <div class="flex items-center gap-4">
+            <div class="w-11 h-11 rounded-full bg-[var(--alt-surface)] flex items-center justify-center">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--alt-black)" stroke-width="1.6"><path d="M4 4h16v12H8l-4 4z"/></svg>
+            </div>
+            <div>
+              <p class="text-sm font-medium">Live Chat</p>
+              <p class="text-xs text-[var(--alt-muted)]">Coming soon — email us in the meantime.</p>
+            </div>
+          </div>
+          <button id="live-chat-btn" class="ghost-btn">Start Chat</button>
+        </div>
+
+        <h2 class="font-display text-lg font-medium mb-2">Frequently Asked Questions</h2>
+        <div id="faq-list" class="mb-10"></div>
+
+        <h2 class="font-display text-lg font-medium mb-4">Contact Us</h2>
+        <div class="grid grid-cols-2 gap-4 max-w-xl mb-3">
+          <div><label class="field-label">Name</label><input id="ct-name" class="field-input"></div>
+          <div><label class="field-label">Email</label><input id="ct-email" class="field-input" type="email"></div>
+        </div>
+        <div class="max-w-xl space-y-4">
+          <div><label class="field-label">Subject</label><input id="ct-subject" class="field-input"></div>
+          <div><label class="field-label">Message</label><textarea id="ct-message" class="field-input" rows="4"></textarea></div>
+        </div>
+        <button id="ct-submit" class="mt-5 px-7 py-3.5 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium">Submit Ticket</button>
+
+        <h2 class="font-display text-lg font-medium mt-12 mb-4">Support Ticket History</h2>
+        <div id="ticket-list" class="space-y-3"></div>
+        <p id="ticket-empty" class="text-sm text-[var(--alt-muted)]">You haven't submitted any support tickets yet.</p>
+      </section>
+
+      <!-- ============ SETTINGS ============ -->
+      <section class="dash-view" data-view="settings">
+        <h1 class="font-display text-2xl font-medium mb-6">Security &amp; Privacy</h1>
+
+        <div class="space-y-4 max-w-xl">
+          <div class="flex items-center justify-between border border-[var(--alt-border)] rounded-[16px] p-5">
+            <div><p class="text-sm font-medium">Two-Factor Authentication</p><p class="text-xs text-[var(--alt-muted)] mt-0.5">Coming soon.</p></div>
+            <div class="switch disabled"></div>
+          </div>
+          <div class="flex items-center justify-between border border-[var(--alt-border)] rounded-[16px] p-5">
+            <div><p class="text-sm font-medium">Personalized Recommendations</p></div>
+            <div class="switch" id="priv-personalization"></div>
+          </div>
+          <div class="flex items-center justify-between border border-[var(--alt-border)] rounded-[16px] p-5">
+            <div><p class="text-sm font-medium">Share Usage Analytics</p></div>
+            <div class="switch" id="priv-analytics"></div>
+          </div>
+        </div>
+
+        <h2 class="font-display text-lg font-medium mt-10 mb-4">Active Sessions</h2>
+        <div id="active-sessions" class="max-w-xl"></div>
+        <button id="logout-all-btn" class="mt-4 text-sm underline underline-offset-4" style="color:var(--alt-bad);">Log out from all devices</button>
+
+        <h2 class="font-display text-lg font-medium mt-10 mb-4">Login History</h2>
+        <div id="login-history" class="max-w-xl border border-[var(--alt-border)] rounded-[16px] divide-y divide-[var(--alt-border)]"></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ================================================================
+     ORDER TRACKING MODAL
+     ================================================================ -->
+<div id="tracking-backdrop">
+  <div class="fixed inset-0 flex items-center justify-center p-4">
+    <div id="tracking-panel" class="bg-[var(--alt-white)] rounded-[24px] w-full max-w-md max-h-[85vh] overflow-y-auto no-scrollbar p-7 shadow-[0_40px_100px_-30px_rgba(10,10,10,0.4)]">
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="font-display text-lg font-medium">Track Order</h3>
+        <button id="tracking-close" aria-label="Close" class="w-8 h-8 rounded-full border border-[var(--alt-border)] flex items-center justify-center">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <p id="tracking-order-id" class="font-mono text-xs text-[var(--alt-muted)] mb-6"></p>
+      <div id="tracking-timeline"></div>
+      <p id="tracking-cancelled-note" class="mt-4 text-sm" style="color:var(--alt-bad); display:none;">This order was cancelled and refunded.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     CUSTOM ORDER DETAIL MODAL
+     ================================================================ -->
+<div id="cr-detail-backdrop">
+  <div class="fixed inset-0 flex items-center justify-center p-4">
+    <div id="cr-detail-panel" class="bg-[var(--alt-white)] rounded-[24px] w-full max-w-lg max-h-[85vh] overflow-y-auto no-scrollbar p-7 shadow-[0_40px_100px_-30px_rgba(10,10,10,0.4)]">
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="font-display text-lg font-medium">Custom Request</h3>
+        <button id="cr-detail-close" aria-label="Close" class="w-8 h-8 rounded-full border border-[var(--alt-border)] flex items-center justify-center">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div id="cr-detail-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     RETURN / EXCHANGE REQUEST FORM MODAL
+     ================================================================ -->
+<div id="return-form-backdrop">
+  <div class="fixed inset-0 flex items-center justify-center p-4">
+    <div id="return-form-panel" class="bg-[var(--alt-white)] rounded-[24px] w-full max-w-lg max-h-[85vh] overflow-y-auto no-scrollbar p-7 shadow-[0_40px_100px_-30px_rgba(10,10,10,0.4)]">
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="font-display text-lg font-medium">Return or Exchange</h3>
+        <button id="return-form-close" aria-label="Close" class="w-8 h-8 rounded-full border border-[var(--alt-border)] flex items-center justify-center">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <p id="return-form-order-id" class="font-mono text-xs text-[var(--alt-muted)] mb-5"></p>
+      <div id="return-form-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     RETURN / EXCHANGE DETAIL MODAL
+     ================================================================ -->
+<div id="return-detail-backdrop">
+  <div class="fixed inset-0 flex items-center justify-center p-4">
+    <div id="return-detail-panel" class="bg-[var(--alt-white)] rounded-[24px] w-full max-w-lg max-h-[85vh] overflow-y-auto no-scrollbar p-7 shadow-[0_40px_100px_-30px_rgba(10,10,10,0.4)]">
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="font-display text-lg font-medium">Return / Exchange Request</h3>
+        <button id="return-detail-close" aria-label="Close" class="w-8 h-8 rounded-full border border-[var(--alt-border)] flex items-center justify-center">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div id="return-detail-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     MYSTERY REWARD — scratch modal (opened from Reward Vault's grid)
+     ================================================================ -->
+<div id="scratch-modal-backdrop">
+  <div class="fixed inset-0 flex items-center justify-center p-4">
+    <div id="scratch-modal-panel" class="bg-[var(--alt-white)] rounded-[24px] w-full max-w-sm p-7 shadow-[0_40px_100px_-30px_rgba(10,10,10,0.4)] text-center">
+      <div class="flex items-center justify-end mb-2">
+        <button id="scratch-modal-close" aria-label="Close" class="w-8 h-8 rounded-full border border-[var(--alt-border)] flex items-center justify-center">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div id="scratch-modal-card" class="sc-card"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium px-6 py-3.5 rounded-full shadow-[0_20px_40px_-15px_rgba(10,10,10,0.5)]" style="position:fixed;bottom:28px;left:50%;transform:translate(-50%,16px);opacity:0;pointer-events:none;z-index:95;transition:opacity .35s ease, transform .35s cubic-bezier(0.16,1,0.3,1);">
+  Saved.
+</div>
+
+<script>
+/* ================================================================
+   AUTH GUARD
+   ================================================================ */
+if (!Auth.isLoggedIn()){
+  window.location.href = "account.html?redirect=dashboard.html";
+} else {
+/* Everything below only runs once a session is confirmed — the guard
+   above already triggered the redirect and stops here otherwise. */
+const currentUser = Auth.currentUser();
+
+/* ================================================================
+   PER-USER STORAGE HELPERS
+   Orders/notifications/tickets/addresses/payment methods are all
+   scoped to the signed-in user, so a second demo account doesn't see
+   the first account's data in the same browser.
+   ================================================================ */
+function readUserStore(key){
+  try { return JSON.parse(localStorage.getItem(key) || "{}"); } catch (e) { return {}; }
+}
+function getUserList(key){
+  const all = readUserStore(key);
+  return all[currentUser.id] || [];
+}
+function setUserList(key, list){
+  const all = readUserStore(key);
+  all[currentUser.id] = list;
+  localStorage.setItem(key, JSON.stringify(all));
+}
+
+let toastTimeout;
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  t.style.opacity = "1"; t.style.transform = "translate(-50%,0)";
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => { t.style.opacity = "0"; t.style.transform = "translate(-50%,16px)"; }, 2200);
+}
+
+const DAY = 86400000;
+
+// One-time migration from Checkout's single saved address into the
+// Dashboard's multi-address store.
+if (getUserList("alt_addresses_v1").length === 0){
+  const legacy = JSON.parse(localStorage.getItem("alt_saved_address") || "null");
+  if (legacy && legacy.street){
+    setUserList("alt_addresses_v1", [{
+      id: "addr_" + Date.now(), label: "Home", isDefault: true,
+      name: `${legacy.firstName || ""} ${legacy.lastName || ""}`.trim(), phone: legacy.phone || "",
+      division: legacy.division, district: legacy.district, upazila: legacy.upazila, area: legacy.area,
+      street: legacy.street, apartment: legacy.apartment, postal: legacy.postal,
+    }]);
+  }
+}
+
+/* ================================================================
+   VIEW SWITCHING
+   ================================================================ */
+function setView(name){
+  document.querySelectorAll(".dash-view").forEach(v => v.classList.toggle("active", v.dataset.view === name));
+  document.querySelectorAll(".side-link[data-view]").forEach(b => b.classList.toggle("active", b.dataset.view === name));
+  closeSidebar();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  if (name === "orders") renderOrders();
+  if (name === "custom-orders") renderCustomOrders();
+  if (name === "rewards") renderRewards();
+  if (name === "returns") renderReturns();
+  if (name === "addresses") renderAddresses();
+  if (name === "payments") renderPayments();
+  if (name === "profile") renderProfile();
+  if (name === "notifications") renderNotifications();
+  if (name === "support") renderTickets();
+  if (name === "settings") renderSettings();
+}
+document.querySelectorAll(".side-link[data-view]").forEach(btn => btn.addEventListener("click", () => setView(btn.dataset.view)));
+
+/* Mobile sidebar drawer */
+const sidebar = document.getElementById("sidebar");
+const sidebarOverlay = document.getElementById("sidebar-overlay");
+function openSidebar(){ sidebar.classList.add("open"); sidebarOverlay.classList.add("open"); }
+function closeSidebar(){ sidebar.classList.remove("open"); sidebarOverlay.classList.remove("open"); }
+document.getElementById("sidebar-toggle").addEventListener("click", openSidebar);
+sidebarOverlay.addEventListener("click", closeSidebar);
+
+/* ================================================================
+   SIDEBAR PROFILE + LOGOUT
+   ================================================================ */
+function initials(user){ return `${(user.firstName||"?")[0]}${(user.lastName||"")[0]||""}`.toUpperCase(); }
+function renderIdentityChrome(){
+  const avatarHTML = currentUser.avatar ? `<img src="${currentUser.avatar}" alt="">` : initials(currentUser);
+  document.getElementById("sidebar-avatar").innerHTML = avatarHTML;
+  document.getElementById("sidebar-name").textContent = `${currentUser.firstName} ${currentUser.lastName}`;
+  document.getElementById("sidebar-email").textContent = currentUser.email;
+  const unread = getUserList("alt_notifications_v1").filter(n => !n.read).length;
+  const badge = document.getElementById("notif-badge");
+  badge.textContent = unread;
+  badge.style.display = unread > 0 ? "" : "none";
+}
+document.getElementById("logout-btn").addEventListener("click", () => { Auth.logout(); window.location.href = "Home.html"; });
+document.getElementById("logout-all-btn").addEventListener("click", () => {
+  // A real multi-device revoke needs server-side session invalidation;
+  // this demo only ever has "this browser" to sign out of.
+  Auth.logout(); window.location.href = "Home.html";
+});
+
+/* ================================================================
+   DASHBOARD HOME
+   ================================================================ */
+function renderHome(){
+  document.getElementById("welcome-heading").textContent = `Welcome back, ${currentUser.firstName}.`;
+  const memberSince = new Date(currentUser.createdAt).toLocaleDateString(undefined, { month: "long", year: "numeric" });
+  document.getElementById("welcome-sub").textContent = `Member since ${memberSince}`;
+
+  const orders = myOrders();
+  const wishlistCount = Wishlist.ids().length;
+  const activeSlugs = ["pending", "confirmed", "packed", "shipped", "out-for-delivery"];
+  const cards = [
+    { label: "Total Orders", value: orders.length, icon: `<path d="M4 7h16l-1.5 13h-13z"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/>` },
+    { label: "Pending Orders", value: orders.filter(o => activeSlugs.includes(o.status)).length, icon: `<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>` },
+    { label: "Completed Orders", value: orders.filter(o => o.status === "delivered").length, icon: `<path d="M20 6L9 17l-5-5"/>` },
+    { label: "Wishlist Items", value: wishlistCount, icon: `<path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4 6 4c2 0 3.5 1 4.5 2.6C11.5 5 13 4 15 4c4 0 5.6 4.1 4 7.7C19.5 16.1 12 21 12 21z"/>` },
+    { label: "Reward Points", value: loyaltyAccount(currentUser.id).balance, icon: `<path d="M12 17.3l-5.4 3 1-6-4.6-4 6.1-.6L12 4l2.9 5.7 6.1.6-4.6 4 1 6z"/>` },
+    { label: "Coupons Available", value: Object.keys(COUPONS).length, icon: `<path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V8z"/>` },
+  ];
+  document.getElementById("overview-cards").innerHTML = cards.map((c, i) => `
+    <div class="overview-card" data-enter style="transition-delay:${0.05 * i}s;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--alt-black)" stroke-width="1.5" class="mb-4">${c.icon}</svg>
+      <p class="font-display text-2xl font-medium">${c.value}</p>
+      <p class="text-xs text-[var(--alt-muted)] mt-1">${c.label}${c.future ? ` <span class="font-mono text-[9px]">(Future)</span>` : ""}</p>
+    </div>
+  `).join("");
+  document.querySelectorAll("#overview-cards [data-enter]").forEach(el => requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("in"))));
+
+  const activity = [];
+  orders.slice(0, 3).forEach(o => activity.push({ at: o.placedAt, text: `Order ${o.id} ${o.status === "delivered" ? "was delivered" : o.status === "shipped" ? "shipped" : o.status === "cancelled" ? "was cancelled" : "was placed"}.` }));
+  Wishlist.ids().slice(0, 2).forEach(id => {
+    const p = getProduct(id);
+    if (p) activity.push({ at: Date.now() - DAY, text: `You saved ${p.name} to your wishlist.` });
+  });
+  activity.sort((a, b) => b.at - a.at);
+  document.getElementById("recent-activity").innerHTML = activity.length
+    ? activity.slice(0, 6).map(a => `<div class="px-5 py-3.5 text-sm flex items-center justify-between"><span>${a.text}</span><span class="text-xs text-[var(--alt-muted)] font-mono">${relativeTime(a.at)}</span></div>`).join("")
+    : `<p class="px-5 py-6 text-sm text-[var(--alt-muted)]">No activity yet.</p>`;
+}
+
+function relativeTime(ts){
+  const days = Math.floor((Date.now() - ts) / DAY);
+  if (days <= 0) return "Today";
+  if (days === 1) return "Yesterday";
+  if (days < 30) return `${days} days ago`;
+  return `${Math.floor(days / 30)} mo ago`;
+}
+
+/* ================================================================
+   MY ORDERS
+   ORDER_STATUSES / orderStatusMeta / orderAmount / orderSearchText now
+   live in order-service.js, shared with checkout.html and admin.js.
+   ================================================================ */
+let orderFilter = "all";
+let orderSearch = "";
+
+function myOrders(){
+  const mine = getUserList("alt_orders_v1");
+  return hasAnyRealOrders() ? mine.filter(o => !o.demo) : mine;
+}
+
+function renderOrderChips(){
+  const chips = [{ slug: "all", label: "All" }].concat(ORDER_STATUSES);
+  document.getElementById("order-status-chips").innerHTML = chips.map(s => `
+    <button class="chip shrink-0 px-4 py-2 rounded-full text-sm font-medium ${s.slug === orderFilter ? "bg-[var(--alt-black)] text-[var(--alt-white)]" : "bg-[var(--alt-surface)] hover:bg-[var(--alt-border)]"}" data-slug="${s.slug}">${s.label}</button>
+  `).join("");
+  document.querySelectorAll("#order-status-chips .chip").forEach(btn => btn.addEventListener("click", () => { orderFilter = btn.dataset.slug; renderOrders(); }));
+}
+
+function orderMatches(o){
+  const statusOk = orderFilter === "all" || o.status === orderFilter;
+  if (!statusOk) return false;
+  if (!orderSearch) return true;
+  return orderSearchText(o).includes(orderSearch.toLowerCase());
+}
+
+function renderOrders(){
+  renderOrderChips();
+  const all = myOrders();
+  const orders = all.filter(orderMatches);
+  const list = document.getElementById("orders-list");
+  const empty = document.getElementById("orders-empty");
+
+  if (all.length === 0){ list.innerHTML = ""; empty.style.display = "flex"; return; }
+  empty.style.display = "none";
+  if (orders.length === 0){ list.innerHTML = `<p class="text-sm text-[var(--alt-muted)] py-10 text-center">No orders match your filters.</p>`; return; }
+
+  list.innerHTML = orders.map(o => {
+    const items = (o.items || []).map(it => it.name ? it : Object.assign({}, it, { name: (getProduct(it.productId) || {}).name, img: (getProduct(it.productId) || {}).img, unitPrice: it.unitPrice ?? ((getProduct(it.productId) || {}).salePrice || (getProduct(it.productId) || {}).price || 0) }));
+    const total = orderAmount(o);
+    const meta = orderStatusMeta(o.status);
+    const isDelivered = o.status === "delivered";
+    const isCancelled = ["cancelled", "returned", "refunded"].includes(o.status);
+    return `
+      <div class="order-card" data-order-id="${o.id}">
+        <div class="flex items-start justify-between flex-wrap gap-3">
+          <div>
+            <p class="font-mono text-xs text-[var(--alt-muted)]">${o.id}</p>
+            <p class="text-sm mt-1">${new Date(o.placedAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</p>
+          </div>
+          <div class="text-right">
+            <p class="flex items-center gap-2 justify-end text-sm font-medium"><span class="status-dot" style="background:${meta.color};"></span>${meta.label}</p>
+            <p class="text-xs text-[var(--alt-muted)] mt-1">${o.paymentStatus}</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 mt-4">
+          ${items.slice(0, 4).map(p => `<div class="order-thumb"><img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';"></div>`).join("")}
+          <div class="ml-2 text-sm">
+            <p class="font-mono">${bdt(total)}</p>
+            <p class="text-xs text-[var(--alt-muted)]">${isDelivered ? "Delivered" : isCancelled ? "—" : "Est. delivery"} ${!isCancelled ? new Date(o.eta).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : ""}</p>
+          </div>
+        </div>
+
+        <div class="order-detail mt-4 pt-4 border-t border-[var(--alt-border)]" id="detail-${o.id}">
+          ${items.map(p => `<div class="flex items-center justify-between text-sm py-1.5"><span>${p.name}${p.qty > 1 ? ` × ${p.qty}` : ""}</span><span class="font-mono">${bdt(p.unitPrice * p.qty)}</span></div>`).join("")}
+        </div>
+
+        <div class="flex items-center gap-2 mt-4 flex-wrap">
+          <button class="ghost-btn" data-action="details">View Details</button>
+          ${!isCancelled ? `<button class="ghost-btn" data-action="track">Track Order</button>` : ""}
+          <button class="ghost-btn" data-action="invoice">Download Invoice</button>
+          <button class="ghost-btn" data-action="buyagain">Buy Again</button>
+          ${typeof isOrderReturnEligible === "function" && isOrderReturnEligible(o) && !hasOpenReturnRequest(currentUser.id, o.id) ? `<button class="ghost-btn" data-action="return">Return / Exchange</button>` : ""}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  document.querySelectorAll(".order-card").forEach(card => {
+    const id = card.dataset.orderId;
+    const order = orders.find(o => o.id === id);
+    card.querySelector('[data-action="details"]').addEventListener("click", () => {
+      document.getElementById(`detail-${id}`).classList.toggle("open");
+    });
+    const trackBtn = card.querySelector('[data-action="track"]');
+    if (trackBtn) trackBtn.addEventListener("click", () => openTracking(order));
+    card.querySelector('[data-action="invoice"]').addEventListener("click", () => downloadInvoice(order));
+    card.querySelector('[data-action="buyagain"]').addEventListener("click", () => {
+      order.items.forEach(it => Cart.add(it.productId, {}, it.qty));
+      showToast("Added those items to your cart.");
+    });
+    const returnBtn = card.querySelector('[data-action="return"]');
+    if (returnBtn) returnBtn.addEventListener("click", () => openReturnRequestForm(order));
+  });
+}
+
+document.getElementById("order-search").addEventListener("input", (e) => { orderSearch = e.target.value.trim(); renderOrders(); });
+
+/* downloadOrderInvoice() is now downloadInvoice() in order-service.js —
+   one shared, qty-correct invoice generator for checkout/dashboard/admin. */
+
+/* ================================================================
+   ORDER TRACKING MODAL
+   ================================================================ */
+const trackingBackdrop = document.getElementById("tracking-backdrop");
+function openTracking(order){
+  document.getElementById("tracking-order-id").textContent = order.id;
+  document.getElementById("tracking-timeline").innerHTML = order.timeline.map((step, i) => {
+    const isCurrent = !step.done && (i === 0 || order.timeline[i - 1].done);
+    return `
+      <div class="timeline-row ${step.done ? "done" : ""} ${isCurrent ? "current" : ""}">
+        <div class="timeline-dot">${step.done ? "✓" : ""}</div>
+        <div>
+          <p class="text-sm font-medium">${step.label}</p>
+          <p class="text-xs text-[var(--alt-muted)] mt-0.5">${step.at ? new Date(step.at).toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "Pending"}</p>
+        </div>
+      </div>
+    `;
+  }).join("");
+  document.getElementById("tracking-cancelled-note").style.display = order.status === "cancelled" ? "block" : "none";
+  trackingBackdrop.classList.add("open");
+}
+document.getElementById("tracking-close").addEventListener("click", () => trackingBackdrop.classList.remove("open"));
+trackingBackdrop.addEventListener("click", (e) => { if (e.target === trackingBackdrop) trackingBackdrop.classList.remove("open"); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") trackingBackdrop.classList.remove("open"); });
+
+/* ================================================================
+   CUSTOM ORDERS — request-product.html submissions, tracked here the
+   same way regular orders are tracked above. custom-requests.js is
+   the single source of truth (submit/quote/pay/status), shared with
+   admin.js's Custom Requests view.
+   ================================================================ */
+/* ================================================================
+   REWARDS
+   ================================================================ */
+let rewardsCouponFilter = "unused";
+
+function renderRewards(){
+  const account = loyaltyAccount(currentUser.id);
+  const settings = loyaltySettings();
+  document.getElementById("rewards-balance").textContent = `${account.balance} coins`;
+  document.getElementById("rewards-balance-bdt").textContent = `≈ ${bdt(pointsToBDT(account.balance))}`;
+  document.getElementById("rewards-how-it-works").textContent = settings.enabled
+    ? `Earn coins automatically from delivered orders and Mystery Rewards — worth ${bdt(settings.pointValueBDT)} each at checkout once you have ${settings.minRedeemPoints}+.`
+    : "Coin rewards are currently paused.";
+
+  const tierInfo = loyaltyTier(currentUser.id);
+  document.getElementById("rewards-tier").innerHTML = `${tierInfo.tier.label}`;
+  document.getElementById("rewards-tier-progress").textContent = tierInfo.next
+    ? `${tierInfo.toNext} coins earned to reach ${tierInfo.next.label}`
+    : "You've reached the highest level";
+
+  renderRewardsAvailable();
+  renderRewardsCoupons();
+  renderRewardsHistory();
+
+  const badge = document.getElementById("rewards-vault-badge");
+  const unscratched = scratchCardsForUser(currentUser.id).filter(c => !c.scratched).length;
+  badge.textContent = unscratched;
+  badge.style.display = unscratched > 0 ? "" : "none";
+}
+
+function renderRewardsAvailable(){
+  const cards = scratchCardsForUser(currentUser.id).filter(c => !c.scratched);
+  const wrap = document.getElementById("rewards-available-wrap");
+  wrap.style.display = cards.length ? "block" : "none";
+  document.getElementById("rewards-available-grid").innerHTML = cards.map(c => `
+    <div class="reward-locked-card" data-id="${c.id}">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--alt-muted)" stroke-width="1.4"><path d="M4 8h16v12H4z"/><path d="M4 8l8-5 8 5"/><path d="M12 3v17"/></svg>
+      <p class="text-xs text-[var(--alt-muted)] font-mono uppercase tracking-widest">Mystery Reward</p>
+    </div>
+  `).join("");
+  document.querySelectorAll(".reward-locked-card").forEach(el => el.addEventListener("click", () => openScratchModal(el.dataset.id)));
+}
+
+const scratchModalBackdrop = document.getElementById("scratch-modal-backdrop");
+function openScratchModal(cardId){
+  const card = scratchCardsForUser(currentUser.id).find(c => c.id === cardId);
+  if (!card) return;
+  scratchModalBackdrop.classList.add("open");
+  mountScratchCard(document.getElementById("scratch-modal-card"), Object.assign({ userId: currentUser.id }, card), () => {
+    renderRewards();
+    renderIdentityChrome();
+  });
+}
+document.getElementById("scratch-modal-close").addEventListener("click", () => scratchModalBackdrop.classList.remove("open"));
+scratchModalBackdrop.addEventListener("click", (e) => { if (e.target === scratchModalBackdrop) scratchModalBackdrop.classList.remove("open"); });
+
+function myRewardCoupons(){
+  try {
+    return JSON.parse(localStorage.getItem("alt_admin_coupons_v1") || "[]").filter(c => c.customerId === currentUser.id);
+  } catch (e) { return []; }
+}
+function couponStatus(c){
+  if (c.expiry && c.expiry < Date.now()) return "expired";
+  if (c.usageLimit && (c.usedCount || 0) >= c.usageLimit) return "used";
+  return "unused";
+}
+function renderRewardsCoupons(){
+  const all = myRewardCoupons();
+  const chips = [
+    { slug: "unused", label: "Unused" },
+    { slug: "used", label: "Used" },
+    { slug: "expired", label: "Expired" },
+  ];
+  document.getElementById("rewards-coupon-chips").innerHTML = chips.map(c => `
+    <button class="chip px-4 py-2 rounded-full text-sm font-medium ${rewardsCouponFilter === c.slug ? "bg-[var(--alt-black)] text-[var(--alt-white)]" : "bg-[var(--alt-surface)] hover:bg-[var(--alt-border)]"}" data-slug="${c.slug}">${c.label}</button>
+  `).join("");
+  document.querySelectorAll("#rewards-coupon-chips .chip").forEach(btn => btn.addEventListener("click", () => { rewardsCouponFilter = btn.dataset.slug; renderRewardsCoupons(); }));
+
+  const filtered = all.filter(c => couponStatus(c) === rewardsCouponFilter);
+  document.getElementById("rewards-coupons-empty").style.display = filtered.length ? "none" : "block";
+  document.getElementById("rewards-coupons-list").innerHTML = filtered.map(c => {
+    const label = c.type === "percentage" ? `${c.value}% OFF` : c.type === "fixed" ? `${bdt(c.value)} OFF` : "Free Shipping";
+    return `
+    <div class="order-card">
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <p class="font-mono text-base tracking-wide">${c.code}</p>
+          <p class="text-xs text-[var(--alt-muted)] mt-0.5">${label}${c.minPurchase ? ` · Min. ${bdt(c.minPurchase)}` : ""}${c.expiry ? ` · Expires ${new Date(c.expiry).toLocaleDateString()}` : ""}</p>
+        </div>
+        ${rewardsCouponFilter === "unused" ? `<button type="button" class="ghost-btn rewards-copy-coupon" data-code="${c.code}">Copy Code</button>` : ""}
+      </div>
+    </div>`;
+  }).join("");
+  document.querySelectorAll(".rewards-copy-coupon").forEach(btn => btn.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(btn.dataset.code); } catch (e) { /* clipboard blocked — code is still visible */ }
+    const original = btn.textContent;
+    btn.textContent = "✓ Copied";
+    setTimeout(() => { btn.textContent = original; }, 1400);
+  }));
+}
+
+function renderRewardsHistory(){
+  const cards = scratchCardsForUser(currentUser.id);
+  document.getElementById("rewards-empty").style.display = cards.length ? "none" : "flex";
+  document.getElementById("rewards-history").innerHTML = cards.map(c => `
+    <div class="order-card">
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <p class="text-sm font-medium">${c.scratched ? rewardCardRewardText(c.rewardSnapshot) : "Unopened Mystery Reward"}</p>
+          <p class="text-xs text-[var(--alt-muted)] font-mono mt-0.5">${c.id} · ${c.source === "order" ? `Order ${c.sourceRef}` : `Code ${c.sourceRef}`} · ${new Date(c.createdAt).toLocaleDateString()}</p>
+        </div>
+        <span class="badge ${c.scratched ? "badge-good" : "badge-warn"}"><span class="badge-dot"></span>${c.scratched ? "Revealed" : "Unopened"}</span>
+      </div>
+    </div>
+  `).join("");
+}
+
+document.getElementById("rewards-claim-btn").addEventListener("click", () => {
+  const input = document.getElementById("rewards-claim-input");
+  const feedback = document.getElementById("rewards-claim-feedback");
+  const result = claimPromoCode(input.value, currentUser.id);
+  feedback.style.display = "block";
+  if (!result.ok){
+    feedback.textContent = result.error;
+    feedback.style.color = "var(--alt-bad)";
+    return;
+  }
+  feedback.textContent = "Code claimed — scratch your new Mystery Reward below!";
+  feedback.style.color = "var(--alt-good)";
+  input.value = "";
+  renderRewards();
+});
+document.getElementById("rewards-claim-input").addEventListener("keydown", (e) => { if (e.key === "Enter") document.getElementById("rewards-claim-btn").click(); });
+
+function myCustomRequests(){ return customRequestsForUser(currentUser.id); }
+
+function renderCustomOrders(){
+  const list = myCustomRequests();
+  document.getElementById("custom-orders-empty").style.display = list.length ? "none" : "flex";
+  document.getElementById("custom-orders-list").innerHTML = list.map(r => `
+    <div class="order-card">
+      <div class="flex items-center gap-4">
+        ${r.images && r.images[0] ? `<img src="${r.images[0]}" class="order-thumb" alt="" loading="lazy">` : `<div class="order-thumb flex items-center justify-center text-[var(--alt-muted)] font-mono text-[10px]">No Photo</div>`}
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium truncate">${escapeHTML(r.productName)}</p>
+          <p class="text-xs text-[var(--alt-muted)] font-mono mt-0.5">${r.id} · ${new Date(r.createdAt).toLocaleDateString()}</p>
+        </div>
+        <span class="badge ${crStatusMeta(r.status).badgeClass}"><span class="badge-dot"></span>${crStatusMeta(r.status).label}</span>
+      </div>
+      <div class="flex items-center gap-2 mt-4 flex-wrap">
+        <button class="ghost-btn cr-view-btn" data-id="${r.id}">View Details</button>
+        ${r.status === "quotation-sent" ? `<button class="ghost-btn cr-view-btn" data-id="${r.id}" style="border-color:var(--alt-black);">Review Quotation</button>` : ""}
+        ${r.status === "ready-for-final" ? `<button class="ghost-btn cr-view-btn" data-id="${r.id}" style="border-color:var(--alt-black);">Pay Remaining Balance</button>` : ""}
+      </div>
+    </div>
+  `).join("");
+  document.querySelectorAll(".cr-view-btn").forEach(btn => btn.addEventListener("click", () => openCustomRequestDetail(btn.dataset.id)));
+  const badge = document.getElementById("custom-orders-badge");
+  const needsAttention = list.filter(r => r.status === "quotation-sent" || r.status === "ready-for-final").length;
+  badge.textContent = needsAttention;
+  badge.style.display = needsAttention > 0 ? "" : "none";
+}
+
+const crDetailBackdrop = document.getElementById("cr-detail-backdrop");
+function closeCrDetail(){ crDetailBackdrop.classList.remove("open"); }
+function openCustomRequestDetail(id){
+  const request = myCustomRequests().find(r => r.id === id);
+  if (!request) return;
+  const q = request.quotation;
+
+  const timelineHTML = CR_STATUSES.map((s, i) => {
+    const currentIdx = CR_STATUS_INDEX[request.status];
+    const isTerminal = request.status === "cancelled" || request.status === "rejected";
+    const done = !isTerminal && currentIdx !== undefined && i <= currentIdx;
+    const isCurrent = !isTerminal && i === currentIdx;
+    const entry = (request.statusHistory || []).find(h => h.status === s.slug);
+    return `
+      <div class="cr-step ${done ? "done" : ""} ${isCurrent ? "current" : ""}">
+        <div class="cr-step-dot">${done ? "✓" : ""}</div>
+        <div><p class="text-sm ${isCurrent ? "font-medium" : ""}">${s.label}</p><p class="text-xs text-[var(--alt-muted)]">${entry ? new Date(entry.at).toLocaleDateString() : ""}</p></div>
+      </div>`;
+  }).join("");
+
+  const quotationHTML = q ? `
+    <div class="border-t border-[var(--alt-border)] pt-4 mt-4">
+      <p class="field-label mb-2">Quotation</p>
+      <div class="text-sm space-y-1.5 mb-3">
+        <div class="flex items-center justify-between"><span class="text-[var(--alt-muted)]">Product Cost</span><span class="font-mono">${bdt(q.productCost)}</span></div>
+        <div class="flex items-center justify-between"><span class="text-[var(--alt-muted)]">Shipping</span><span class="font-mono">${bdt(q.shippingCost)}</span></div>
+        ${q.importCost ? `<div class="flex items-center justify-between"><span class="text-[var(--alt-muted)]">Import Cost</span><span class="font-mono">${bdt(q.importCost)}</span></div>` : ""}
+        <div class="flex items-center justify-between"><span class="text-[var(--alt-muted)]">Service Charge</span><span class="font-mono">${bdt(q.serviceCharge)}</span></div>
+        ${q.tax ? `<div class="flex items-center justify-between"><span class="text-[var(--alt-muted)]">Tax</span><span class="font-mono">${bdt(q.tax)}</span></div>` : ""}
+        <div class="flex items-center justify-between font-medium border-t border-[var(--alt-border)] pt-2 mt-1"><span>Total</span><span class="font-mono">${bdt(q.total)}</span></div>
+        <div class="flex items-center justify-between" style="color:var(--alt-good);"><span>Advance (${q.advancePercent}%)</span><span class="font-mono">${bdt(q.advanceAmount)}</span></div>
+        <div class="flex items-center justify-between"><span class="text-[var(--alt-muted)]">Remaining Balance</span><span class="font-mono">${bdt(q.remainingAmount)}</span></div>
+      </div>
+      <p class="text-xs text-[var(--alt-muted)] mb-1">Estimated delivery: ${q.deliveryDays} days from advance payment · Valid until ${new Date(q.validUntil).toLocaleDateString()}</p>
+      <p class="text-xs text-[var(--alt-muted)] mb-3">Refund policy: ${(CR_REFUND_POLICIES.find(p => p.slug === q.refundPolicy) || {}).label}</p>
+      ${q.notes ? `<div class="bg-[var(--alt-surface)] rounded-xl p-3 text-xs mb-3">${escapeHTML(q.notes)}</div>` : ""}
+    </div>
+  ` : "";
+
+  let actionHTML = "";
+  if (request.status === "quotation-sent"){
+    actionHTML = `
+      <div class="border-t border-[var(--alt-border)] pt-4 mt-4">
+        <label class="flex items-start gap-2 text-xs text-[var(--alt-muted)] mb-3"><input type="checkbox" id="cr-ack-refund" style="margin-top:2px;"> I understand this advance payment is <strong>${(CR_REFUND_POLICIES.find(p => p.slug === q.refundPolicy) || {}).label.toLowerCase()}</strong>.</label>
+        ${crPaymentFormHTML("advance", q.advanceAmount)}
+        <button id="cr-pay-advance-submit" class="w-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium py-3.5 rounded-full mt-3">Pay ${bdt(q.advanceAmount)} Advance</button>
+        <p id="cr-pay-error" class="text-xs mt-2" style="color:var(--alt-bad); display:none;"></p>
+      </div>`;
+  } else if (request.status === "ready-for-final"){
+    actionHTML = `
+      <div class="border-t border-[var(--alt-border)] pt-4 mt-4">
+        ${crPaymentFormHTML("final", q.remainingAmount)}
+        <button id="cr-pay-final-submit" class="w-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium py-3.5 rounded-full mt-3">Pay ${bdt(q.remainingAmount)} Remaining Balance</button>
+        <p id="cr-pay-error" class="text-xs mt-2" style="color:var(--alt-bad); display:none;"></p>
+      </div>`;
+  } else if (request.advancePayment && request.advancePayment.status === "pending"){
+    actionHTML = `<div class="border-t border-[var(--alt-border)] pt-4 mt-4"><p class="text-sm text-[var(--alt-muted)]">Advance payment submitted — waiting for our team to verify it.</p></div>`;
+  } else if (request.finalPayment && request.finalPayment.status === "pending"){
+    actionHTML = `<div class="border-t border-[var(--alt-border)] pt-4 mt-4"><p class="text-sm text-[var(--alt-muted)]">Final payment submitted — waiting for our team to verify it.</p></div>`;
+  }
+
+  const body = `
+    <div class="mb-4">
+      <div class="flex items-center justify-between mb-1"><span class="font-mono text-xs text-[var(--alt-muted)]">${request.id}</span><span class="badge ${crStatusMeta(request.status).badgeClass}"><span class="badge-dot"></span>${crStatusMeta(request.status).label}</span></div>
+      <p class="text-sm font-medium">${escapeHTML(request.productName)}</p>
+      <p class="text-xs text-[var(--alt-muted)] mt-1">${escapeHTML(request.description)}</p>
+    </div>
+    ${quotationHTML}
+    ${actionHTML}
+    <div class="border-t border-[var(--alt-border)] pt-4 mt-4">
+      <p class="field-label mb-2">Status Timeline</p>
+      ${timelineHTML}
+    </div>
+    <div class="flex items-center gap-2 mt-5 flex-wrap">
+      ${canCancelCustomRequest(request) ? `<button id="cr-cancel-btn" class="ghost-btn" style="color:var(--alt-bad); border-color:var(--alt-bad);">Cancel Request</button>` : ""}
+      ${request.quotation ? `<button id="cr-invoice-btn" class="ghost-btn">Download Invoice</button>` : ""}
+      <button id="cr-message-btn" class="ghost-btn">Message Support</button>
+    </div>
+  `;
+  document.getElementById("cr-detail-body").innerHTML = body;
+  crDetailBackdrop.classList.add("open");
+
+  if (request.status === "quotation-sent"){
+    wireCrPaymentForm("advance", () => {
+      if (!document.getElementById("cr-ack-refund").checked){
+        const err = document.getElementById("cr-pay-error");
+        err.textContent = "Please acknowledge the refund policy first.";
+        err.style.display = "block";
+        return;
+      }
+      const data = crReadPaymentForm("advance");
+      if (!data) return;
+      recordAdvancePaymentSubmission(request, data);
+      closeCrDetail();
+      renderCustomOrders();
+      showToast("Advance payment submitted for verification.");
+    });
+  } else if (request.status === "ready-for-final"){
+    wireCrPaymentForm("final", () => {
+      const data = crReadPaymentForm("final");
+      if (!data) return;
+      recordFinalPaymentSubmission(request, data);
+      closeCrDetail();
+      renderCustomOrders();
+      showToast("Final payment submitted for verification.");
+    });
+  }
+  const cancelBtn = document.getElementById("cr-cancel-btn");
+  if (cancelBtn) cancelBtn.addEventListener("click", () => {
+    cancelCustomRequest(request);
+    closeCrDetail();
+    renderCustomOrders();
+    showToast("Request cancelled.");
+  });
+  const invoiceBtn = document.getElementById("cr-invoice-btn");
+  if (invoiceBtn) invoiceBtn.addEventListener("click", () => downloadCustomRequestInvoice(request));
+  document.getElementById("cr-message-btn").addEventListener("click", () => {
+    const tickets = getUserList("alt_tickets_v1");
+    tickets.unshift({ id: "TCK-" + Math.random().toString(36).slice(2, 7).toUpperCase(), subject: `Custom Request ${request.id} — ${request.productName}`, message: "I have a question about this custom request.", status: "Open", at: Date.now() });
+    setUserList("alt_tickets_v1", tickets);
+    closeCrDetail();
+    showToast("Support ticket opened — check the Support tab.");
+  });
+}
+
+/* Same manual-wallet-then-verify payment UI as checkout.html, reused
+   here for both the advance and final custom-order payments instead of
+   inventing a second payment flow. */
+function crPaymentFormHTML(kind, amount){
+  return `
+    <p class="text-sm font-medium mb-3">Pay ${bdt(amount)} via mobile wallet</p>
+    <select id="cr-${kind}-method" class="field-input mb-3">
+      <option value="bkash">bKash</option><option value="nagad">Nagad</option><option value="rocket">Rocket</option>
+    </select>
+    <div class="bg-[var(--alt-surface)] rounded-xl p-3 text-sm mb-3">
+      <p>Send <strong>${bdt(amount)}</strong> to:</p>
+      <p class="font-mono text-base mt-1" id="cr-${kind}-send-number">—</p>
+    </div>
+    <label class="field-label">Your Wallet Number</label>
+    <input id="cr-${kind}-number" class="field-input mb-3" type="tel" placeholder="01XXXXXXXXX">
+    <label class="field-label">Transaction ID</label>
+    <input id="cr-${kind}-txn" class="field-input" type="text" placeholder="e.g. 8N7A2K91X1">
+  `;
+}
+function wireCrPaymentForm(kind, onSubmit){
+  const methodSel = document.getElementById(`cr-${kind}-method`);
+  const updateNumber = () => { document.getElementById(`cr-${kind}-send-number`).textContent = getWalletNumber(methodSel.value) || "Number not set yet — contact support."; };
+  methodSel.addEventListener("change", updateNumber);
+  updateNumber();
+  document.getElementById(`cr-pay-${kind}-submit`).addEventListener("click", onSubmit);
+}
+function crReadPaymentForm(kind){
+  const errEl = document.getElementById("cr-pay-error");
+  errEl.style.display = "none";
+  const number = document.getElementById(`cr-${kind}-number`).value.trim();
+  const txn = document.getElementById(`cr-${kind}-txn`).value.trim();
+  if (!/^(\+?880|0)1[3-9]\d{8}$/.test(number)){ errEl.textContent = "Enter the wallet number you sent from."; errEl.style.display = "block"; return null; }
+  if (!/^[A-Za-z0-9]{5,20}$/.test(txn)){ errEl.textContent = "Enter the Transaction ID you received."; errEl.style.display = "block"; return null; }
+  return { method: document.getElementById(`cr-${kind}-method`).value, walletNumber: number, customerTxnId: txn };
+}
+document.getElementById("cr-detail-close").addEventListener("click", closeCrDetail);
+crDetailBackdrop.addEventListener("click", (e) => { if (e.target === crDetailBackdrop) closeCrDetail(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCrDetail(); });
+
+/* ================================================================
+   RETURNS & EXCHANGES
+   ================================================================ */
+function myReturnRequests(){ return returnRequestsForUser(currentUser.id); }
+
+function returnResizeImageFile(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(reader.error);
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("Could not read image."));
+      img.onload = () => {
+        const maxSide = 800;
+        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.72));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+const returnFormBackdrop = document.getElementById("return-form-backdrop");
+let returnFormPhotos = [];
+
+function openReturnRequestForm(order){
+  returnFormPhotos = [];
+  document.getElementById("return-form-order-id").textContent = order.id;
+  document.getElementById("return-form-body").innerHTML = `
+    <div class="mb-4">
+      <label class="field-label">Which item(s)?</label>
+      <div class="space-y-2">
+        ${order.items.map((it, i) => `
+          <label class="return-item-row">
+            <input type="checkbox" class="ret-item-check" data-index="${i}" style="accent-color:var(--alt-black);">
+            <img src="${it.img || ""}" class="w-10 h-10 rounded-lg object-cover shrink-0" alt="">
+            <span class="text-sm flex-1">${it.name}${it.qty > 1 ? ` × ${it.qty}` : ""}</span>
+          </label>
+        `).join("")}
+      </div>
+    </div>
+    <div class="mb-4">
+      <label class="field-label">Return or Exchange?</label>
+      <select id="ret-type" class="field-input">
+        ${RETURN_TYPES.map(t => `<option value="${t.slug}">${t.label}</option>`).join("")}
+      </select>
+    </div>
+    <div id="ret-exchange-fields" class="mb-4 grid grid-cols-2 gap-3" style="display:none;">
+      <div><label class="field-label">Preferred Color</label><input id="ret-exchange-color" class="field-input"></div>
+      <div><label class="field-label">Preferred Size</label><input id="ret-exchange-size" class="field-input"></div>
+    </div>
+    <div class="mb-4">
+      <label class="field-label">Reason</label>
+      <select id="ret-reason-category" class="field-input mb-3">
+        ${RETURN_REASONS.map(r => `<option>${r}</option>`).join("")}
+      </select>
+      <textarea id="ret-reason" rows="3" class="field-input" placeholder="A few details help us process this faster…"></textarea>
+    </div>
+    <div class="mb-4">
+      <label class="field-label">Photos <span class="font-mono text-[10px]">(optional, up to 4)</span></label>
+      <div id="ret-photo-previews" class="flex items-center gap-2 flex-wrap mb-2"></div>
+      <button type="button" id="ret-photo-trigger" class="text-xs font-medium underline underline-offset-4">+ Add photos</button>
+      <input type="file" id="ret-photo-input" accept="image/*" multiple style="display:none;">
+    </div>
+    <p id="ret-form-error" class="text-xs mb-3" style="color:var(--alt-bad); display:none;"></p>
+    <button id="ret-submit" class="w-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium py-3.5 rounded-full">Submit Request</button>
+  `;
+
+  document.getElementById("ret-type").addEventListener("change", (e) => {
+    document.getElementById("ret-exchange-fields").style.display = e.target.value === "exchange" ? "grid" : "none";
+  });
+
+  function renderRetPhotoPreviews(){
+    document.getElementById("ret-photo-previews").innerHTML = returnFormPhotos.map((src, i) => `
+      <div class="return-photo-thumb"><img src="${src}" alt="Photo ${i + 1}"><button type="button" class="ret-photo-remove" data-index="${i}" aria-label="Remove">×</button></div>
+    `).join("");
+    document.querySelectorAll(".ret-photo-remove").forEach(btn => btn.addEventListener("click", () => { returnFormPhotos.splice(Number(btn.dataset.index), 1); renderRetPhotoPreviews(); }));
+    document.getElementById("ret-photo-trigger").style.display = returnFormPhotos.length >= 4 ? "none" : "inline-block";
+  }
+  document.getElementById("ret-photo-trigger").addEventListener("click", () => document.getElementById("ret-photo-input").click());
+  document.getElementById("ret-photo-input").addEventListener("change", async (e) => {
+    const files = Array.from(e.target.files).slice(0, 4 - returnFormPhotos.length);
+    for (const file of files){
+      if (!file.type.startsWith("image/")) continue;
+      try { returnFormPhotos.push(await returnResizeImageFile(file)); } catch (err) { /* skip unreadable file */ }
+    }
+    e.target.value = "";
+    renderRetPhotoPreviews();
+  });
+
+  document.getElementById("ret-submit").addEventListener("click", () => {
+    const errEl = document.getElementById("ret-form-error");
+    errEl.style.display = "none";
+    const checkedIndexes = Array.from(document.querySelectorAll(".ret-item-check:checked")).map(cb => Number(cb.dataset.index));
+    const items = checkedIndexes.map(i => order.items[i]);
+    const result = submitReturnRequest({
+      userId: currentUser.id,
+      orderId: order.id,
+      items,
+      type: document.getElementById("ret-type").value,
+      reasonCategory: document.getElementById("ret-reason-category").value,
+      reason: document.getElementById("ret-reason").value,
+      exchangeFor: document.getElementById("ret-type").value === "exchange" ? {
+        color: document.getElementById("ret-exchange-color").value.trim(),
+        size: document.getElementById("ret-exchange-size").value.trim(),
+      } : null,
+      images: returnFormPhotos,
+    });
+    if (!result.ok){
+      errEl.textContent = result.errors[0];
+      errEl.style.display = "block";
+      return;
+    }
+    returnFormBackdrop.classList.remove("open");
+    renderOrders();
+    showToast("Request submitted — track it from Returns & Exchanges.");
+  });
+
+  returnFormBackdrop.classList.add("open");
+}
+document.getElementById("return-form-close").addEventListener("click", () => returnFormBackdrop.classList.remove("open"));
+returnFormBackdrop.addEventListener("click", (e) => { if (e.target === returnFormBackdrop) returnFormBackdrop.classList.remove("open"); });
+
+function renderReturns(){
+  const list = myReturnRequests();
+  document.getElementById("returns-empty").style.display = list.length ? "none" : "flex";
+  document.getElementById("returns-list").innerHTML = list.map(r => `
+    <div class="order-card">
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <p class="text-sm font-medium">${RETURN_TYPES.find(t => t.slug === r.type).label}</p>
+          <p class="text-xs text-[var(--alt-muted)] font-mono mt-0.5">${r.id} · Order ${r.orderId} · ${new Date(r.createdAt).toLocaleDateString()}</p>
+        </div>
+        <span class="badge ${returnStatusMeta(r.status).badgeClass}"><span class="badge-dot"></span>${returnStatusMeta(r.status).label}</span>
+      </div>
+      <div class="flex items-center gap-2 mt-4">
+        <button class="ghost-btn ret-view-btn" data-id="${r.id}">View Details</button>
+      </div>
+    </div>
+  `).join("");
+  document.querySelectorAll(".ret-view-btn").forEach(btn => btn.addEventListener("click", () => openReturnRequestDetail(btn.dataset.id)));
+  const badge = document.getElementById("returns-badge");
+  const active = list.filter(r => !["completed", "rejected", "cancelled"].includes(r.status)).length;
+  badge.textContent = active;
+  badge.style.display = active > 0 ? "" : "none";
+}
+
+const returnDetailBackdrop = document.getElementById("return-detail-backdrop");
+function openReturnRequestDetail(id){
+  const r = myReturnRequests().find(x => x.id === id);
+  if (!r) return;
+  const timelineHTML = RETURN_STATUSES.map((s, i) => {
+    const isTerminal = r.status === "cancelled" || r.status === "rejected";
+    const currentIdx = RETURN_STATUS_INDEX[r.status];
+    const done = !isTerminal && currentIdx !== undefined && i <= currentIdx;
+    const isCurrent = !isTerminal && i === currentIdx;
+    const entry = (r.statusHistory || []).find(h => h.status === s.slug);
+    return `
+      <div class="cr-step ${done ? "done" : ""} ${isCurrent ? "current" : ""}">
+        <div class="cr-step-dot">${done ? "✓" : ""}</div>
+        <div><p class="text-sm ${isCurrent ? "font-medium" : ""}">${s.label}</p><p class="text-xs text-[var(--alt-muted)]">${entry ? new Date(entry.at).toLocaleDateString() : ""}</p></div>
+      </div>`;
+  }).join("");
+
+  document.getElementById("return-detail-body").innerHTML = `
+    <div class="mb-4">
+      <div class="flex items-center justify-between mb-1"><span class="font-mono text-xs text-[var(--alt-muted)]">${r.id}</span><span class="badge ${returnStatusMeta(r.status).badgeClass}"><span class="badge-dot"></span>${returnStatusMeta(r.status).label}</span></div>
+      <p class="text-sm font-medium">${RETURN_TYPES.find(t => t.slug === r.type).label} — Order ${r.orderId}</p>
+      <p class="text-xs text-[var(--alt-muted)] mt-1">${r.reasonCategory}: ${r.reason}</p>
+    </div>
+    ${r.refundMethod ? `<div class="border-t border-[var(--alt-border)] pt-4 mb-4"><p class="field-label mb-1">Resolution</p><p class="text-sm">${REFUND_METHODS.find(m => m.slug === r.refundMethod).label} — ${bdt(r.refundAmount || 0)}</p></div>` : ""}
+    <div class="border-t border-[var(--alt-border)] pt-4">
+      <p class="field-label mb-2">Status Timeline</p>
+      ${timelineHTML}
+    </div>
+    ${canCancelReturnRequest(r) ? `<button id="ret-cancel-btn" class="ghost-btn mt-5" style="color:var(--alt-bad); border-color:var(--alt-bad);">Cancel Request</button>` : ""}
+  `;
+  returnDetailBackdrop.classList.add("open");
+  const cancelBtn = document.getElementById("ret-cancel-btn");
+  if (cancelBtn) cancelBtn.addEventListener("click", () => {
+    cancelReturnRequest(r);
+    returnDetailBackdrop.classList.remove("open");
+    renderReturns();
+    renderOrders();
+    showToast("Request cancelled.");
+  });
+}
+document.getElementById("return-detail-close").addEventListener("click", () => returnDetailBackdrop.classList.remove("open"));
+returnDetailBackdrop.addEventListener("click", (e) => { if (e.target === returnDetailBackdrop) returnDetailBackdrop.classList.remove("open"); });
+
+/* Wishlist now lives on its own dedicated page (wishlist.html) — the
+   sidebar link above just navigates there. */
+
+/* ================================================================
+   SAVED ADDRESSES
+   ================================================================ */
+const afDivision = document.getElementById("af-division");
+const afDistrict = document.getElementById("af-district");
+afDivision.innerHTML = `<option value="">Select division</option>` + Object.keys(BD_DIVISIONS).map(d => `<option value="${d}">${d}</option>`).join("");
+function populateAfDistricts(division){ afDistrict.innerHTML = `<option value="">Select district</option>` + (BD_DIVISIONS[division] || []).map(d => `<option value="${d}">${d}</option>`).join(""); }
+afDivision.addEventListener("change", () => populateAfDistricts(afDivision.value));
+
+let editingAddressId = null;
+function renderAddresses(){
+  const list = getUserList("alt_addresses_v1");
+  const el = document.getElementById("addresses-list");
+  const empty = document.getElementById("addresses-empty");
+  if (list.length === 0){ el.innerHTML = ""; empty.style.display = "flex"; }
+  else {
+    empty.style.display = "none";
+    el.innerHTML = list.map(a => `
+      <div class="info-card">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium">${a.label}</span>
+          ${a.isDefault ? `<span class="default-badge">Default</span>` : ""}
+        </div>
+        <p class="text-sm">${a.name}${a.phone ? " · " + a.phone : ""}</p>
+        <p class="text-sm text-[var(--alt-muted)] mt-1">${[a.street, a.apartment, a.area, a.upazila, a.district, a.division, a.postal].filter(Boolean).join(", ")}</p>
+        <div class="flex items-center gap-2 mt-4">
+          <button class="ghost-btn" data-action="edit">Edit</button>
+          ${!a.isDefault ? `<button class="ghost-btn" data-action="default">Set Default</button>` : ""}
+          <button class="ghost-btn" data-action="delete">Delete</button>
+        </div>
+      </div>
+    `).join("");
+    el.querySelectorAll(".info-card").forEach((card, i) => {
+      const addr = list[i];
+      card.querySelector('[data-action="edit"]').addEventListener("click", () => openAddressForm(addr));
+      card.querySelector('[data-action="delete"]').addEventListener("click", () => {
+        setUserList("alt_addresses_v1", list.filter(a => a.id !== addr.id));
+        renderAddresses();
+      });
+      const defBtn = card.querySelector('[data-action="default"]');
+      if (defBtn) defBtn.addEventListener("click", () => {
+        setUserList("alt_addresses_v1", list.map(a => ({ ...a, isDefault: a.id === addr.id })));
+        renderAddresses();
+      });
+    });
+  }
+}
+
+function openAddressForm(address){
+  editingAddressId = address ? address.id : null;
+  document.getElementById("address-form-title").textContent = address ? "Edit Address" : "Add Address";
+  document.getElementById("af-label").value = address ? address.label : "Home";
+  document.getElementById("af-name").value = address ? address.name : `${currentUser.firstName} ${currentUser.lastName}`;
+  document.getElementById("af-phone").value = address ? address.phone : currentUser.phone;
+  afDivision.value = address ? address.division : "";
+  populateAfDistricts(afDivision.value);
+  afDistrict.value = address ? address.district : "";
+  document.getElementById("af-upazila").value = address ? address.upazila : "";
+  document.getElementById("af-area").value = address ? address.area : "";
+  document.getElementById("af-street").value = address ? address.street : "";
+  document.getElementById("af-apartment").value = address ? address.apartment : "";
+  document.getElementById("af-postal").value = address ? address.postal : "";
+  document.getElementById("af-default").checked = address ? !!address.isDefault : getUserList("alt_addresses_v1").length === 0;
+  document.getElementById("address-form-wrap").style.display = "block";
+  document.getElementById("address-form-wrap").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+document.getElementById("add-address-btn").addEventListener("click", () => openAddressForm(null));
+document.getElementById("address-form-cancel").addEventListener("click", () => { document.getElementById("address-form-wrap").style.display = "none"; });
+document.getElementById("address-form-save").addEventListener("click", () => {
+  const data = {
+    id: editingAddressId || "addr_" + Date.now(),
+    label: document.getElementById("af-label").value,
+    name: document.getElementById("af-name").value.trim(),
+    phone: document.getElementById("af-phone").value.trim(),
+    division: afDivision.value, district: afDistrict.value,
+    upazila: document.getElementById("af-upazila").value.trim(),
+    area: document.getElementById("af-area").value.trim(),
+    street: document.getElementById("af-street").value.trim(),
+    apartment: document.getElementById("af-apartment").value.trim(),
+    postal: document.getElementById("af-postal").value.trim(),
+    isDefault: document.getElementById("af-default").checked,
+  };
+  if (!data.name || !data.street || !data.division || !data.district){ showToast("Please fill in the required fields."); return; }
+  let list = getUserList("alt_addresses_v1");
+  if (data.isDefault) list = list.map(a => ({ ...a, isDefault: false }));
+  const idx = list.findIndex(a => a.id === data.id);
+  if (idx === -1) list.push(data); else list[idx] = data;
+  setUserList("alt_addresses_v1", list);
+  document.getElementById("address-form-wrap").style.display = "none";
+  renderAddresses();
+  showToast("Address saved.");
+});
+
+/* ================================================================
+   PAYMENT METHODS
+   Only masked, non-sensitive fragments are ever persisted — see the
+   save handler below, which discards the real number immediately.
+   ================================================================ */
+const PAYMENT_TYPES = [
+  { id: "card", label: "Card", icon: `<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/>` },
+  { id: "bkash", label: "bKash", icon: `<rect x="5" y="3" width="14" height="18" rx="2"/>` },
+  { id: "nagad", label: "Nagad", icon: `<rect x="5" y="3" width="14" height="18" rx="2"/>` },
+  { id: "rocket", label: "Rocket", icon: `<rect x="5" y="3" width="14" height="18" rx="2"/>` },
+];
+let pfType = "card";
+function renderPaymentTypeCards(){
+  document.getElementById("payment-type-cards").innerHTML = PAYMENT_TYPES.map(t => `
+    <button type="button" class="ghost-btn flex flex-col items-center gap-1.5 py-3 ${t.id === pfType ? "border-[var(--alt-black)]" : ""}" data-type="${t.id}" style="${t.id === pfType ? "border-color:var(--alt-black);" : ""}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--alt-black)" stroke-width="1.5">${t.icon}</svg>${t.label}
+    </button>
+  `).join("");
+  document.querySelectorAll("#payment-type-cards [data-type]").forEach(btn => btn.addEventListener("click", () => {
+    pfType = btn.dataset.type;
+    renderPaymentTypeCards();
+    document.getElementById("pf-card-fields").style.display = pfType === "card" ? "grid" : "none";
+    document.getElementById("pf-wallet-fields").style.display = pfType === "card" ? "none" : "block";
+  }));
+}
+document.getElementById("pf-number").addEventListener("input", (e) => { e.target.value = e.target.value.replace(/\D/g, "").slice(0,16).replace(/(\d{4})(?=\d)/g, "$1 "); });
+document.getElementById("pf-expiry").addEventListener("input", (e) => { e.target.value = e.target.value.replace(/\D/g, "").slice(0,4).replace(/(\d{2})(?=\d)/, "$1/"); });
+
+function renderPayments(){
+  const list = getUserList("alt_payment_methods_v1");
+  const el = document.getElementById("payments-list");
+  const empty = document.getElementById("payments-empty");
+  if (list.length === 0){ el.innerHTML = ""; empty.style.display = "flex"; return; }
+  empty.style.display = "none";
+  el.innerHTML = list.map(m => `
+    <div class="info-card flex items-center justify-between">
+      <div>
+        <p class="text-sm font-medium">${m.type === "card" ? `${m.name} · Card` : m.type[0].toUpperCase() + m.type.slice(1)}</p>
+        <p class="text-sm text-[var(--alt-muted)] mt-1 font-mono">${m.masked}${m.expiry ? " · Exp " + m.expiry : ""}</p>
+      </div>
+      <div class="flex items-center gap-2">
+        ${m.isDefault ? `<span class="default-badge">Default</span>` : `<button class="ghost-btn" data-action="default">Set Default</button>`}
+        <button class="ghost-btn" data-action="delete">Remove</button>
+      </div>
+    </div>
+  `).join("");
+  el.querySelectorAll(".info-card").forEach((card, i) => {
+    const m = list[i];
+    const defBtn = card.querySelector('[data-action="default"]');
+    if (defBtn) defBtn.addEventListener("click", () => { setUserList("alt_payment_methods_v1", list.map(x => ({ ...x, isDefault: x.id === m.id }))); renderPayments(); });
+    card.querySelector('[data-action="delete"]').addEventListener("click", () => { setUserList("alt_payment_methods_v1", list.filter(x => x.id !== m.id)); renderPayments(); });
+  });
+}
+document.getElementById("add-payment-btn").addEventListener("click", () => {
+  pfType = "card"; renderPaymentTypeCards();
+  document.getElementById("pf-card-fields").style.display = "grid";
+  document.getElementById("pf-wallet-fields").style.display = "none";
+  document.getElementById("payment-form-wrap").style.display = "block";
+  document.getElementById("payment-form-wrap").scrollIntoView({ behavior: "smooth", block: "center" });
+});
+document.getElementById("payment-form-cancel").addEventListener("click", () => { document.getElementById("payment-form-wrap").style.display = "none"; });
+document.getElementById("payment-form-save").addEventListener("click", () => {
+  let entry;
+  if (pfType === "card"){
+    const number = document.getElementById("pf-number").value.replace(/\D/g, "");
+    const name = document.getElementById("pf-name").value.trim();
+    const expiry = document.getElementById("pf-expiry").value.trim();
+    if (number.length < 12 || !name){ showToast("Enter a valid card number and name."); return; }
+    entry = { id: "pm_" + Date.now(), type: "card", name, masked: "•••• " + number.slice(-4), expiry, isDefault: false };
+  } else {
+    const num = document.getElementById("pf-wallet-number").value.replace(/\D/g, "");
+    if (num.length < 6){ showToast("Enter a valid wallet number."); return; }
+    entry = { id: "pm_" + Date.now(), type: pfType, masked: num.slice(0,3) + "••••" + num.slice(-2), isDefault: false };
+  }
+  const list = getUserList("alt_payment_methods_v1");
+  if (list.length === 0) entry.isDefault = true;
+  list.push(entry);
+  setUserList("alt_payment_methods_v1", list);
+  document.getElementById("payment-form-wrap").style.display = "none";
+  document.getElementById("pf-number").value = ""; document.getElementById("pf-name").value = ""; document.getElementById("pf-expiry").value = ""; document.getElementById("pf-wallet-number").value = "";
+  renderPayments();
+  showToast("Payment method saved.");
+});
+
+/* ================================================================
+   PROFILE
+   ================================================================ */
+function renderProfile(){
+  document.getElementById("pr-first").value = currentUser.firstName;
+  document.getElementById("pr-last").value = currentUser.lastName;
+  document.getElementById("pr-email").value = currentUser.email;
+  document.getElementById("pr-phone").value = currentUser.phone;
+  const avatarEl = document.getElementById("profile-avatar");
+  avatarEl.innerHTML = currentUser.avatar ? `<img src="${currentUser.avatar}" alt="">` : initials(currentUser);
+  syncSwitch("pref-orderUpdates", currentUser.marketingPrefs.orderUpdates);
+  syncSwitch("pref-promotions", currentUser.marketingPrefs.promotions);
+  syncSwitch("pref-restock", currentUser.marketingPrefs.restock);
+}
+document.getElementById("profile-avatar-input").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    Object.assign(currentUser, Auth.updateUser(currentUser.id, { avatar: reader.result }));
+    renderProfile(); renderIdentityChrome();
+    showToast("Photo updated.");
+  };
+  reader.readAsDataURL(file);
+});
+document.getElementById("profile-save-btn").addEventListener("click", () => {
+  const patch = {
+    firstName: document.getElementById("pr-first").value.trim(),
+    lastName: document.getElementById("pr-last").value.trim(),
+    email: document.getElementById("pr-email").value.trim(),
+    phone: document.getElementById("pr-phone").value.trim(),
+  };
+  Object.assign(currentUser, Auth.updateUser(currentUser.id, patch));
+  renderIdentityChrome();
+  showToast("Profile updated.");
+});
+document.getElementById("password-save-btn").addEventListener("click", async () => {
+  const errEl = document.getElementById("password-error");
+  errEl.classList.remove("show"); errEl.textContent = "";
+  const current = document.getElementById("pr-current-pw").value;
+  const next = document.getElementById("pr-new-pw").value;
+  const confirm = document.getElementById("pr-confirm-pw").value;
+  if (next.length < 8 || next !== confirm){
+    errEl.textContent = "New passwords must match and be at least 8 characters."; errEl.classList.add("show"); return;
+  }
+  const result = await Auth.changePassword(currentUser.id, current, next);
+  if (!result.ok){ errEl.textContent = result.error; errEl.classList.add("show"); return; }
+  document.getElementById("pr-current-pw").value = ""; document.getElementById("pr-new-pw").value = ""; document.getElementById("pr-confirm-pw").value = "";
+  showToast("Password updated.");
+});
+
+function syncSwitch(id, on){ document.getElementById(id).classList.toggle("on", !!on); }
+function wireSwitch(id, prefKey){
+  document.getElementById(id).addEventListener("click", (e) => {
+    const on = !e.currentTarget.classList.contains("on");
+    e.currentTarget.classList.toggle("on", on);
+    const prefs = { ...currentUser.marketingPrefs, [prefKey]: on };
+    Object.assign(currentUser, Auth.updateUser(currentUser.id, { marketingPrefs: prefs }));
+  });
+}
+wireSwitch("pref-orderUpdates", "orderUpdates");
+wireSwitch("pref-promotions", "promotions");
+wireSwitch("pref-restock", "restock");
+
+/* ================================================================
+   NOTIFICATIONS
+   ================================================================ */
+const NOTIF_CATEGORIES = ["All", "Order Updates", "Promotions", "Restock Alerts", "Delivery", "System"];
+let notifFilter = "All";
+function renderNotifChips(){
+  document.getElementById("notif-chips").innerHTML = NOTIF_CATEGORIES.map(c => `
+    <button class="chip shrink-0 px-4 py-2 rounded-full text-sm font-medium ${c === notifFilter ? "bg-[var(--alt-black)] text-[var(--alt-white)]" : "bg-[var(--alt-surface)] hover:bg-[var(--alt-border)]"}" data-cat="${c}">${c}</button>
+  `).join("");
+  document.querySelectorAll("#notif-chips .chip").forEach(btn => btn.addEventListener("click", () => { notifFilter = btn.dataset.cat; renderNotifications(); }));
+}
+function renderNotifications(){
+  renderNotifChips();
+  const all = getUserList("alt_notifications_v1");
+  const list = notifFilter === "All" ? all : all.filter(n => n.category === notifFilter);
+  const el = document.getElementById("notif-list");
+  const empty = document.getElementById("notif-empty");
+  if (list.length === 0){ el.innerHTML = ""; empty.style.display = "flex"; return; }
+  empty.style.display = "none";
+  el.innerHTML = list.sort((a, b) => b.at - a.at).map(n => `
+    <div class="notif-row ${n.read ? "read" : ""}" data-id="${n.id}">
+      <div class="notif-dot"></div>
+      <div class="flex-1">
+        <div class="flex items-center justify-between gap-3">
+          <h4 class="text-sm font-medium">${n.title}</h4>
+          <span class="text-xs text-[var(--alt-muted)] font-mono shrink-0">${relativeTime(n.at)}</span>
+        </div>
+        <p class="text-xs text-[var(--alt-muted)] mt-1">${n.body}</p>
+        <div class="flex items-center gap-2 mt-1.5">
+          <span class="badge text-[var(--alt-muted)] font-mono inline-block">${n.category}</span>
+          ${n.orderId ? `<button type="button" class="ghost-btn notif-track-btn" data-order-id="${n.orderId}" style="padding:2px 12px;font-size:11px;">Track Order</button>` : ""}
+          ${n.reviewProductId ? `<a href="product.html?id=${n.reviewProductId}" class="ghost-btn" style="padding:2px 12px;font-size:11px;">Write a Review</a>` : ""}
+          ${n.customRequestId ? `<button type="button" class="ghost-btn notif-cr-btn" data-request-id="${n.customRequestId}" style="padding:2px 12px;font-size:11px;">View Request</button>` : ""}
+        </div>
+      </div>
+    </div>
+  `).join("");
+  el.querySelectorAll(".notif-row").forEach(row => row.addEventListener("click", () => {
+    const list = getUserList("alt_notifications_v1").map(n => n.id === row.dataset.id ? { ...n, read: true } : n);
+    setUserList("alt_notifications_v1", list);
+    renderNotifications(); renderIdentityChrome();
+  }));
+  el.querySelectorAll(".notif-track-btn").forEach(btn => btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const order = getOrderById(btn.dataset.orderId);
+    if (order) openTracking(order);
+  }));
+  el.querySelectorAll(".notif-cr-btn").forEach(btn => btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    setView("custom-orders");
+    const request = myCustomRequests().find(r => r.id === btn.dataset.requestId);
+    if (request) openCustomRequestDetail(request.id);
+  }));
+}
+document.getElementById("mark-all-read-btn").addEventListener("click", () => {
+  setUserList("alt_notifications_v1", getUserList("alt_notifications_v1").map(n => ({ ...n, read: true })));
+  renderNotifications(); renderIdentityChrome();
+});
+
+/* ================================================================
+   SUPPORT
+   ================================================================ */
+const FAQS = [
+  { q: "How long does delivery take?", a: "Standard delivery is 3–5 business days; Express is 1–2 business days, both shown at checkout." },
+  { q: "What's your return policy?", a: "Most items can be returned within 14 days in original condition. See the product page for any exceptions." },
+  { q: "What payment methods do you accept?", a: "Cash on Delivery, bKash, Nagad, Rocket, and major cards — see the Payment step at checkout." },
+  { q: "Can I change or cancel my order?", a: "Reach out from the Support tab as soon as possible — we can usually adjust an order before it ships." },
+  { q: "Does my cart or wishlist stay saved?", a: "Yes — both are saved to this browser automatically, even if you close the tab or come back later." },
+];
+document.getElementById("faq-list").innerHTML = FAQS.map((f, i) => `
+  <div class="faq-item" data-index="${i}">
+    <button class="faq-q">${f.q} <svg class="faq-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+    <div class="faq-a"><p class="faq-a-inner">${f.a}</p></div>
+  </div>
+`).join("");
+document.querySelectorAll(".faq-item").forEach(item => {
+  item.querySelector(".faq-q").addEventListener("click", () => {
+    const wasOpen = item.classList.contains("open");
+    document.querySelectorAll(".faq-item").forEach(i => { i.classList.remove("open"); i.querySelector(".faq-a").style.maxHeight = null; });
+    if (!wasOpen){ item.classList.add("open"); const a = item.querySelector(".faq-a"); a.style.maxHeight = a.scrollHeight + "px"; }
+  });
+});
+
+document.getElementById("live-chat-btn").addEventListener("click", () => showToast("Live chat is coming soon."));
+document.getElementById("ct-name").value = `${currentUser.firstName} ${currentUser.lastName}`;
+document.getElementById("ct-email").value = currentUser.email;
+document.getElementById("ct-submit").addEventListener("click", () => {
+  const subject = document.getElementById("ct-subject").value.trim();
+  const message = document.getElementById("ct-message").value.trim();
+  if (!subject || !message){ showToast("Please add a subject and message."); return; }
+  const tickets = getUserList("alt_tickets_v1");
+  tickets.unshift({ id: "TCK-" + Math.random().toString(36).slice(2, 7).toUpperCase(), subject, message, status: "Open", at: Date.now() });
+  setUserList("alt_tickets_v1", tickets);
+  document.getElementById("ct-subject").value = ""; document.getElementById("ct-message").value = "";
+  renderTickets();
+  showToast("Support ticket submitted.");
+});
+function renderTickets(){
+  const tickets = getUserList("alt_tickets_v1");
+  document.getElementById("ticket-empty").style.display = tickets.length ? "none" : "block";
+  document.getElementById("ticket-list").innerHTML = tickets.map(t => `
+    <div class="info-card flex items-center justify-between">
+      <div>
+        <p class="text-sm font-medium">${escapeHTML(t.subject)}</p>
+        <p class="text-xs text-[var(--alt-muted)] font-mono mt-1">${t.id} · ${new Date(t.at).toLocaleDateString()}</p>
+      </div>
+      <span class="badge px-2.5 py-1 rounded-full bg-white/90">${t.status}</span>
+    </div>
+  `).join("");
+}
+
+/* ================================================================
+   SETTINGS
+   ================================================================ */
+function renderSettings(){
+  syncSwitch("priv-personalization", true);
+  syncSwitch("priv-analytics", true);
+  document.getElementById("active-sessions").innerHTML = `
+    <div class="info-card flex items-center justify-between">
+      <div>
+        <p class="text-sm font-medium">This device</p>
+        <p class="text-xs text-[var(--alt-muted)] mt-1">${navigator.userAgent.match(/Chrome|Firefox|Safari|Edg/)?.[0] || "Browser"} · Active now</p>
+      </div>
+      <span class="default-badge">Current</span>
+    </div>
+  `;
+  const history = Auth.loginHistory(currentUser.id);
+  document.getElementById("login-history").innerHTML = history.length
+    ? history.map(h => `<div class="px-5 py-3.5 text-sm flex items-center justify-between"><span>${h.device} · ${h.browser}</span><span class="text-xs text-[var(--alt-muted)] font-mono">${new Date(h.time).toLocaleString()}</span></div>`).join("")
+    : `<p class="px-5 py-6 text-sm text-[var(--alt-muted)]">No login history yet.</p>`;
+}
+document.getElementById("priv-personalization").addEventListener("click", (e) => e.currentTarget.classList.toggle("on"));
+document.getElementById("priv-analytics").addEventListener("click", (e) => e.currentTarget.classList.toggle("on"));
+
+/* ================================================================
+   INIT
+   ================================================================ */
+renderIdentityChrome();
+renderHome();
+Cart.load();
+Cart.syncBadges();
+
+/* Sidebar badge should be visible even before opening the Custom
+   Orders tab, same idea as the Notifications badge above. */
+(function syncCustomOrdersBadge(){
+  const needsAttention = myCustomRequests().filter(r => r.status === "quotation-sent" || r.status === "ready-for-final").length;
+  const badge = document.getElementById("custom-orders-badge");
+  badge.textContent = needsAttention;
+  badge.style.display = needsAttention > 0 ? "" : "none";
+})();
+(function syncReturnsBadge(){
+  const active = myReturnRequests().filter(r => !["completed", "rejected", "cancelled"].includes(r.status)).length;
+  const badge = document.getElementById("returns-badge");
+  badge.textContent = active;
+  badge.style.display = active > 0 ? "" : "none";
+})();
+(function syncRewardsVaultBadge(){
+  const unscratched = scratchCardsForUser(currentUser.id).filter(c => !c.scratched).length;
+  const badge = document.getElementById("rewards-vault-badge");
+  badge.textContent = unscratched;
+  badge.style.display = unscratched > 0 ? "" : "none";
+})();
+
+/* Deep link from checkout's success screen: dashboard.html?view=orders&order=ALT-... */
+const deepLinkParams = new URLSearchParams(window.location.search);
+if (deepLinkParams.get("view") === "orders"){
+  setView("orders");
+  const targetOrderId = deepLinkParams.get("order");
+  if (targetOrderId){
+    const target = myOrders().find(o => o.id === targetOrderId);
+    if (target) setTimeout(() => openTracking(target), 400);
+  }
+} else if (deepLinkParams.get("view") === "notifications"){
+  setView("notifications");
+} else if (deepLinkParams.get("view") === "custom-orders"){
+  setView("custom-orders");
+  const targetRequestId = deepLinkParams.get("request");
+  if (targetRequestId){
+    const target = myCustomRequests().find(r => r.id === targetRequestId);
+    if (target) setTimeout(() => openCustomRequestDetail(target.id), 400);
+  }
+}
+
+window.addEventListener("load", () => {
+  document.getElementById("dash-root").classList.add("settled");
+  document.querySelectorAll("[data-enter]").forEach(el => el.classList.add("in"));
+});
+
+} // end else (session confirmed)
+</script>
+
+</body>
+</html>

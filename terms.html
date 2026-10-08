@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<script>(function(){try{var t=localStorage.getItem("alt_theme_v1");if(t==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0A0A0A" />
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Terms of Service — Aesthetic Lifestyle Touch</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="products-data.js"></script>
+<script src="site-content.js"></script>
+<script src="cart.js"></script>
+<script src="auth.js"></script>
+<script src="theme.js"></script>
+<script src="search.js"></script>
+<link rel="stylesheet" href="cart.css">
+<link rel="stylesheet" href="search.css">
+<script src="loader.js"></script>
+<link rel="stylesheet" href="loader.css">
+<script src="footer.js"></script>
+<link rel="stylesheet" href="footer.css">
+<script src="mobile-nav.js"></script>
+<link rel="stylesheet" href="mobile-nav.css">
+<link rel="stylesheet" href="mobile.css">
+<script src="smooth-scroll.js" defer></script>
+
+<style>
+  :root{
+    --alt-white:   #FFFFFF;
+    --alt-surface: #F5F4F1;
+    --alt-black:   #0A0A0A;
+    --alt-border:  #E8E6E1;
+    --alt-beige:   #C9C2B4;
+    --alt-muted:   #8A8A8A;
+    --alt-good:    #3F8F5F;
+    --alt-bad:     #B23B3B;
+  }
+  /* ================= DARK MODE ================= */
+  :root[data-theme="dark"]{
+    --alt-white:   #0A0A0A;
+    --alt-surface: #17160F;
+    --alt-black:   #F5F4F1;
+    --alt-border:  #2C2A22;
+    --alt-beige:   #C9C2B4;
+    --alt-muted:   #9C9890;
+    --alt-good:    #4FAE73;
+    --alt-warn:    #D4A24F;
+    --alt-bad:     #E0655C;
+  }
+  :root[data-theme="dark"] .nav-glass{
+    background: rgba(10,9,7,0.55);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  :root[data-theme="dark"] img{ filter: brightness(0.92); }
+  * { -webkit-font-smoothing: antialiased; }
+  body{ background: var(--alt-white); font-family:'Inter', sans-serif; color: var(--alt-black); overflow-x: hidden; }
+  .font-display{ font-family:'Space Grotesk', sans-serif; }
+  .font-mono{ font-family:'JetBrains Mono', monospace; }
+  :focus-visible{ outline: 2px solid var(--alt-black); outline-offset: 2px; }
+
+  .nav-glass{
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    border-bottom: 1px solid rgba(232,230,225,0.6);
+  }
+
+  #lg-root{ opacity:0; transform: scale(1.03); filter: blur(6px); transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1), filter 0.9s cubic-bezier(0.16,1,0.3,1); }
+  #lg-root.settled{ opacity:1; transform: none; filter: none; }
+  [data-enter]{ opacity:0; transform: translateY(18px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+  [data-enter].in{ opacity:1; transform: translateY(0); }
+
+  .lg-prose h2{ font-family:'Space Grotesk', sans-serif; font-size:1.15rem; font-weight:500; margin-top:2.25rem; margin-bottom:0.75rem; }
+  .lg-prose p, .lg-prose li{ font-size:14.5px; line-height:1.75; color: var(--alt-muted); }
+  .lg-prose p{ margin-bottom: 0.9rem; }
+  .lg-prose ul{ list-style: disc; padding-left: 1.3rem; margin-bottom: 0.9rem; }
+  .lg-note{ border: 1px solid var(--alt-border); background: var(--alt-surface); border-radius: 16px; padding: 16px 18px; font-size: 13px; color: var(--alt-muted); line-height: 1.6; }
+
+  @media (prefers-reduced-motion: reduce){
+    [data-enter], #lg-root{ transition:none !important; animation:none !important; }
+    [data-enter]{ opacity:1 !important; transform:none !important; }
+    #lg-root{ opacity:1 !important; transform:none !important; filter:none !important; }
+  }
+</style>
+<link rel="stylesheet" href="tailwind.css">
+</head>
+<body>
+
+<div id="site-loader" aria-hidden="true">
+  <div class="sl-glow"></div>
+  <p class="sl-mark">AESTHETIC <span>LIFESTYLE TOUCH</span></p>
+  <div class="sl-progress-track"><div class="sl-progress-fill"></div></div>
+</div>
+
+<header class="nav-glass fixed top-0 left-0 right-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 md:px-10 h-16 md:h-[72px] flex items-center justify-between">
+    <a href="Home.html" class="font-display text-[15px] md:text-base font-medium tracking-tight">
+      AESTHETIC <span class="text-[var(--alt-muted)] font-normal">LIFESTYLE TOUCH</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-10">
+      <a href="Home.html" class="nav-link">Home</a>
+      <a href="store.html" class="nav-link">Store</a>
+      <a href="collections.html" class="nav-link">Collections</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+    </nav>
+    <div class="flex items-center gap-5">
+      <button id="search-trigger" aria-label="Search (Ctrl+K)" class="hover:opacity-60 transition-opacity">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
+      <a id="account-icon" href="account.html" aria-label="Account" class="hover:opacity-60 transition-opacity">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+      </a>
+      <a id="messages-icon" href="dashboard.html?view=notifications" aria-label="Messages" class="hover:opacity-60 transition-opacity relative" style="display:none;">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span id="messages-badge" class="absolute -top-2 -right-2 bg-[var(--alt-black)] text-[var(--alt-white)] text-[10px] font-mono w-4 h-4 rounded-full flex items-center justify-center" style="display:none;">0</span>
+      </a>
+      <a id="wishlist-icon" href="wishlist.html" aria-label="Wishlist" class="hover:opacity-60 transition-opacity relative">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4 6 4c2 0 3.5 1 4.5 2.6C11.5 5 13 4 15 4c4 0 5.6 4.1 4 7.7C19.5 16.1 12 21 12 21z"/></svg>
+        <span id="wishlist-badge" class="absolute -top-2 -right-2 bg-[var(--alt-black)] text-[var(--alt-white)] text-[10px] font-mono w-4 h-4 rounded-full flex items-center justify-center">0</span>
+      </a>
+      <button id="cart-icon" aria-label="Cart, 0 items" class="hover:opacity-60 transition-opacity relative">
+        <svg width="20" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L4.5 2.5H2"/>
+          <circle cx="9" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="17" cy="20" r="1.4" fill="currentColor" stroke="none"/>
+        </svg>
+        <span id="cart-badge" class="absolute -top-2 -right-2 bg-[var(--alt-black)] text-[var(--alt-white)] text-[10px] font-mono w-4 h-4 rounded-full flex items-center justify-center">0</span>
+      </button>
+      <button type="button" class="theme-toggle-btn theme-toggle-icon-btn hidden md:flex" aria-label="Toggle dark mode">
+        <svg class="theme-icon-light" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="theme-icon-dark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="lg-root">
+  <section class="px-6 md:px-10 pt-32 md:pt-40 pb-10 max-w-3xl mx-auto">
+    <p class="font-mono text-xs tracking-[0.22em] text-[var(--alt-muted)] uppercase mb-4" data-enter>Legal</p>
+    <h1 class="font-display text-3xl md:text-4xl font-medium tracking-tight mb-3" data-enter style="transition-delay:0.06s;">Terms of Service</h1>
+    <p class="text-sm text-[var(--alt-muted)]" data-enter style="transition-delay:0.1s;">Last updated: July 2026</p>
+  </section>
+
+  <section class="px-6 md:px-10 pb-24 max-w-3xl mx-auto">
+    <div class="lg-note mb-10" data-enter>
+      This is a template Terms of Service for Aesthetic Lifestyle Touch. It hasn't been reviewed by a lawyer — please have it checked before relying on it for a real, live store.
+    </div>
+
+    <div class="lg-prose" data-enter style="transition-delay:0.04s;">
+      <h2>1. Agreement to Terms</h2>
+      <p>By accessing or using the Aesthetic Lifestyle Touch website ("we", "us", "our"), you agree to be bound by these Terms of Service. If you don't agree, please don't use the site.</p>
+
+      <h2>2. Accounts</h2>
+      <p>You need an account to check out. You're responsible for keeping your login details secure and for anything that happens under your account. Provide accurate information when you sign up.</p>
+
+      <h2>3. Products, Pricing &amp; Availability</h2>
+      <p>We try to keep product descriptions, images, and prices accurate, but errors can happen. We reserve the right to correct pricing mistakes, limit quantities, or cancel orders placed at an incorrect price. Stock is shown in real time based on what's currently available; an item can sell out between when you view it and when you check out.</p>
+
+      <h2>4. Orders &amp; Payment</h2>
+      <p>Placing an order is an offer to buy, which we may accept or decline. Cash on Delivery orders are paid on arrival. For bKash, Nagad, and Rocket, you send payment directly to the number shown at checkout and submit the Transaction ID — your order is confirmed once we manually verify that Transaction ID and amount against what we received. We are not liable for payments sent to the wrong number or with an incorrect Transaction ID.</p>
+
+      <h2>5. Shipping &amp; Delivery</h2>
+      <p>Delivery estimates shown at checkout are our best estimate, not a guarantee. Delivery charges and timelines vary by the method you choose and may change without notice.</p>
+
+      <h2>6. Returns, Refunds &amp; Cancellations</h2>
+      <p>Contact us within a reasonable time of delivery if there's a problem with your order. Refunds for cancelled, returned, or refunded orders are processed back through the original payment method where possible. Items must generally be unused and in their original packaging to qualify for a return.</p>
+
+      <h2>7. Reviews &amp; User Content</h2>
+      <p>If you submit a review, you confirm it's your own honest opinion and that you have the right to post it. We may edit, decline to publish, or remove any review — including ones that are abusive, fake, or off-topic — at our discretion.</p>
+
+      <h2>8. Intellectual Property</h2>
+      <p>All text, graphics, logos, and design on this site belong to Aesthetic Lifestyle Touch or our licensors. You may not copy, resell, or repurpose them without permission.</p>
+
+      <h2>9. Limitation of Liability</h2>
+      <p>We provide this site "as is." To the fullest extent permitted by law, we're not liable for indirect, incidental, or consequential damages arising from your use of the site or products purchased through it.</p>
+
+      <h2>10. Changes to These Terms</h2>
+      <p>We may update these Terms from time to time. Continued use of the site after a change means you accept the updated Terms.</p>
+
+      <h2>11. Contact</h2>
+      <p>Questions about these Terms? Reach us through the <a href="contact.html" class="underline underline-offset-4 hover:opacity-60 transition-opacity">Contact page</a>.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+window.addEventListener("load", () => {
+  document.getElementById("lg-root").classList.add("settled");
+  document.querySelectorAll("[data-enter]").forEach(el => el.classList.add("in"));
+});
+</script>
+
+</body>
+</html>

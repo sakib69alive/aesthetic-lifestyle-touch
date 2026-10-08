@@ -1,0 +1,174 @@
+/* ================================================================
+   SHARED SEARCH COMMAND PALETTE
+   Injected by search.js on every page that includes it. Opens with
+   the header Search icon or Ctrl/Cmd+K.
+   ================================================================ */
+
+:root{
+  --alt-white:   #FFFFFF;
+  --alt-surface: #F5F4F1;
+  --alt-black:   #0A0A0A;
+  --alt-border:  #E8E6E1;
+  --alt-beige:   #C9C2B4;
+  --alt-muted:   #8A8A8A;
+}
+/* This file's translucent glass surfaces are hardcoded to white (a
+   frosted-glass look over whatever's behind the overlay) and don't
+   participate in the --alt-* swap the way solid surfaces do — so they
+   need their own explicit dark-mode surface, same idea as .nav-glass
+   in each page's own <style> block. */
+:root[data-theme="dark"] #search-panel{
+  background: rgba(23,22,15,0.92);
+  border-color: rgba(255,255,255,0.1);
+  color: var(--alt-black);
+}
+
+#search-overlay{
+  position: fixed; inset: 0; z-index: 140;
+  background: rgba(10,10,10,0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s ease;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 9vh 16px 16px;
+  overflow-y: auto;
+}
+#search-overlay.open{ opacity: 1; pointer-events: all; }
+
+#search-panel{
+  width: min(680px, 100%);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 26px;
+  box-shadow: 0 50px 120px -30px rgba(10,10,10,0.45);
+  border: 1px solid rgba(255,255,255,0.6);
+  transform: scale(0.95) translateY(-14px);
+  opacity: 0;
+  transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  color: var(--alt-black);
+}
+#search-overlay.open #search-panel{ transform: scale(1) translateY(0); opacity: 1; }
+
+@media (max-width: 640px){
+  #search-overlay{ padding: 0; align-items: stretch; }
+  #search-panel{ width: 100%; height: 100%; border-radius: 0; max-height: none; }
+}
+
+.sp-font-display{ font-family: 'Space Grotesk', sans-serif; }
+.sp-font-mono{ font-family: 'JetBrains Mono', monospace; }
+#search-panel .no-scrollbar::-webkit-scrollbar{ display:none; }
+#search-panel .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
+
+/* ================= INPUT ROW ================= */
+#sp-input-row{
+  display: flex; align-items: center; gap: 12px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--alt-border);
+  flex-shrink: 0;
+}
+#sp-input{
+  flex: 1; border: none; outline: none; background: transparent;
+  font-size: 17px; color: var(--alt-black);
+}
+#sp-input::placeholder{ color: var(--alt-muted); }
+
+.sp-icon-btn{
+  width: 34px; height: 34px; border-radius: 999px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--alt-muted);
+  transition: color 0.2s ease, background-color 0.2s ease, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.sp-icon-btn:hover{ background: var(--alt-surface); color: var(--alt-black); }
+.sp-icon-btn.mic-active{ color: var(--alt-black); background: var(--alt-surface); animation: mic-pulse 1.2s ease-in-out infinite; }
+@keyframes mic-pulse{ 0%,100%{ box-shadow: 0 0 0 0 rgba(10,10,10,0.12); } 50%{ box-shadow: 0 0 0 8px rgba(10,10,10,0.06); } }
+
+.sp-esc-hint{
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--alt-muted);
+  border: 1px solid var(--alt-border); border-radius: 6px; padding: 2px 7px; flex-shrink: 0;
+}
+
+/* ================= BODY / SCROLL AREA ================= */
+#sp-body{
+  max-height: min(62vh, 560px);
+  overflow-y: auto;
+  padding: 18px 22px 24px;
+}
+@media (max-width: 640px){ #sp-body{ max-height: none; flex: 1; } }
+
+.sp-section{ margin-bottom: 22px; }
+.sp-section:last-child{ margin-bottom: 4px; }
+.sp-section-head{
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.sp-section-title{
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--alt-muted);
+}
+.sp-clear-link{ font-size: 11px; color: var(--alt-muted); text-decoration: underline; text-underline-offset: 3px; transition: opacity 0.2s ease; }
+.sp-clear-link:hover{ opacity: 0.6; }
+
+/* ================= CHIPS ================= */
+.sp-chip-row{ display: flex; flex-wrap: wrap; gap: 8px; }
+.sp-chip{
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 999px;
+  background: var(--alt-surface); font-size: 12.5px; font-weight: 500;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.sp-chip:hover{ background: var(--alt-border); transform: translateY(-1px); }
+.sp-chip.selected{ background: var(--alt-black); color: var(--alt-white); }
+.sp-chip-remove{ opacity: 0.5; }
+.sp-chip-remove:hover{ opacity: 1; }
+
+/* ================= FILTER BAR ================= */
+#sp-filter-bar{ display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; }
+
+/* ================= RESULT ROW ================= */
+.sp-result{
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px; border-radius: 16px; cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.sp-result:hover, .sp-result.active{ background: var(--alt-surface); }
+.sp-result-thumb{ width: 58px; height: 58px; border-radius: 12px; overflow: hidden; background: var(--alt-border); flex-shrink: 0; }
+.sp-result-thumb img{ width: 100%; height: 100%; object-fit: cover; }
+.sp-result-actions{ display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.sp-mini-btn{
+  width: 32px; height: 32px; border-radius: 999px; border: 1px solid var(--alt-border);
+  display: flex; align-items: center; justify-content: center; color: var(--alt-muted);
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), background-color 0.2s ease, color 0.2s ease;
+}
+.sp-mini-btn:hover{ background: var(--alt-white); color: var(--alt-black); transform: translateY(-1px); }
+.sp-mini-btn.active{ color: var(--alt-black); background: var(--alt-white); }
+.sp-mini-btn.active svg{ fill: var(--alt-black); }
+
+/* ================= RECENTLY VIEWED (thumbnail strip) ================= */
+.sp-thumb-strip{ display: flex; gap: 10px; overflow-x: auto; }
+.sp-thumb-card{ width: 64px; flex-shrink: 0; cursor: pointer; transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); }
+.sp-thumb-card:hover{ transform: translateY(-2px); }
+.sp-thumb-card .sp-result-thumb{ width: 64px; height: 64px; }
+
+/* ================= AI ASSISTANT ================= */
+.sp-ai-card{
+  border: 1px solid var(--alt-border); border-radius: 16px; padding: 14px;
+}
+
+/* ================= EMPTY STATE ================= */
+#sp-empty{ display: none; flex-direction: column; align-items: center; text-align: center; padding: 40px 10px 20px; }
+#sp-empty.show{ display: flex; }
+
+/* ================= FADE-IN FOR RESULTS ================= */
+.sp-fade-item{ opacity: 0; transform: translateY(6px); animation: sp-fade-in 0.35s cubic-bezier(0.16,1,0.3,1) forwards; }
+@keyframes sp-fade-in{ to{ opacity: 1; transform: translateY(0); } }
+
+@media (prefers-reduced-motion: reduce){
+  #search-overlay, #search-panel, .sp-icon-btn, .sp-chip, .sp-result, .sp-mini-btn, .sp-thumb-card, .sp-fade-item{
+    transition: none !important; animation: none !important;
+  }
+  .sp-fade-item{ opacity: 1 !important; transform: none !important; }
+}

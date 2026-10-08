@@ -1,0 +1,106 @@
+/* ================================================================
+   SITE LOADER + SKELETON UTILITIES
+   Shared across every page. The loader markup itself must live in
+   each page's HTML (first child of <body>) so it paints before any
+   script runs — this file just styles it; loader.js times its exit.
+   ================================================================ */
+
+:root{
+  --alt-white:   #FFFFFF;
+  --alt-surface: #F5F4F1;
+  --alt-black:   #0A0A0A;
+  --alt-border:  #E8E6E1;
+  --alt-beige:   #C9C2B4;
+  --alt-muted:   #8A8A8A;
+}
+
+/* ================= INITIAL LOADING SCREEN ================= */
+/* pointer-events: none from the start (not just once .hide is added) —
+   this is what was causing the site-wide "magnetic scroll" bug: for its
+   ~0.7-2.5s on screen, this full-viewport fixed overlay was silently
+   absorbing every scroll/touch/click a visitor made, since nothing here
+   is actually interactive. The visual fade/dismiss timing is unchanged. */
+#site-loader{
+  position: fixed; inset: 0; z-index: 300;
+  background: var(--alt-white);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: opacity 0.6s cubic-bezier(0.65,0,0.35,1);
+  pointer-events: none;
+}
+#site-loader.hide{ opacity: 0; }
+
+.sl-glow{
+  position: absolute; width: 420px; height: 420px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,194,180,0.35), transparent 70%);
+  filter: blur(60px);
+  animation: sl-breathe 2.2s ease-in-out infinite;
+}
+@keyframes sl-breathe{ 0%,100%{ opacity: 0.5; transform: scale(1); } 50%{ opacity: 0.9; transform: scale(1.08); } }
+
+.sl-mark{
+  position: relative; z-index: 1;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px; font-weight: 500; letter-spacing: 0.02em;
+  color: var(--alt-black);
+  opacity: 0;
+  animation: sl-fade-in 0.7s ease forwards 0.1s;
+}
+.sl-mark span{ color: var(--alt-muted); font-weight: 400; }
+@keyframes sl-fade-in{ to{ opacity: 1; } }
+
+.sl-progress-track{
+  position: relative; z-index: 1;
+  width: 120px; height: 2px;
+  background: var(--alt-border); border-radius: 999px;
+  margin-top: 26px; overflow: hidden;
+}
+.sl-progress-fill{
+  position: absolute; inset: 0 auto 0 0;
+  width: 0%; height: 100%;
+  background: var(--alt-black); border-radius: 999px;
+  transition: width 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+
+@media (prefers-reduced-motion: reduce){
+  #site-loader{ transition: none; }
+  .sl-glow{ animation: none; opacity: 0.6; }
+  .sl-mark{ animation: none; opacity: 1; }
+}
+
+/* ================= SKELETON UTILITIES ================= */
+/* Reusable shimmer building blocks — seed a container with these in
+   markup; render functions that already do innerHTML replacement
+   (Store, Wishlist, Collections, Dashboard, Product) swap them out
+   for real content automatically, no extra JS required. */
+.skeleton{
+  background: linear-gradient(100deg, var(--alt-surface) 30%, var(--alt-border) 50%, var(--alt-surface) 70%);
+  background-size: 200% 100%;
+  animation: skel-shimmer 1.6s ease-in-out infinite;
+  border-radius: 8px;
+}
+@keyframes skel-shimmer{ 0%{ background-position: 200% 0; } 100%{ background-position: -200% 0; } }
+
+.skel-card{ display: block; }
+.skel-card .skeleton + .skeleton{ margin-top: 10px; }
+
+@media (prefers-reduced-motion: reduce){
+  .skeleton{ animation: none; background: var(--alt-surface); }
+}
+
+/* ================= SHARED NAV LINK — animated underline ================= */
+.nav-link{
+  position: relative;
+  font-size: 14px; font-weight: 500;
+  padding-bottom: 4px;
+}
+.nav-link::after{
+  content: "";
+  position: absolute; left: 0; right: 100%; bottom: 0;
+  height: 1px; background: var(--alt-black);
+  transition: right 0.35s cubic-bezier(0.16,1,0.3,1);
+}
+.nav-link:hover::after, .nav-link:focus-visible::after{ right: 0; }
+.nav-link.active::after{ right: 0; }
+@media (prefers-reduced-motion: reduce){
+  .nav-link::after{ transition: none; }
+}
