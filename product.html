@@ -375,6 +375,112 @@
     [data-enter], [data-reveal]{ opacity: 1 !important; transform: none !important; }
     #pdp-root{ opacity: 1 !important; transform: none !important; filter: none !important; }
   }
+
+  /* ===== MOBILE (≤767px) ===== */
+  .m-gallery-track, .m-gallery-count, .m-gallery-dots, .m-acc-sum, .m-review-actions{ display: none; }
+  .m-acc-sum::-webkit-details-marker{ display: none; }
+  @media (max-width: 767px){
+
+    /* ---- gallery: full-bleed 4:5 swipe track, counter pill + dots, no thumbnails ---- */
+    #pdp-root > nav[aria-label="Breadcrumb"]{ display: none; }
+    body:has(#mnav-overlay) #pdp-root > section:first-of-type{ padding: var(--m-header-h) 0 32px; }
+    #pdp-root > section:first-of-type > div{ display: block; }
+    .gallery-stage{ aspect-ratio: 4 / 5; border-radius: 0; box-shadow: none; }
+    .gallery-stage:hover img{ transform: none; }
+    #main-image, #main-fallback{ display: none !important; }
+    #thumb-row{ display: none; }
+    .m-gallery-track{
+      display: flex; position: absolute; inset: 0; overflow-x: auto;
+      scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none;
+    }
+    .m-gallery-track::-webkit-scrollbar{ display: none; }
+    .m-gallery-slide{ flex: 0 0 100%; height: 100%; scroll-snap-align: center; scroll-snap-stop: always; }
+    .m-gallery-slide img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+    .m-gallery-count{
+      display: block; position: absolute; right: 14px; bottom: 14px; z-index: 5;
+      padding: 6px 12px; border-radius: 999px; background: rgba(10,10,10,.55); color: #fff;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .06em;
+    }
+    .m-gallery-dots{ display: flex; gap: 6px; position: absolute; left: 0; right: 0; bottom: 22px; justify-content: center; z-index: 4; pointer-events: none; }
+    .m-gallery-dots i{ width: 6px; height: 6px; border-radius: 999px; background: rgba(255,255,255,.55); transition: width .3s var(--m-ease), background-color .3s ease; }
+    .m-gallery-dots i.on{ width: 18px; background: #fff; }
+    .expand-btn{ width: 44px; height: 44px; top: 12px; right: 12px; -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(255,255,255,.9); }
+
+    /* ---- info block ---- */
+    #pdp-root > section:first-of-type > div > div:last-child{ padding: 24px var(--m-gutter) 0; }
+    #pdp-brand-cat{ font-size: var(--m-fs-eyebrow); letter-spacing: var(--m-ls-eyebrow); margin-bottom: 10px; }
+    #pdp-name{ font-size: 1.5rem; line-height: 1.2; letter-spacing: var(--m-ls-h2); }
+    #pdp-rating{ display: block; padding-block: 12px; margin-block: -12px; cursor: pointer; text-decoration: underline; text-decoration-color: var(--alt-border); text-underline-offset: 5px; }
+    #pdp-price{ font-size: 1.75rem; }
+    #pdp-desc{ font-size: var(--m-fs-body); line-height: var(--m-lh-body); max-width: none; }
+    .swatch{ width: 44px; height: 44px; box-shadow: inset 0 0 0 5px var(--alt-white); }
+    .qty-btn{ width: 44px; height: 44px; }
+    #pdp-actions{ margin-top: 28px; }
+    #add-cart-btn, #buy-now-btn{ height: 52px; padding: 0 24px; font-size: 15px; }
+    #wishlist-btn{ height: 48px; padding-block: 0; }
+    #share-btn{ width: 48px; height: 48px; }
+    #restock-email{ font-size: var(--m-fs-input); }
+
+    /* ---- section headings ---- */
+    #pdp-root p.font-mono[class*="tracking-[0.22em]"]{ font-size: var(--m-fs-eyebrow); letter-spacing: var(--m-ls-eyebrow); margin-bottom: 10px; }
+    #pdp-root h2{ font-size: 1.5rem; line-height: 1.2; letter-spacing: var(--m-ls-h2); }
+    #pdp-root h2.mb-10{ margin-bottom: 24px; }
+
+    /* ---- "Why this piece": snap rail of compact cards ---- */
+    #features-grid{
+      display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory;
+      margin: 24px calc(-1 * var(--m-gutter)) 0; padding: 0 var(--m-gutter) 4px;
+      scroll-padding-inline: var(--m-gutter); scrollbar-width: none;
+    }
+    #features-grid::-webkit-scrollbar{ display: none; }
+    #features-grid .feature-card{ flex: 0 0 70%; scroll-snap-align: start; padding: 18px; border-radius: var(--m-radius-card); }
+    #features-grid .feature-card:hover{ transform: none; box-shadow: none; border-color: var(--alt-border); }
+    #features-grid .feature-card > div:first-child{ width: 36px; height: 36px; margin-bottom: 12px; }
+    #features-grid .feature-card p{ display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* ---- specs + story → accordions ---- */
+    body:has(#mnav-overlay) #pdp-root #pdp-specs, body:has(#mnav-overlay) #pdp-root #pdp-story{
+      padding: 0; background: var(--alt-white);
+    }
+    #pdp-story{ border-bottom: 1px solid var(--alt-border); }
+    .m-acc-sum{
+      display: flex; align-items: center; justify-content: space-between; min-height: 56px;
+      padding: 0 var(--m-gutter); list-style: none; cursor: pointer;
+      border-top: 1px solid var(--alt-border);
+      font-family: 'Space Grotesk', sans-serif; font-size: 1.0625rem; font-weight: 500;
+    }
+    .m-acc-chev{ color: var(--alt-muted); transition: transform .3s var(--m-ease); }
+    .m-acc[open] .m-acc-chev{ transform: rotate(180deg); }
+    #pdp-specs .max-w-3xl, #pdp-story .max-w-2xl{ padding: 0 var(--m-gutter) 24px; }
+    #pdp-specs p.font-mono, #pdp-specs h2, #pdp-story p.font-mono, #pdp-story h2{ display: none; }
+    #pdp-story #desc-body{ line-height: var(--m-lh-body); font-size: var(--m-fs-body); }
+
+    /* ---- reviews: 2 on the page, the rest + the form in sheets ---- */
+    #review-write-block{ display: none; }
+    .m-sheet #review-write-block{ display: block; margin-top: 0; padding-top: 0; border-top: 0; }
+    .m-review-actions{ display: flex; gap: 10px; margin-top: 24px; }
+    .m-reviews-sheet > div + div{ margin-top: 28px; }
+    .helpful-btn{ min-height: 44px; }
+    .review-star{ min-width: 44px !important; min-height: 44px !important; font-size: 28px !important; }
+    .field-input{ font-size: var(--m-fs-input); }
+    #review-photo-trigger{ padding-block: 14px; }
+    #review-submit-btn{ width: 100%; height: 52px; padding: 0; }
+
+    /* ---- related rail ---- */
+    #related-grid{
+      gap: 12px; scroll-snap-type: x mandatory; scroll-padding-inline: var(--m-gutter);
+      margin-inline: calc(-1 * var(--m-gutter)); padding-inline: var(--m-gutter);
+    }
+    #related-grid .p-card{ flex: 0 0 64%; width: auto; scroll-snap-align: start; border-radius: var(--m-radius-card); padding-bottom: 0; }
+    #related-grid .p-card:hover{ transform: none; box-shadow: none; }
+    #related-grid .p-stage{ border-radius: var(--m-radius-card); }
+    #related-grid .p-card .mt-4{ margin-top: 12px; padding: 0 2px; }
+
+    /* ---- sticky buy bar (shows once the inline buttons have scrolled away) ---- */
+    #mobile-bar{ padding: 12px var(--m-gutter) calc(12px + var(--sab)); }
+    #mobile-bar button{ height: 52px; padding: 0 20px; font-size: 15px; }
+    #mobile-price{ font-size: 1rem; }
+  }
 </style>
 <link rel="stylesheet" href="tailwind.css">
 </head>
@@ -582,29 +688,35 @@
   <!-- ============================================================
        SPECIFICATIONS
        ============================================================ -->
-  <section class="px-6 md:px-10 py-16 md:py-20">
+  <section id="pdp-specs" class="px-6 md:px-10 py-16 md:py-20">
+   <details class="m-acc" open>
+    <summary class="m-acc-sum"><span>Specifications</span><svg class="m-acc-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
     <div class="max-w-3xl mx-auto">
       <p data-reveal class="font-mono text-xs tracking-[0.22em] text-[var(--alt-muted)] uppercase mb-4">Specifications</p>
       <h2 data-reveal class="font-display text-2xl md:text-3xl font-medium tracking-tight mb-8" style="transition-delay:0.06s;">The fine print, made clear.</h2>
       <div id="specs-table" data-reveal style="transition-delay:0.1s;"></div>
     </div>
+   </details>
   </section>
 
   <!-- ============================================================
        DESCRIPTION
        ============================================================ -->
-  <section class="px-6 md:px-10 py-16 md:py-20 bg-[var(--alt-surface)]">
+  <section id="pdp-story" class="px-6 md:px-10 py-16 md:py-20 bg-[var(--alt-surface)]">
+   <details class="m-acc" open>
+    <summary class="m-acc-sum"><span>The story</span><svg class="m-acc-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
     <div class="max-w-2xl mx-auto">
       <p data-reveal class="font-mono text-xs tracking-[0.22em] text-[var(--alt-muted)] uppercase mb-4">The Story</p>
       <h2 id="desc-heading" data-reveal class="font-display text-2xl md:text-3xl font-medium tracking-tight mb-6" style="transition-delay:0.06s;"></h2>
       <div id="desc-body" data-reveal class="space-y-5 text-[15px] md:text-base text-[var(--alt-muted)] leading-[1.9]" style="transition-delay:0.1s;"></div>
     </div>
+   </details>
   </section>
 
   <!-- ============================================================
        CUSTOMER REVIEWS
        ============================================================ -->
-  <section class="px-6 md:px-10 py-16 md:py-20">
+  <section id="pdp-reviews" class="px-6 md:px-10 py-16 md:py-20">
     <div class="max-w-3xl mx-auto">
       <div class="flex items-end justify-between flex-wrap gap-3 mb-10">
         <div>
@@ -613,8 +725,9 @@
         </div>
       </div>
       <div id="reviews-list" class="space-y-8"></div>
+      <div id="m-review-actions" class="m-review-actions"></div>
 
-      <div class="mt-12 pt-10 border-t border-[var(--alt-border)]">
+      <div id="review-write-block" class="mt-12 pt-10 border-t border-[var(--alt-border)]">
         <h3 class="font-display text-lg font-medium mb-4">Write a Review</h3>
         <div id="review-signin-prompt" style="display:none;">
           <p class="text-sm text-[var(--alt-muted)]">
@@ -777,6 +890,8 @@ document.getElementById("breadcrumb").innerHTML = `
 /* ================================================================
    GALLERY
    ================================================================ */
+const pdpMobile = window.matchMedia("(max-width: 767px)");
+let mTrack = null, mCount = null, mDots = null;
 const mainImage = document.getElementById("main-image");
 const mainFallback = document.getElementById("main-fallback");
 const thumbRow = document.getElementById("thumb-row");
@@ -795,6 +910,7 @@ function setActiveImage(index){
   }, 160);
 
   thumbRow.querySelectorAll(".thumb").forEach((t, i) => t.classList.toggle("active", i === state.activeImage));
+  if (typeof mobileGalleryTo === "function" && pdpMobile.matches && mTrack) mobileGalleryTo(state.activeImage);
 }
 
 thumbRow.innerHTML = product.gallery.map((src, i) => `
@@ -808,6 +924,66 @@ thumbRow.querySelectorAll(".thumb").forEach(btn => {
 setActiveImage(0);
 
 document.getElementById("expand-btn").addEventListener("click", () => openLightbox(state.activeImage));
+
+/* ---------------- MOBILE GALLERY (≤767px) ----------------
+   A full-bleed scroll-snap track (native swipe), "1 / N" counter pill and
+   dots, built only on phones. The desktop stage + thumbnails stay as they
+   were; tapping a slide opens the same fullscreen lightbox. */
+function buildMobileGallery(){
+  if (mTrack || !pdpMobile.matches) return;
+  const stage = document.getElementById("gallery-stage");
+  const n = product.gallery.length;
+  mTrack = document.createElement("div");
+  mTrack.className = "m-gallery-track";
+  mTrack.innerHTML = product.gallery.map((src, i) => `
+    <div class="m-gallery-slide"><img src="${src}" alt="${escapeHTML(product.name)} — image ${i + 1} of ${n}" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"></div>
+  `).join("");
+  stage.insertBefore(mTrack, stage.firstChild);
+  if (n > 1){
+    mCount = document.createElement("span");
+    mCount.className = "m-gallery-count";
+    mCount.setAttribute("aria-live", "polite");
+    mDots = document.createElement("div");
+    mDots.className = "m-gallery-dots";
+    mDots.setAttribute("aria-hidden", "true");
+    mDots.innerHTML = product.gallery.map(() => "<i></i>").join("");
+    stage.appendChild(mCount);
+    stage.appendChild(mDots);
+  }
+  syncMobileGallery(state.activeImage);
+  mTrack.scrollLeft = state.activeImage * mTrack.clientWidth;
+  let raf = 0;
+  mTrack.addEventListener("scroll", () => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      const idx = Math.round(mTrack.scrollLeft / Math.max(1, mTrack.clientWidth));
+      if (idx !== state.activeImage){
+        state.activeImage = idx;
+        thumbRow.querySelectorAll(".thumb").forEach((t, i) => t.classList.toggle("active", i === idx));
+        syncMobileGallery(idx);
+      }
+    });
+  }, { passive: true });
+  mTrack.addEventListener("click", () => openLightbox(state.activeImage));
+}
+function syncMobileGallery(idx){
+  if (mCount) mCount.textContent = (idx + 1) + " / " + product.gallery.length;
+  if (mDots) Array.from(mDots.children).forEach((d, i) => d.classList.toggle("on", i === idx));
+}
+function mobileGalleryTo(idx){
+  if (!mTrack) return;
+  mTrack.scrollTo({ left: idx * mTrack.clientWidth, behavior: "smooth" });
+  syncMobileGallery(idx);
+}
+function activeFlyImage(){
+  if (mTrack && pdpMobile.matches){
+    const slide = mTrack.children[state.activeImage];
+    if (slide) return slide.querySelector("img");
+  }
+  return mainImage;
+}
+buildMobileGallery();
+pdpMobile.addEventListener("change", buildMobileGallery);
 
 /* ================================================================
    FULLSCREEN LIGHTBOX — with prev/next, swipe, and keyboard nav
@@ -906,7 +1082,7 @@ function addSwipeSupport(el, onSwipe){
     if (Math.abs(dx) > 40) onSwipe(dx < 0 ? 1 : -1);
   }, { passive: true });
 }
-addSwipeSupport(document.getElementById("gallery-stage"), (dir) => setActiveImage(state.activeImage + dir));
+addSwipeSupport(document.getElementById("gallery-stage"), (dir) => { if (!window.matchMedia("(max-width: 767px)").matches) setActiveImage(state.activeImage + dir); });
 addSwipeSupport(lightbox, (dir) => { if (lbZoom === 1) stepLightbox(dir); });
 
 /* ================================================================
@@ -1108,11 +1284,11 @@ function currentVariant(){
 
 document.getElementById("add-cart-btn").addEventListener("click", () => {
   if (product.stock === 0){ handleNotifyClick(); return; }
-  addToCartWithFlourish(product.id, currentVariant(), state.qty, mainImage);
+  addToCartWithFlourish(product.id, currentVariant(), state.qty, activeFlyImage());
 });
 document.getElementById("mobile-add-cart").addEventListener("click", () => {
   if (product.stock === 0){ handleNotifyClick(); return; }
-  addToCartWithFlourish(product.id, currentVariant(), state.qty, mainImage);
+  addToCartWithFlourish(product.id, currentVariant(), state.qty, activeFlyImage());
 });
 document.getElementById("buy-now-btn").addEventListener("click", () => {
   Cart.add(product.id, currentVariant(), state.qty);
@@ -1176,8 +1352,12 @@ document.getElementById("reviews-heading").textContent = `${product.reviews} rev
 /* Real, per-product reviews (approved only) — reviewsForProduct() lives in
    products-data.js, the same store admin.js's moderation queue reads/writes. */
 let realReviews = reviewsForProduct(product.id);
-function renderReviewsList(){
-  document.getElementById("reviews-list").innerHTML = realReviews.length ? realReviews.map(r => {
+const REVIEWS_ON_PAGE_MOBILE = 2;
+function renderReviewsList(targetEl, limit){
+  targetEl = targetEl || document.getElementById("reviews-list");
+  if (limit == null) limit = pdpMobile.matches ? REVIEWS_ON_PAGE_MOBILE : Infinity;
+  const shown = realReviews.slice(0, limit);
+  targetEl.innerHTML = shown.length ? shown.map(r => {
     const helpful = reviewHelpfulState(r);
     return `
   <div class="flex gap-4">
@@ -1199,22 +1379,52 @@ function renderReviewsList(){
   </div>
 `;
   }).join("") : `<p class="text-sm text-[var(--alt-muted)]">No reviews yet for this product — be the first to write one.</p>`;
-  document.querySelectorAll(".review-photo-view").forEach(el => {
+  renderMobileReviewActions();
+  targetEl.querySelectorAll(".review-photo-view").forEach(el => {
     el.addEventListener("click", () => {
       const r = realReviews.find(x => x.id === el.dataset.review);
       if (r) openLightboxSrc(r.photos[Number(el.dataset.index)], `Photo from ${r.author}'s review`);
     });
   });
-  document.querySelectorAll(".helpful-btn").forEach(btn => {
+  targetEl.querySelectorAll(".helpful-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const result = toggleReviewHelpful(btn.dataset.review);
       if (!result) return;
       realReviews = reviewsForProduct(product.id);
-      renderReviewsList();
+      renderReviewsList(targetEl, limit);
+      if (targetEl.id !== "reviews-list") renderReviewsList(document.getElementById("reviews-list"));
     });
   });
 }
+
+/* phones: "See all reviews (n)" + "Write a review" open bottom sheets; the
+   real review form node is moved into the sheet and put back on close. */
+function renderMobileReviewActions(){
+  const host = document.getElementById("m-review-actions");
+  if (!host) return;
+  if (!pdpMobile.matches){ host.innerHTML = ""; return; }
+  host.innerHTML = (realReviews.length > REVIEWS_ON_PAGE_MOBILE
+      ? `<button type="button" class="m-btn is-outline is-grow" data-m-all>See all reviews (${realReviews.length})</button>` : "")
+    + `<button type="button" class="m-btn ${realReviews.length > REVIEWS_ON_PAGE_MOBILE ? "" : "is-grow"}" data-m-write>Write a review</button>`;
+  const all = host.querySelector("[data-m-all]");
+  if (all) all.addEventListener("click", () => {
+    const wrap = document.createElement("div");
+    wrap.className = "m-reviews-sheet";
+    renderReviewsList(wrap, Infinity);
+    MobileUI.openSheet({ title: `Reviews (${realReviews.length})`, content: wrap });
+  });
+  host.querySelector("[data-m-write]").addEventListener("click", () => {
+    const block = document.getElementById("review-write-block");
+    const home = block.parentNode, marker = document.createComment("review-write-block");
+    home.insertBefore(marker, block);
+    const wrap = document.createElement("div");
+    wrap.className = "m-review-write";
+    wrap.appendChild(block);
+    MobileUI.openSheet({ title: "Write a review", content: wrap, onClose: () => { home.insertBefore(block, marker); marker.remove(); } });
+  });
+}
 renderReviewsList();
+pdpMobile.addEventListener("change", () => renderReviewsList());
 
 /* ---------------- write a review ---------------- */
 const reviewer = (typeof Auth !== "undefined") ? Auth.currentUser() : null;
@@ -1379,8 +1589,38 @@ function goToProduct(id){
 const mobileBar = document.getElementById("mobile-bar");
 const actionsBlock = document.getElementById("pdp-actions");
 new IntersectionObserver((entries) => {
+  if (pdpMobile.matches) return;   // phones use the scroll check below
   entries.forEach(entry => mobileBar.classList.toggle("show", !entry.isIntersecting));
 }, { threshold: 0 }).observe(actionsBlock);
+
+/* phones: show the bar only once the inline buttons have scrolled UP out of
+   view (not while they are still below the fold). A scroll check instead of
+   an observer, because an anchor jump past the buttons never "intersects". */
+let mobileBarRaf = 0;
+function syncMobileBar(){
+  if (!pdpMobile.matches) return;
+  cancelAnimationFrame(mobileBarRaf);
+  mobileBarRaf = requestAnimationFrame(() => {
+    mobileBar.classList.toggle("show", actionsBlock.getBoundingClientRect().bottom < 0);
+  });
+}
+window.addEventListener("scroll", syncMobileBar, { passive: true });
+pdpMobile.addEventListener("change", () => { if (pdpMobile.matches) syncMobileBar(); });
+
+/* ================================================================
+   MOBILE: accordions (specs + story) closed on phones, open on desktop;
+   the rating line scrolls to the reviews.
+   ================================================================ */
+function syncAccordions(){
+  document.querySelectorAll(".m-acc").forEach(d => { d.open = !pdpMobile.matches; });
+}
+syncAccordions();
+pdpMobile.addEventListener("change", syncAccordions);
+const ratingEl = document.getElementById("pdp-rating");
+ratingEl.addEventListener("click", () => {
+  if (!pdpMobile.matches) return;
+  document.getElementById("pdp-reviews").scrollIntoView({ behavior: "smooth", block: "start" });
+});
 
 /* ================================================================
    SCROLL REVEAL — Features / Specs / Description / Reviews / Related
