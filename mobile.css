@@ -26,7 +26,17 @@
   --sar: env(safe-area-inset-right, 0px);
 }
 
-html, body{ overflow-x: hidden; max-width: 100vw; }
+/* overflow-x must NOT be set on <html> and <body> at the same time:
+   once both are non-visible, body stops propagating its overflow to the
+   viewport and becomes its own (nested) scroll container, so wheel/touch
+   scrolling latches onto it first and the page feels "magnetic"/stuck.
+   Only body carries it (it propagates to the viewport), and `clip` is
+   used where supported since it never creates a scroll container. */
+html{ max-width: 100vw; }
+body{ overflow-x: hidden; max-width: 100vw; }
+@supports (overflow: clip){
+  body{ overflow-x: clip; }
+}
 
 /* ---------------- header consolidation ---------------- */
 /* mobile-nav.js adds a hamburger into the header's icon row without
@@ -92,4 +102,22 @@ html, body{ overflow-x: hidden; max-width: 100vw; }
 
 @media (prefers-reduced-motion: reduce){
   * { scroll-behavior: auto !important; }
+}
+
+/* ---------------- performance: live blur on phones ----------------
+   backdrop-filter re-blurs everything behind a fixed bar on EVERY scroll
+   frame, which is what makes mid/low-range phones stutter. On small
+   screens the header and bottom bar use a near-opaque tint instead —
+   same look, no per-frame blur cost. Desktop keeps the glass. */
+@media (max-width: 767px){
+  .nav-glass{
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+    background: rgba(255,255,255,0.94) !important;
+  }
+  :root[data-theme="dark"] .nav-glass{ background: rgba(10,9,7,0.94) !important; }
+  #mnav-bottombar{
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+    background: rgba(245,244,241,0.97) !important;
+  }
+  :root[data-theme="dark"] #mnav-bottombar{ background: rgba(24,22,19,0.97) !important; }
 }

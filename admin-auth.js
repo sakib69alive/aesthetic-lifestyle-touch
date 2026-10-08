@@ -14,6 +14,11 @@ const ADMIN_LOCKOUT_MAX_ATTEMPTS = 5;
 const ADMIN_LOCKOUT_WINDOW_MS = 15 * 60 * 1000;   // failed attempts older than this don't count
 const ADMIN_LOCKOUT_DURATION_MS = 15 * 60 * 1000; // how long a lockout lasts
 
+/* TEMPORARY: while true, anyone who opens admin.html / cms.html goes straight
+   in with no login. Set back to false to restore the normal password gate
+   (nothing else needs to change — login, lockout and sessions are intact). */
+const ADMIN_LOCK_OFF = true;
+
 const AdminAuth = {
   record(){ try { return JSON.parse(localStorage.getItem(ADMIN_KEY) || "null"); } catch (e) { return null; } },
   save(rec){ localStorage.setItem(ADMIN_KEY, JSON.stringify(rec)); },
@@ -24,7 +29,7 @@ const AdminAuth = {
     if (s.expiresAt && Date.now() > s.expiresAt){ this.logout(); return null; }
     return s;
   },
-  isLoggedIn(){ return !!this.session(); },
+  isLoggedIn(){ return ADMIN_LOCK_OFF || !!this.session(); },
   async ensureSeeded(){
     if (this.record()) return;
     this.save({

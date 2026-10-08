@@ -17,7 +17,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-<script src="https://cdn.tailwindcss.com"></script>
 <script src="products-data.js"></script>
 <script src="site-content.js"></script>
 <script src="cart.js"></script>
@@ -33,6 +32,7 @@
 <script src="mobile-nav.js"></script>
 <link rel="stylesheet" href="mobile-nav.css">
 <link rel="stylesheet" href="mobile.css">
+<script src="smooth-scroll.js" defer></script>
 
 <style>
   :root{
@@ -114,8 +114,8 @@
   }
   #store-root.settled{
     opacity: 1;
-    transform: scale(1);
-    filter: blur(0px);
+    transform: none;
+    filter: none;
   }
   /* Outgoing state — Store handing off to a Product Details page */
   #store-root.zooming{
@@ -170,12 +170,17 @@
   }
 
   /* ================= PRODUCT CARD ================= */
+  /* The card box itself needs a radius (and a little bottom padding): the
+     hover shadow follows the card's box, and with square corners it drew
+     hard, sharp edges under the rounded photo. */
   .p-card{
+    border-radius: 24px;
+    padding-bottom: 14px;
     transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), box-shadow 0.45s ease;
   }
   .p-card:hover{
     transform: translateY(-6px);
-    box-shadow: 0 26px 50px -22px rgba(10,10,10,0.22);
+    box-shadow: 0 24px 48px -24px rgba(10,10,10,0.2);
   }
   .p-stage{
     position: relative;
@@ -247,7 +252,7 @@
      unreachable. This card puts Add to Cart in the flow (always visible,
      real tap target) instead of a hover overlay, and drops the
      description to stay scannable in a 2-up grid. ======================= */
-  .pm-card{ cursor: pointer; }
+  .pm-card{ cursor: pointer; border-radius: 18px; }
   .pm-stage{
     position: relative; aspect-ratio: 1/1; border-radius: 16px; overflow: hidden;
     background: var(--alt-surface);
@@ -342,6 +347,7 @@
     #store-root{ opacity: 1 !important; transform: none !important; filter:none !important; }
   }
 </style>
+<link rel="stylesheet" href="tailwind.css">
 </head>
 
 <body>
@@ -726,12 +732,12 @@ function productCardHTMLMobile(p){
   return `
     <article class="pm-card ${soldOut ? "opacity-70" : ""}" data-id="${p.id}">
       <div class="pm-stage">
-        <img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async"
+        <img src="${thumb(p.img, 560)}" alt="${p.name}" loading="lazy" decoding="async"
              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
         <div class="fallback" style="display:none;">${p.name}</div>
         ${soldOut
-          ? `<span class="badge absolute top-2 left-2 z-10 uppercase bg-white/90 backdrop-blur px-2 py-1 rounded-full" style="color:var(--alt-bad);">Sold Out</span>`
-          : (p.badge ? `<span class="badge absolute top-2 left-2 z-10 uppercase bg-white/90 backdrop-blur px-2 py-1 rounded-full">${p.badge}</span>` : "")}
+          ? `<span class="badge absolute top-2 left-2 z-10 uppercase bg-white/90 px-2 py-1 rounded-full" style="color:var(--alt-bad);">Sold Out</span>`
+          : (p.badge ? `<span class="badge absolute top-2 left-2 z-10 uppercase bg-white/90 px-2 py-1 rounded-full">${p.badge}</span>` : "")}
         <button class="pm-wishlist ${isWished ? "active" : ""}" data-action="wishlist" aria-label="Add to wishlist">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4 6 4c2 0 3.5 1 4.5 2.6C11.5 5 13 4 15 4c4 0 5.6 4.1 4 7.7C19.5 16.1 12 21 12 21z"/>
@@ -758,22 +764,22 @@ function productCardHTML(p){
   return `
     <article class="p-card group cursor-pointer ${soldOut ? "opacity-70" : ""}" data-id="${p.id}">
       <div class="p-stage">
-        <img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async"
+        <img src="${thumb(p.img, 560)}" alt="${p.name}" loading="lazy" decoding="async"
              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
         <div class="fallback" style="display:none;">${p.name}</div>
 
         ${soldOut
-          ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 backdrop-blur px-2.5 py-1 rounded-full" style="color:var(--alt-bad);">Sold Out</span>`
-          : (p.badge ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 backdrop-blur px-2.5 py-1 rounded-full">${p.badge}</span>` : "")}
+          ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 px-2.5 py-1 rounded-full" style="color:var(--alt-bad);">Sold Out</span>`
+          : (p.badge ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 px-2.5 py-1 rounded-full">${p.badge}</span>` : "")}
 
-        <button class="wishlist-btn ${isWished ? 'active' : ''} absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center" data-action="wishlist" aria-label="Add to wishlist">
+        <button class="wishlist-btn ${isWished ? 'active' : ''} absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center" data-action="wishlist" aria-label="Add to wishlist">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4 6 4c2 0 3.5 1 4.5 2.6C11.5 5 13 4 15 4c4 0 5.6 4.1 4 7.7C19.5 16.1 12 21 12 21z"/>
           </svg>
         </button>
 
         <div class="p-actions">
-          <button class="flex-1 py-2.5 rounded-full bg-white/95 backdrop-blur text-xs font-medium hover:bg-white transition-colors" data-action="quickview">
+          <button class="flex-1 py-2.5 rounded-full bg-white/95 text-xs font-medium hover:bg-white transition-colors" data-action="quickview">
             Quick View
           </button>
           <button class="flex-1 py-2.5 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-xs font-medium hover:opacity-90 transition-opacity ${soldOut ? "opacity-40 cursor-not-allowed" : ""}" data-action="addcart" ${soldOut ? "disabled" : ""}>
@@ -817,7 +823,7 @@ function renderGrid(){
     card.style.opacity = 0;
     card.style.transform = "translateY(16px)";
     requestAnimationFrame(() => {
-      card.style.transition = `opacity 0.5s ease ${i * 40}ms, transform 0.5s cubic-bezier(0.16,1,0.3,1) ${i * 40}ms`;
+      card.style.transition = `opacity 0.5s ease ${Math.min(i, 8) * 40}ms, transform 0.5s cubic-bezier(0.16,1,0.3,1) ${Math.min(i, 8) * 40}ms`;
       card.style.opacity = 1;
       card.style.transform = "translateY(0)";
     });

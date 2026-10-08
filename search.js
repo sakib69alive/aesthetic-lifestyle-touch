@@ -266,7 +266,7 @@ function renderIdle(){
   document.getElementById("sp-viewed-wrap").style.display = viewed.length ? "block" : "none";
   document.getElementById("sp-recently-viewed").innerHTML = viewed.map(p => `
     <div class="sp-thumb-card" data-id="${p.id}">
-      <div class="sp-result-thumb"><img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';"></div>
+      <div class="sp-result-thumb"><img src="${typeof thumb === "function" ? thumb(p.img, 160) : p.img}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';"></div>
       <p class="text-[10px] mt-1.5 truncate">${p.name}</p>
     </div>
   `).join("");
@@ -325,7 +325,7 @@ function renderResultRow(p, index){
   const isWished = typeof Wishlist !== "undefined" && Wishlist.has(p.id);
   return `
     <div class="sp-result sp-fade-item" data-id="${p.id}" data-index="${index}" style="animation-delay:${Math.min(index, 8) * 0.03}s;" role="option">
-      <div class="sp-result-thumb"><img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';"></div>
+      <div class="sp-result-thumb"><img src="${typeof thumb === "function" ? thumb(p.img, 160) : p.img}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';"></div>
       <div class="flex-1 min-w-0">
         <div class="flex items-center justify-between gap-2">
           <h4 class="sp-font-display text-[14px] font-medium truncate">${p.name}</h4>
@@ -414,7 +414,7 @@ function goToProductFromSearch(id){
 function openMiniQuickView(id){
   const p = getProduct(id);
   if (!p) return;
-  document.getElementById("sp-qv-thumb").innerHTML = `<img src="${p.img}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.opacity='0.3';">`;
+  document.getElementById("sp-qv-thumb").innerHTML = `<img src="${typeof thumb === "function" ? thumb(p.img, 160) : p.img}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.opacity='0.3';">`;
   document.getElementById("sp-qv-name").textContent = p.name;
   document.getElementById("sp-qv-rating").innerHTML = `<span style="color:var(--alt-black)">${starString(p.rating)}</span> ${p.rating} · ${p.reviews} reviews`;
   document.getElementById("sp-qv-price").textContent = p.salePrice ? `${bdt(p.salePrice)} (was ${bdt(p.price)})` : bdt(p.price);

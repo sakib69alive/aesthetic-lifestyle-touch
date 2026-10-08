@@ -14,12 +14,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-<script src="https://cdn.tailwindcss.com"></script>
 <script src="auth.js"></script>
 <script src="theme.js"></script>
 <script src="loader.js"></script>
 <link rel="stylesheet" href="loader.css">
 <link rel="stylesheet" href="mobile.css">
+<script src="smooth-scroll.js" defer></script>
 
 <style>
   :root{
@@ -55,13 +55,13 @@
   .font-mono{ font-family:'JetBrains Mono', monospace; }
   :focus-visible{ outline: 2px solid var(--alt-black); outline-offset: 2px; }
 
-  .ambient-light{ position:absolute; border-radius:50%; filter: blur(90px); pointer-events:none; z-index:0; }
+  .ambient-light{ position:absolute; border-radius:50%; pointer-events:none; z-index:0; }
 
   [data-enter]{ opacity:0; transform: translateY(16px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
   [data-enter].in{ opacity:1; transform: translateY(0); }
 
   #auth-root{ opacity:0; transform: scale(1.03); transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1); }
-  #auth-root.settled{ opacity:1; transform: scale(1); }
+  #auth-root.settled{ opacity:1; transform: none; }
 
   /* ================= TAB SWITCHER ================= */
   .auth-tab{
@@ -169,6 +169,7 @@
     #auth-root{ opacity:1 !important; transform:none !important; }
   }
 </style>
+<link rel="stylesheet" href="tailwind.css">
 </head>
 <body>
 

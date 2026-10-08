@@ -5,3 +5,6 @@ Thumbs.db
 *.log
 
 # server/ has its own .gitignore (node_modules, .env, payments.sqlite)
+
+# local preview tooling
+.claude/

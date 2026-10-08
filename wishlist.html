@@ -14,7 +14,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-<script src="https://cdn.tailwindcss.com"></script>
 <script src="products-data.js"></script>
 <script src="site-content.js"></script>
 <script src="cart.js"></script>
@@ -30,6 +29,7 @@
 <script src="mobile-nav.js"></script>
 <link rel="stylesheet" href="mobile-nav.css">
 <link rel="stylesheet" href="mobile.css">
+<script src="smooth-scroll.js" defer></script>
 
 <style>
   :root{
@@ -76,7 +76,7 @@
   }
 
   #wl-root{ opacity:0; transform: scale(1.03); filter: blur(6px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1), filter 0.8s cubic-bezier(0.16,1,0.3,1); }
-  #wl-root.settled{ opacity:1; transform: scale(1); filter: blur(0px); }
+  #wl-root.settled{ opacity:1; transform: none; filter: none; }
 
   [data-enter]{ opacity:0; transform: translateY(18px); transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1); }
   [data-enter].in{ opacity:1; transform: translateY(0); }
@@ -190,6 +190,7 @@
     #wl-root{ opacity:1 !important; transform:none !important; filter:none !important; }
   }
 </style>
+<link rel="stylesheet" href="tailwind.css">
 </head>
 <body>
 
@@ -444,9 +445,9 @@ function wishlistCardHTML(p){
   return `
     <article class="wl-card border border-[var(--alt-border)] p-4" data-id="${p.id}">
       <div class="wl-stage">
-        <img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <img src="${thumb(p.img, 560)}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
         <div class="fallback" style="display:none;">${p.name}</div>
-        ${p.salePrice ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 backdrop-blur px-2.5 py-1 rounded-full">Price Dropped</span>` : (p.badge ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 backdrop-blur px-2.5 py-1 rounded-full">${p.badge}</span>` : "")}
+        ${p.salePrice ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 px-2.5 py-1 rounded-full">Price Dropped</span>` : (p.badge ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 px-2.5 py-1 rounded-full">${p.badge}</span>` : "")}
         <button class="wl-heart ${isWished ? "active" : ""}" data-action="heart" aria-label="Remove from wishlist">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4 6 4c2 0 3.5 1 4.5 2.6C11.5 5 13 4 15 4c4 0 5.6 4.1 4 7.7C19.5 16.1 12 21 12 21z"/></svg>
         </button>
@@ -729,7 +730,7 @@ function renderWishlistRecommended(){
 function miniCardHTML(p){
   return `
     <div class="mini-card" data-id="${p.id}">
-      <div class="mini-stage"><img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';"></div>
+      <div class="mini-stage"><img src="${thumb(p.img, 560)}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';"></div>
       <p class="font-display text-[13px] font-medium mt-2 truncate">${p.name}</p>
       <p class="font-mono text-[12px] text-[var(--alt-muted)] mt-0.5">${bdt(p.salePrice || p.price)}</p>
     </div>

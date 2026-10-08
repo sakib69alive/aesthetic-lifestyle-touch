@@ -14,7 +14,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-<script src="https://cdn.tailwindcss.com"></script>
 <script src="products-data.js"></script>
 <script src="site-content.js"></script>
 <script src="cart.js"></script>
@@ -37,6 +36,7 @@
 <script src="mobile-nav.js"></script>
 <link rel="stylesheet" href="mobile-nav.css">
 <link rel="stylesheet" href="mobile.css">
+<script src="smooth-scroll.js" defer></script>
 
 <style>
   :root{
@@ -84,7 +84,7 @@
   }
 
   #dash-root{ opacity:0; transform: scale(1.03); filter: blur(6px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1), filter 0.8s cubic-bezier(0.16,1,0.3,1); }
-  #dash-root.settled{ opacity:1; transform: scale(1); filter: blur(0px); }
+  #dash-root.settled{ opacity:1; transform: none; filter: none; }
 
   [data-enter]{ opacity:0; transform: translateY(16px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
   [data-enter].in{ opacity:1; transform: translateY(0); }
@@ -272,6 +272,7 @@
     #dash-root{ opacity:1 !important; transform:none !important; filter:none !important; }
   }
 </style>
+<link rel="stylesheet" href="tailwind.css">
 </head>
 <body>
 

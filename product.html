@@ -17,7 +17,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-<script src="https://cdn.tailwindcss.com"></script>
 <script src="products-data.js"></script>
 <script src="site-content.js"></script>
 <script src="cart.js"></script>
@@ -34,6 +33,7 @@
 <script src="mobile-nav.js"></script>
 <link rel="stylesheet" href="mobile-nav.css">
 <link rel="stylesheet" href="mobile.css">
+<script src="smooth-scroll.js" defer></script>
 
 <style>
   :root{
@@ -107,7 +107,7 @@
     filter: blur(6px);
     transition: opacity 1s cubic-bezier(0.16,1,0.3,1), transform 1s cubic-bezier(0.16,1,0.3,1), filter 1s cubic-bezier(0.16,1,0.3,1);
   }
-  #pdp-root.settled{ opacity: 1; transform: scale(1); filter: blur(0px); }
+  #pdp-root.settled{ opacity: 1; transform: none; filter: none; }
   #pdp-root.zooming{ opacity: 0; transform: scale(1.04); filter: blur(6px); }
 
   #pdp-curtain{
@@ -308,8 +308,8 @@
   .review-photo-view img{ width:100%; height:100%; object-fit:cover; }
 
   /* ================= RELATED PRODUCTS (same card system as Store) ================= */
-  .p-card{ transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), box-shadow 0.45s ease; cursor: pointer; }
-  .p-card:hover{ transform: translateY(-6px); box-shadow: 0 26px 50px -22px rgba(10,10,10,0.22); }
+  .p-card{ border-radius: 24px; padding-bottom: 14px; transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), box-shadow 0.45s ease; cursor: pointer; }
+  .p-card:hover{ transform: translateY(-6px); box-shadow: 0 24px 48px -24px rgba(10,10,10,0.2); }
   .p-stage{ position: relative; aspect-ratio: 1/1; border-radius: 18px; overflow: hidden; background: var(--alt-surface); }
   .p-stage img{ width:100%; height:100%; object-fit: cover; transform: scale(1); transition: transform 0.7s cubic-bezier(0.16,1,0.3,1); }
   .p-card:hover .p-stage img{ transform: scale(1.08); }
@@ -375,6 +375,7 @@
     #pdp-root{ opacity: 1 !important; transform: none !important; filter: none !important; }
   }
 </style>
+<link rel="stylesheet" href="tailwind.css">
 </head>
 
 <body>
@@ -1331,7 +1332,7 @@ function relatedCardHTML(p){
       <div class="p-stage">
         <img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
         <div class="fallback" style="display:none;">${p.name}</div>
-        ${p.badge ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 backdrop-blur px-2.5 py-1 rounded-full">${p.badge}</span>` : ""}
+        ${p.badge ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 px-2.5 py-1 rounded-full">${p.badge}</span>` : ""}
       </div>
       <div class="mt-4">
         <div class="flex items-start justify-between gap-2">
@@ -1390,7 +1391,7 @@ const revealObserver = new IntersectionObserver((entries, obs) => {
       obs.unobserve(entry.target);
     }
   });
-}, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
+}, { threshold: 0.01, rootMargin: "0px 0px -4% 0px" });
 
 /* ================================================================
    INIT

@@ -14,7 +14,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-<script src="https://cdn.tailwindcss.com"></script>
 <script src="products-data.js"></script>
 <script src="site-content.js"></script>
 <script src="cart.js"></script>
@@ -30,6 +29,7 @@
 <script src="mobile-nav.js"></script>
 <link rel="stylesheet" href="mobile-nav.css">
 <link rel="stylesheet" href="mobile.css">
+<script src="smooth-scroll.js" defer></script>
 
 <style>
   :root{
@@ -73,7 +73,7 @@
   }
 
   #ab-root{ opacity:0; transform: scale(1.03); filter: blur(6px); transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1), filter 0.9s cubic-bezier(0.16,1,0.3,1); }
-  #ab-root.settled{ opacity:1; transform: scale(1); filter: blur(0px); }
+  #ab-root.settled{ opacity:1; transform: none; filter: none; }
 
   [data-enter]{ opacity:0; transform: translateY(18px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
   [data-enter].in{ opacity:1; transform: translateY(0); }
@@ -124,6 +124,7 @@
     #ab-root{ opacity:1 !important; transform:none !important; filter:none !important; }
   }
 </style>
+<link rel="stylesheet" href="tailwind.css">
 </head>
 <body>
 
@@ -560,7 +561,7 @@ const abRevealObserver = new IntersectionObserver((entries, obs) => {
   entries.forEach(entry => {
     if (entry.isIntersecting){ entry.target.classList.add("in"); obs.unobserve(entry.target); }
   });
-}, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
+}, { threshold: 0.01, rootMargin: "0px 0px -4% 0px" });
 document.querySelectorAll("[data-reveal]").forEach(el => abRevealObserver.observe(el));
 
 /* ================================================================

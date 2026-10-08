@@ -396,7 +396,7 @@ function cartItemHTML(line, product){
   return `
     <article class="cart-item" data-line-id="${line.lineId}">
       <div class="cart-item-img">
-        <img src="${product.img}" alt="${product.name}" loading="lazy" decoding="async"
+        <img src="${typeof thumb === "function" ? thumb(product.img, 200) : product.img}" alt="${product.name}" loading="lazy" decoding="async"
              onerror="this.style.opacity='0.4';" />
       </div>
       <div class="flex-1 min-w-0">
@@ -466,7 +466,7 @@ function renderRecommended(excludeIds){
   document.getElementById("cart-recommended-row").innerHTML = picks.map(p => `
     <div class="cart-rec-card" data-id="${p.id}">
       <div class="cart-rec-stage">
-        <img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.4';" />
+        <img src="${typeof thumb === "function" ? thumb(p.img, 240) : p.img}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.4';" />
       </div>
       <p class="cart-font-display text-[12px] font-medium mt-2 leading-snug truncate">${p.name}</p>
       <p class="cart-font-mono text-[12px] text-[var(--alt-muted)] mt-0.5">${bdt(p.salePrice || p.price)}</p>

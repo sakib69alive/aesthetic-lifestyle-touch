@@ -1,0 +1,6 @@
+/* Rebuild after adding new Tailwind classes to any page / script:
+     npx --yes tailwindcss@3.4.17 -c tailwind.config.js -i tailwind.input.css -o tailwind.css --minify
+*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

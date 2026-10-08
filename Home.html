@@ -20,7 +20,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-<script src="https://cdn.tailwindcss.com"></script>
 <script src="products-data.js"></script>
 <script src="site-content.js"></script>
 <script src="cart.js"></script>
@@ -36,6 +35,7 @@
 <script src="mobile-nav.js"></script>
 <link rel="stylesheet" href="mobile-nav.css">
 <link rel="stylesheet" href="mobile.css">
+<script src="smooth-scroll.js" defer></script>
 
 <style>
   :root{
@@ -109,7 +109,7 @@
   .ambient-light{
     position: absolute;
     border-radius: 50%;
-    filter: blur(90px);
+   
     pointer-events: none;
     z-index: 0;
   }
@@ -225,7 +225,7 @@
     opacity: 0;
     pointer-events: none;
     transform: scale(1.08);
-    filter: blur(0px);
+    filter: none;
     transition:
       opacity 1.1s cubic-bezier(0.65,0,0.35,1),
       transform 1.1s cubic-bezier(0.65,0,0.35,1),
@@ -238,14 +238,17 @@
     opacity: 1;
     pointer-events: all;
     transform: scale(1);
-    filter: blur(0px);
+    filter: none;
   }
 
   #hero-root{
     transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.65,0,0.35,1), filter 0.9s ease;
     transform-origin: center;
-    will-change: transform, opacity, filter;
+    /* no permanent will-change here: it pinned the whole hero (with its
+       blurred ambient lights) as one giant filter layer, which made the
+       first scroll stutter. The layer is only needed during .zooming. */
   }
+  #hero-root.zooming{ will-change: transform, opacity, filter; }
   #hero-root.zooming{
     opacity: 0;
     transform: scale(1.06);
@@ -341,6 +344,7 @@
   .no-scrollbar::-webkit-scrollbar{ display:none; }
   .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
 </style>
+<link rel="stylesheet" href="tailwind.css">
 </head>
 
 <body>
@@ -499,7 +503,7 @@
     <div class="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
 
       <a href="store.html?category=desk-setup" data-reveal class="collection-card group" style="transition-delay: 0.05s;">
-        <img src="https://images.unsplash.com/photo-1518106797856-4d7c3e0f1e9a?w=800&q=80&auto=format&fit=crop"
+        <img src="https://images.unsplash.com/photo-1518106797856-4d7c3e0f1e9a?w=640&q=72&auto=format&fit=crop"
              alt="Desk setup collection — organizers, trays and lighting"
              loading="lazy" decoding="async"
              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
@@ -515,7 +519,7 @@
       </a>
 
       <a href="store.html?category=room-decor" data-reveal class="collection-card group" style="transition-delay: 0.11s;">
-        <img src="https://images.unsplash.com/photo-1602874801007-bd458bb1b8b6?w=800&q=80&auto=format&fit=crop"
+        <img src="https://images.unsplash.com/photo-1602874801007-bd458bb1b8b6?w=640&q=72&auto=format&fit=crop"
              alt="Room decor collection — vases, candles and ceramics"
              loading="lazy" decoding="async"
              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
@@ -531,7 +535,7 @@
       </a>
 
       <a href="store.html?category=gadgets" data-reveal class="collection-card group" style="transition-delay: 0.17s;">
-        <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=80&auto=format&fit=crop"
+        <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=640&q=72&auto=format&fit=crop"
              alt="Tech and gadgets collection"
              loading="lazy" decoding="async"
              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
@@ -547,7 +551,7 @@
       </a>
 
       <a href="store.html?category=accessories" data-reveal class="collection-card group" style="transition-delay: 0.23s;">
-        <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=800&q=80&auto=format&fit=crop"
+        <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=640&q=72&auto=format&fit=crop"
              alt="Everyday carry and accessories collection"
              loading="lazy" decoding="async"
              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
@@ -608,12 +612,22 @@
       { cls: "drift-b", style: "width:38%; aspect-ratio:0.85/1; top:38%; right:2%;", rotate: 5 },
       { cls: "drift-c", style: "width:34%; aspect-ratio:1/1; bottom:2%; left:22%;", rotate: -2 },
     ];
+    // Always end up with 3 real products: use the admin's picks where they
+    // still exist, and fill any empty slot from the live catalog so the
+    // hero composition is never left blank.
+    const chosen = ids.map(id => (id && typeof getProduct === "function") ? getProduct(id) : null);
+    const used = new Set(chosen.filter(Boolean).map(p => p.id));
+    const pool = (typeof getStorefrontProducts === "function" ? getStorefrontProducts() : [])
+      .filter(p => p.img && !used.has(p.id) && (p.badge === "New" || p.badge === "Trending" || (p.tags || []).includes("best-sellers")));
+    for (let i = 0; i < slots.length; i++){
+      if (!chosen[i] && pool.length) chosen[i] = pool.shift();
+    }
     stage.innerHTML = slots.map((slot, i) => {
-      const p = (ids[i] && typeof getProduct === "function") ? getProduct(ids[i]) : null;
+      const p = chosen[i];
       if (!p) return "";
       return `
         <a href="product.html?id=${p.id}" class="float-card ${slot.cls}" style="display:block; ${slot.style} transform: rotate(${slot.rotate}deg);" aria-label="View ${escapeHTML(p.name)}">
-          <img src="${p.img}" alt="${escapeHTML(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+          <img src="${thumb(p.img, 640)}" alt="${escapeHTML(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
           <div class="fallback" style="display:none;">${escapeHTML(p.name)}</div>
         </a>
       `;
@@ -674,16 +688,24 @@
   });
 
   if (window.matchMedia('(min-width: 1024px)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // one style write per frame, not one per mouse event
+    let parallaxQueued = false, pmx = 0, pmy = 0;
     document.addEventListener('mousemove', (e) => {
-      const cx = window.innerWidth / 2;
-      const cy = window.innerHeight / 2;
-      const dx = (e.clientX - cx) / cx;
-      const dy = (e.clientY - cy) / cy;
-      floatCards.forEach((card, i) => {
-        const depth = (i + 1) * 6;
-        card.style.transform = `translate(${dx * depth}px, ${dy * depth}px) rotate(${card.dataset.baseRotate})`;
+      pmx = e.clientX; pmy = e.clientY;
+      if (parallaxQueued) return;
+      parallaxQueued = true;
+      requestAnimationFrame(() => {
+        parallaxQueued = false;
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+        const dx = (pmx - cx) / cx;
+        const dy = (pmy - cy) / cy;
+        floatCards.forEach((card, i) => {
+          const depth = (i + 1) * 6;
+          card.style.transform = `translate(${dx * depth}px, ${dy * depth}px) rotate(${card.dataset.baseRotate})`;
+        });
       });
-    });
+    }, { passive: true });
   }
 
   // ============================================================
@@ -738,7 +760,7 @@
         obs.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.18, rootMargin: '0px 0px -10% 0px' });
+  }, { threshold: 0.01, rootMargin: '0px 0px -4% 0px' });
 
   document.querySelectorAll('[data-reveal]').forEach(el => revealObserver.observe(el));
 </script>

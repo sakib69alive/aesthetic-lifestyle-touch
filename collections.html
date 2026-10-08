@@ -14,7 +14,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-<script src="https://cdn.tailwindcss.com"></script>
 <script src="products-data.js"></script>
 <script src="site-content.js"></script>
 <script src="cart.js"></script>
@@ -30,6 +29,7 @@
 <script src="mobile-nav.js"></script>
 <link rel="stylesheet" href="mobile-nav.css">
 <link rel="stylesheet" href="mobile.css">
+<script src="smooth-scroll.js" defer></script>
 
 <style>
   :root{
@@ -87,14 +87,14 @@
   }
 
   #co-root{ opacity:0; transform: scale(1.03); filter: blur(6px); transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1), filter 0.9s cubic-bezier(0.16,1,0.3,1); }
-  #co-root.settled{ opacity:1; transform: scale(1); filter: blur(0px); }
+  #co-root.settled{ opacity:1; transform: none; filter: none; }
 
   [data-enter]{ opacity:0; transform: translateY(20px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
   [data-enter].in{ opacity:1; transform: translateY(0); }
   [data-reveal]{ opacity:0; transform: translateY(28px); transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1); }
   [data-reveal].in{ opacity:1; transform: translateY(0); }
 
-  .ambient-light{ position:absolute; border-radius:50%; filter: blur(90px); pointer-events:none; z-index:0; }
+  .ambient-light{ position:absolute; border-radius:50%; pointer-events:none; z-index:0; }
 
   /* ================= HERO ================= */
   .scroll-indicator{ width: 22px; height: 36px; border: 1.5px solid rgba(10,10,10,0.3); border-radius: 999px; position: relative; }
@@ -128,8 +128,8 @@
   .co-story-img img{ width:100%; height:100%; object-fit:cover; }
 
   /* ================= PRODUCT MINI CARD (same language as Store) ================= */
-  .p-card{ transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), box-shadow 0.45s ease; }
-  .p-card:hover{ transform: translateY(-6px); box-shadow: 0 26px 50px -22px rgba(10,10,10,0.22); }
+  .p-card{ border-radius: 24px; padding-bottom: 14px; transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), box-shadow 0.45s ease; }
+  .p-card:hover{ transform: translateY(-6px); box-shadow: 0 24px 48px -24px rgba(10,10,10,0.2); }
   .p-stage{ position:relative; aspect-ratio:1/1; border-radius:18px; overflow:hidden; background: var(--alt-surface); }
   .p-stage img{ width:100%; height:100%; object-fit:cover; transition: transform .7s cubic-bezier(0.16,1,0.3,1); }
   .p-card:hover .p-stage img{ transform: scale(1.08); }
@@ -182,6 +182,7 @@
     #co-root{ opacity:1 !important; transform:none !important; filter:none !important; }
   }
 </style>
+<link rel="stylesheet" href="tailwind.css">
 </head>
 <body>
 
@@ -498,13 +499,13 @@ function coProductCardHTML(p){
   return `
     <article class="p-card group cursor-pointer relative" data-id="${p.id}">
       <div class="p-stage">
-        <img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';">
-        ${p.salePrice ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 backdrop-blur px-2.5 py-1 rounded-full">Sale</span>` : (p.badge ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 backdrop-blur px-2.5 py-1 rounded-full">${p.badge}</span>` : "")}
+        <img src="${thumb(p.img, 560)}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';">
+        ${p.salePrice ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 px-2.5 py-1 rounded-full">Sale</span>` : (p.badge ? `<span class="badge absolute top-3 left-3 z-10 uppercase bg-white/90 px-2.5 py-1 rounded-full">${p.badge}</span>` : "")}
         <button class="wishlist-mini ${isWished ? "active" : ""}" data-action="wishlist" aria-label="Add to wishlist">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4 6 4c2 0 3.5 1 4.5 2.6C11.5 5 13 4 15 4c4 0 5.6 4.1 4 7.7C19.5 16.1 12 21 12 21z"/></svg>
         </button>
         <div class="p-actions">
-          <button class="flex-1 py-2.5 rounded-full bg-white/95 backdrop-blur text-xs font-medium" data-action="quickview">Quick View</button>
+          <button class="flex-1 py-2.5 rounded-full bg-white/95 text-xs font-medium" data-action="quickview">Quick View</button>
           <button class="flex-1 py-2.5 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-xs font-medium" data-action="addcart" ${p.stock === 0 ? "disabled" : ""}>Add to Cart</button>
         </div>
       </div>
@@ -623,7 +624,7 @@ function renderCoCards(){
     const cover = matches[0];
     return `
       <div class="co-card" data-target="${c.id}" data-reveal style="transition-delay:${i * 0.04}s;">
-        <img src="${cover ? cover.img : ""}" alt="${c.label}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';">
+        <img src="${cover ? thumb(cover.img, 700) : ""}" alt="${c.label}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';">
         <div class="co-overlay"></div>
         <div class="co-foot">
           <span class="font-display text-sm font-medium block">${c.label}</span>
@@ -691,7 +692,7 @@ function renderShopTheLook(containerId, tag){
   const picks = getStorefrontProducts().filter(p => p.tags.includes(tag)).slice(0, 3);
   document.getElementById(containerId).innerHTML = picks.map(p => `
     <div class="co-look-chip" data-id="${p.id}">
-      <img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';">
+      <img src="${thumb(p.img, 560)}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';">
       <span class="text-xs font-medium pr-1">${p.name}</span>
     </div>
   `).join("");
@@ -709,10 +710,10 @@ function renderCoLimited(){
   if (!candidate){ wrap.parentElement.style.display = "none"; return; }
   wrap.innerHTML = `
     <div class="p-stage" style="border-radius:20px;">
-      <img src="${candidate.img}" alt="${candidate.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';">
+      <img src="${thumb(candidate.img, 560)}" alt="${candidate.name}" loading="lazy" decoding="async" onerror="this.style.opacity='0.3';">
     </div>
     <div>
-      <span class="badge inline-block uppercase bg-white/90 backdrop-blur px-3 py-1.5 rounded-full mb-4">Limited Edition</span>
+      <span class="badge inline-block uppercase bg-white/90 px-3 py-1.5 rounded-full mb-4">Limited Edition</span>
       <h2 class="font-display text-2xl md:text-3xl font-medium tracking-tight mb-3">${candidate.name}</h2>
       <p class="text-[var(--alt-muted)] leading-relaxed mb-5">${candidate.desc}</p>
       <p class="text-sm font-medium mb-6" style="color:var(--alt-warn);">Only ${candidate.stock} left in stock.</p>
@@ -850,7 +851,7 @@ const coRevealObserver = new IntersectionObserver((entries, obs) => {
   entries.forEach(entry => {
     if (entry.isIntersecting){ entry.target.classList.add("in"); obs.unobserve(entry.target); }
   });
-}, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
+}, { threshold: 0.01, rootMargin: "0px 0px -4% 0px" });
 
 /* ================================================================
    INIT
