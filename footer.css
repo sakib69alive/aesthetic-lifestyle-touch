@@ -187,7 +187,8 @@
   /* social: one centred row of 44px circles */
   #site-footer .ft-block-follow{ padding: 28px 0 8px; text-align: center; }
   #site-footer .ft-block-follow .ft-group-title{ display: none; }  /* icons carry aria-labels */
-  #site-footer #ft-social-row{ justify-content: center; gap: 10px; }
+  #site-footer #ft-social-row{ justify-content: center; gap: 8px; }
+  #site-footer #ft-social-row .ft-icon-btn{ flex-shrink: 0; }
 
   /* legal row: wrapped links, 44px tap height, copyright below */
   #site-footer .ft-legal{ padding-top: 4px; gap: 4px; }

@@ -225,7 +225,9 @@ button.mnav-quick-link{ background: none; border: none; cursor: pointer; font: i
   .mnav-bb-item{ min-height: 54px; }
   .mnav-bb-icon svg{ width: 22px; height: 22px; }
   .mnav-bb-label{ font-size: 10px; }
-  .mnav-bb-item.active{ background: none; }
+  /* mobile.css turns the bar dark in dark mode, so the old pinned #0A0A0A
+     active colour vanished there — follow the theme instead */
+  .mnav-bb-item.active{ background: none; color: var(--alt-black); }
   .mnav-bb-item.active::after{
     content: ""; position: absolute; bottom: 3px; left: 50%;
     width: 5px; height: 5px; margin-left: -2.5px;

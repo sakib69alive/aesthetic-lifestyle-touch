@@ -344,6 +344,75 @@
 
   .no-scrollbar::-webkit-scrollbar{ display:none; }
   .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
+
+  /* ===== MOBILE (≤767px) ===== */
+  .m-hero-media{ display: none; }
+  @media (max-width: 767px){
+
+    /* ---- hero: editorial image on top, copy + one CTA in the thumb zone ---- */
+    #home{
+      height: auto; min-height: 88svh;
+      flex-direction: column; align-items: stretch; justify-content: flex-start;
+    }
+    #home .ambient-light{ display: none; }
+
+    .m-hero-media{
+      display: block; position: relative; z-index: 1; flex: none;
+      margin-top: var(--m-header-h);
+      height: 37svh; min-height: 260px; max-height: 420px;
+      border-radius: 0 0 var(--m-radius-sheet) var(--m-radius-sheet);
+      overflow: hidden; background: var(--alt-surface);
+    }
+    .m-hero-media img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+    .m-hero-media::after{          /* soft fade into the page colour */
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0) 58%, color-mix(in srgb, var(--alt-white) 85%, transparent) 100%);
+    }
+
+    #home > div.relative.z-10{ display: block; padding: 24px var(--m-gutter) 28px; }
+    #home .font-mono.uppercase{
+      font-size: var(--m-fs-eyebrow); letter-spacing: var(--m-ls-eyebrow); margin-bottom: 14px;
+    }
+    #headline{
+      font-size: var(--m-fs-hero); line-height: var(--m-lh-hero); letter-spacing: var(--m-ls-hero);
+    }
+    #hero-subtext{
+      margin-top: 12px; max-width: none;
+      font-size: var(--m-fs-body); line-height: var(--m-lh-body);
+      display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+    }
+    #home div:has(> #shop-now){ margin-top: 20px; flex-direction: column; align-items: stretch; gap: 4px; }
+    #shop-now{ width: 100%; height: 52px; padding: 0 24px; font-size: 15px; }
+    #home a[href="#collections"]{
+      align-self: center; display: inline-flex; align-items: center; min-height: 44px; padding: 0;
+      border-bottom: 0; text-decoration: underline; text-underline-offset: 6px;
+    }
+
+    /* entrance: 600ms fade-up, shorter travel */
+    [data-enter]{ transform: translateY(16px); transition-duration: 0.6s; }
+    [data-enter].in{ transform: translateY(0); }
+
+    /* ---- Shop by Collection: bento (1 hero card, then pairs; a lone last card spans) ---- */
+    #collections .max-w-2xl p.font-mono{
+      font-size: var(--m-fs-eyebrow); letter-spacing: var(--m-ls-eyebrow); margin-bottom: 14px;
+    }
+    #collections h2{ font-size: var(--m-fs-h2); line-height: var(--m-lh-h2); letter-spacing: var(--m-ls-h2); }
+    #collections .max-w-2xl p:not(.font-mono){ margin-top: 12px; font-size: var(--m-fs-body); line-height: var(--m-lh-body); }
+    #collections .grid{ margin-top: 28px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .collection-card{ aspect-ratio: 3 / 4; border-radius: var(--m-radius-card); }
+    .collection-card:first-child{ grid-column: 1 / -1; aspect-ratio: 4 / 5; }
+    .collection-card:last-child:nth-child(even){ grid-column: 1 / -1; aspect-ratio: 16 / 10; }
+    .collection-card .card-index{ top: 14px; left: 14px; }
+    .collection-card .card-foot{ padding: 14px; }
+    .collection-card .card-foot > span:first-child{
+      font-size: var(--m-fs-card-title); line-height: var(--m-lh-card-title);
+    }
+    .collection-card:first-child .card-foot > span:first-child{ font-size: 1.25rem; }
+    .collection-card .card-arrow{ width: 32px; height: 32px; }
+    .collection-card .card-arrow svg{ transform: rotate(45deg); }   /* ↗ becomes → */
+    .collection-card img{ transition: transform 0.5s var(--m-ease); }
+    .collection-card:active img{ transform: scale(1.04); }
+  }
 </style>
 <link rel="stylesheet" href="tailwind.css">
 </head>
@@ -435,6 +504,14 @@
   <!-- Ambient soft light -->
   <div class="ambient-light" style="width:640px; height:640px; top:-160px; left:-120px; background: radial-gradient(circle, rgba(201,194,180,0.35), transparent 70%);"></div>
   <div class="ambient-light" style="width:520px; height:520px; bottom:-140px; right:-100px; background: radial-gradient(circle, rgba(245,244,241,0.9), transparent 70%);"></div>
+
+  <!-- Mobile hero image (≤767px only — hidden on desktop, where the floating product stage below is the hero visual) -->
+  <div class="m-hero-media" data-enter aria-hidden="true">
+    <picture>
+      <source media="(max-width: 767px)" srcset="https://images.unsplash.com/photo-1602874801007-bd458bb1b8b6?w=900&q=75&auto=format&fit=crop">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="" width="900" height="1125" decoding="async" fetchpriority="high">
+    </picture>
+  </div>
 
   <div class="relative z-10 max-w-7xl w-full mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center pt-16">
 
@@ -597,6 +674,28 @@
     if (wc.heroSubtext) document.getElementById('hero-subtext').textContent = wc.heroSubtext;
     if (wc.heroCtaLabel) document.getElementById('hero-cta-label').textContent = wc.heroCtaLabel;
   }
+
+  // ============================================================
+  // 0-m. MOBILE: show only the first sentence of the hero subtext
+  //     (the full CMS text stays in the DOM data attribute and is
+  //     restored if the viewport grows past the mobile breakpoint)
+  // ============================================================
+  (function(){
+    const sub = document.getElementById('hero-subtext');
+    if (!sub) return;
+    const full = sub.textContent.replace(/\s+/g, ' ').trim();
+    sub.dataset.full = full;
+    const first = full.split(/\s[—–]\s/)[0].replace(/[,;:]+$/, '');
+    // own matchMedia: this inline script runs before the deferred mobile-ui.js
+    const isMobile = window.matchMedia('(max-width: 767px)');
+    function apply(){
+      sub.textContent = (isMobile.matches && first.length > 30 && first !== full)
+        ? first + (/[.!?]$/.test(first) ? '' : '.')
+        : full;
+    }
+    apply();
+    isMobile.addEventListener('change', apply);
+  })();
 
   // ============================================================
   // 0a. HERO FEATURED PRODUCTS — which 3 float in the hero composition
