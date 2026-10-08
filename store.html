@@ -32,7 +32,7 @@
 <script src="mobile-nav.js"></script>
 <link rel="stylesheet" href="mobile-nav.css">
 <link rel="stylesheet" href="mobile.css">
-<script src="mobile-ui.js" defer></script>
+<script src="mobile-ui.js"></script>
 <script src="smooth-scroll.js" defer></script>
 
 <style>
@@ -347,6 +347,96 @@
     [data-enter]{ opacity: 1 !important; transform: none !important; }
     #store-root{ opacity: 1 !important; transform: none !important; filter:none !important; }
   }
+
+  /* ===== MOBILE (≤767px) ===== */
+  .m-filter-icon, .m-filter-dot{ display: none; }
+  @media (max-width: 767px){
+
+    /* hero: compact, sits right under the 56px header */
+    #store-hero{ padding: calc(var(--m-header-h) + 28px) var(--m-gutter) 28px; }
+    #store-hero p.font-mono{ font-size: var(--m-fs-eyebrow); letter-spacing: var(--m-ls-eyebrow); margin-bottom: 12px; }
+    #store-hero h1{ font-size: var(--m-fs-h2); line-height: var(--m-lh-h2); letter-spacing: var(--m-ls-h2); }
+    #store-hero h1 + p{ margin-top: 12px; font-size: var(--m-fs-body); line-height: var(--m-lh-body); }
+
+    /* the chip + search section stops being a box so the chip row can
+       stay sticky for the whole page (its parent becomes #store-root) */
+    #store-root > section[data-enter]{ display: contents; }
+
+    #chip-row{
+      position: sticky; top: var(--m-header-h); z-index: 30;
+      padding: 10px 28px 10px var(--m-gutter); margin: 0;
+      background: var(--alt-white);
+      border-bottom: 1px solid var(--alt-border);
+      -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+      mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+      scroll-padding-inline: var(--m-gutter);
+    }
+    .chip{ height: 44px; padding: 0 18px; font-size: 14px; display: inline-flex; align-items: center; }
+
+    /* search + sort/filter on one row */
+    #chip-row + div{ flex-direction: row; align-items: center; gap: 10px; margin: 14px 0 0; padding: 0 var(--m-gutter); }
+    #chip-row + div .glass-input{ flex: 1; min-width: 0; max-width: none; height: 44px; padding: 0 16px; border-radius: var(--m-radius-pill); }
+    #chip-row + div .glass-input input{ font-size: var(--m-fs-input); height: 44px; }
+    #sort-toggle{
+      position: relative; width: 44px; height: 44px; padding: 0; justify-content: center; border-radius: 50%;
+    }
+    #sort-toggle .m-sort-chevron{ display: none; }
+    #sort-toggle .m-filter-icon{ display: block; }
+    #sort-label{
+      position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+    }
+    #sort-toggle .m-filter-dot{
+      display: none; position: absolute; top: 9px; right: 9px; width: 8px; height: 8px;
+      border-radius: 50%; background: var(--alt-beige); border: 1.5px solid var(--alt-white);
+    }
+    #sort-toggle.has-filter .m-filter-dot{ display: block; }
+    #sort-menu{ display: none; }
+
+    /* grid: 2 columns, 12px gap */
+    #product-grid{ column-gap: 12px; row-gap: 28px; }
+    .pm-card{ border-radius: var(--m-radius-card); }
+    .pm-stage{ aspect-ratio: 4 / 5; border-radius: var(--m-radius-card); }
+    .pm-stage img{ transition: transform .5s var(--m-ease); }
+    .pm-card:active .pm-stage img{ transform: scale(1.03); }
+    .pm-wishlist{
+      top: 2px; right: 2px; width: 44px; height: 44px; background: none;
+      -webkit-backdrop-filter: none; backdrop-filter: none;
+    }
+    .pm-wishlist::before{
+      content: ""; position: absolute; inset: 2px; border-radius: 50%; background: rgba(255,255,255,0.92);
+    }
+    .pm-wishlist svg{ position: relative; }
+    .pm-info{ margin-top: 12px; padding: 0 2px; }
+    .pm-name{ font-size: var(--m-fs-card-title); line-height: var(--m-lh-card-title); }
+    .pm-rating{ font-size: 11px; margin-top: 5px; }
+    .pm-price{ font-size: var(--m-fs-price); }
+    .pm-bottom{ margin-top: 8px; min-height: 44px; }
+
+    /* "+ Add" → round icon-only button (44px hit area, 40px disc); the
+       label stays in aria-label for screen readers */
+    .pm-add:not(:disabled){
+      position: relative; display: flex; align-items: center; justify-content: center;
+      width: 44px; height: 44px; min-width: 44px; padding: 0; margin-right: -4px;
+      background: none; font-size: 11px; color: transparent; overflow: hidden; text-indent: -300px;
+    }
+    .pm-add:not(:disabled)::before{
+      content: ""; position: absolute; inset: 2px; border-radius: 50%; background: var(--alt-black);
+    }
+    .pm-add:not(:disabled)::after{
+      content: "+"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      text-indent: 0; color: var(--alt-white); font-size: 22px; font-weight: 400; line-height: 1;
+    }
+    .pm-add:disabled{ min-height: 44px; }
+
+    /* empty state: outline "Clear filters", primary request link */
+    #empty-state{ padding: 56px 0; }
+    #clear-filters{
+      background: transparent; color: var(--alt-black); border: 1px solid var(--alt-black);
+      min-height: 52px; padding: 0 28px;
+    }
+    #empty-state a{ min-height: 52px; display: inline-flex; align-items: center; padding: 0 28px;
+      background: var(--alt-black); color: var(--alt-white); }
+  }
 </style>
 <link rel="stylesheet" href="tailwind.css">
 </head>
@@ -472,9 +562,14 @@
       <div class="relative shrink-0">
         <button id="sort-toggle" class="flex items-center gap-2 text-sm font-medium px-5 py-3 rounded-full border border-[var(--alt-border)] hover:border-[var(--alt-black)] transition-colors">
           <span id="sort-label">Featured</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="m-sort-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M6 9l6 6 6-6"/>
           </svg>
+          <!-- mobile only: sort + filter icon (the label above becomes screen-reader-only) -->
+          <svg class="m-filter-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+            <path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>
+          </svg>
+          <span class="m-filter-dot" aria-hidden="true"></span>
         </button>
         <div id="sort-menu" class="sort-menu absolute right-0 mt-2 w-52 bg-[var(--alt-white)] rounded-2xl shadow-[0_20px_50px_-15px_rgba(10,10,10,0.25)] border border-[var(--alt-border)] py-2 z-20">
           <!-- populated by JS -->
@@ -677,6 +772,8 @@ function renderSortMenu(){
 
 sortToggle.addEventListener("click", (e) => {
   e.stopPropagation();
+  // phones: sort + category filters live in a bottom sheet instead of the dropdown
+  if (isMobileDevice() && window.MobileUI){ openFilterSheet(); return; }
   sortMenu.classList.toggle("open");
 });
 document.addEventListener("click", () => sortMenu.classList.remove("open"));
@@ -803,21 +900,33 @@ function productCardHTML(p){
   `;
 }
 
+/* Phones render 12 cards, then "Showing 12 of N" + Load more. The count
+   resets to 12 whenever the category / sort / search changes. */
+const MOBILE_PAGE = 12;
+let mobileShown = MOBILE_PAGE;
+let lastFilterKey = "";
+let loadMore = null;
+
 function renderGrid(){
   const visible = getVisibleProducts();
 
   if (visible.length === 0){
     grid.style.display = "none";
     emptyState.classList.add("show");
+    if (loadMore) loadMore.update(0, 0);
+    syncFilterDot();
     return;
   }
   grid.style.display = "grid";
   emptyState.classList.remove("show");
 
   const mobile = isMobileDevice();
+  const key = state.category + "|" + state.sort + "|" + state.search;
+  if (key !== lastFilterKey){ lastFilterKey = key; mobileShown = MOBILE_PAGE; }
+  const list = mobile ? visible.slice(0, mobileShown) : visible;
+
   const cardSelector = mobile ? ".pm-card" : ".p-card";
-  const stageSelector = mobile ? ".pm-stage img" : ".p-stage img";
-  grid.innerHTML = visible.map(mobile ? productCardHTMLMobile : productCardHTML).join("");
+  grid.innerHTML = list.map(mobile ? productCardHTMLMobile : productCardHTML).join("");
 
   // stagger a light reveal on re-render
   grid.querySelectorAll(cardSelector).forEach((card, i) => {
@@ -830,8 +939,43 @@ function renderGrid(){
     });
   });
 
+  wireCards(grid.querySelectorAll(cardSelector), mobile);
+
+  if (window.MobileUI){
+    if (!loadMore) loadMore = MobileUI.createLoadMore(grid, { onMore: showMoreProducts });
+    loadMore.update(list.length, visible.length);
+  }
+  syncFilterDot();
+}
+
+/* "Load more": append only the next 12 cards (no re-render, so the cards
+   already on screen don't flicker or lose their position). */
+function showMoreProducts(){
+  const visible = getVisibleProducts();
+  const from = mobileShown;
+  mobileShown += MOBILE_PAGE;
+  const next = visible.slice(from, mobileShown);
+  const before = grid.querySelectorAll(".pm-card").length;
+  grid.insertAdjacentHTML("beforeend", next.map(productCardHTMLMobile).join(""));
+  const added = Array.from(grid.querySelectorAll(".pm-card")).slice(before);
+  added.forEach((card, i) => {
+    card.style.opacity = 0;
+    card.style.transform = "translateY(16px)";
+    requestAnimationFrame(() => {
+      card.style.transition = `opacity 0.5s ease ${Math.min(i, 8) * 40}ms, transform 0.5s cubic-bezier(0.16,1,0.3,1) ${Math.min(i, 8) * 40}ms`;
+      card.style.opacity = 1;
+      card.style.transform = "translateY(0)";
+    });
+  });
+  wireCards(added, true);
+  loadMore.update(Math.min(mobileShown, visible.length), visible.length);
+}
+
+function wireCards(cards, mobile){
+  const cardSelector = mobile ? ".pm-card" : ".p-card";
+  const stageSelector = mobile ? ".pm-stage img" : ".p-stage img";
   // wire up card interactions
-  grid.querySelectorAll(cardSelector).forEach(card => {
+  cards.forEach(card => {
     const id = idOf(card.dataset.id);
 
     card.querySelector('[data-action="wishlist"]').addEventListener("click", (e) => {
@@ -856,6 +1000,68 @@ function renderGrid(){
 
     // whole-card click -> cinematic transition into the Product Details page
     card.addEventListener("click", () => goToProduct(id, card.querySelector(stageSelector)));
+  });
+}
+
+/* ================================================================
+   MOBILE: sort + category filters in a bottom sheet
+   ================================================================ */
+function syncFilterDot(){
+  // small dot on the sort/filter button when something other than the defaults is active
+  sortToggle.classList.toggle("has-filter", state.sort !== "featured" || state.category !== "all");
+}
+
+function applyFilterChange(){
+  sortLabel.textContent = SORTS.find(s => s.value === state.sort).label;
+  renderChips();
+  renderSortMenu();
+  renderGrid();
+}
+
+function openFilterSheet(){
+  const content = document.createElement("div");
+  const footer = document.createElement("div");
+  footer.style.display = "contents";
+
+  function paint(){
+    content.innerHTML = `
+      <p class="m-sheet-label">Sort by</p>
+      <div role="radiogroup" aria-label="Sort by">
+        ${SORTS.map(s => `
+          <button type="button" class="m-radio ${s.value === state.sort ? "on" : ""}" role="radio" aria-checked="${s.value === state.sort}" data-sort="${s.value}">
+            <span>${s.label}</span><i class="m-radio-dot"></i>
+          </button>`).join("")}
+      </div>
+      <p class="m-sheet-label">Category</p>
+      <div class="m-chip-wrap">
+        ${CATEGORIES.map(c => `<button type="button" class="m-chip ${c.slug === state.category ? "on" : ""}" data-cat="${c.slug}">${c.label}</button>`).join("")}
+      </div>`;
+    const n = getVisibleProducts().length;
+    footer.innerHTML = `
+      <button type="button" class="m-btn is-outline" data-reset>Reset</button>
+      <button type="button" class="m-btn is-grow" data-done>Show ${n} product${n === 1 ? "" : "s"}</button>`;
+  }
+  paint();
+
+  const sheet = MobileUI.openSheet({ title: "Sort & filter", content, footer });
+
+  content.addEventListener("click", (e) => {
+    const sortBtn = e.target.closest("[data-sort]");
+    const catBtn = e.target.closest("[data-cat]");
+    if (sortBtn) state.sort = sortBtn.dataset.sort;
+    else if (catBtn) state.category = catBtn.dataset.cat;
+    else return;
+    applyFilterChange();
+    paint();
+  });
+  footer.addEventListener("click", (e) => {
+    if (e.target.closest("[data-reset]")){
+      state.sort = "featured"; state.category = "all";
+      applyFilterChange();
+      paint();
+    } else if (e.target.closest("[data-done]")){
+      sheet.close();
+    }
   });
 }
 

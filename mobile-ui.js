@@ -1,15 +1,16 @@
 /* ================================================================
    MOBILE UI — shared mobile-only behaviour (≤767px).
-   Loaded with `defer` on customer pages, after mobile-nav.js.
+   Loaded (blocking, small) on customer pages right after mobile-nav.js,
+   so page inline scripts can call into it while they render.
    Everything here must be a no-op at ≥768px: guard with isMobile().
-   Planned contents (see MOBILE_PLAN.md): bottom sheet, load-more,
-   carousel dots. Already here: the reveal fail-safe.
+   Contents: reveal fail-safe, bottom sheet, load-more bar.
    ================================================================ */
 (function () {
   "use strict";
 
   const mq = window.matchMedia("(max-width: 767px)");
   const isMobile = () => mq.matches;
+  const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---------------- reveal fail-safe (Phase 1.7) ----------------
      Pages hide [data-reveal] / [data-enter] blocks until their own
@@ -38,5 +39,115 @@
   }, { passive: true });
   window.addEventListener("load", () => setTimeout(flushReveals, 2500));
 
-  window.MobileUI = { isMobile: isMobile, mq: mq, flushReveals: flushReveals };
+  /* ---------------- bottom sheet (Phase 3+) ----------------
+     openSheet({ title, content, footer, className, onClose }) → { close, el, body, footerEl }
+     content / footer: HTML string or Node. Backdrop tap, Esc, the close
+     button and a swipe-down on the grab zone all close it; page scroll is
+     locked while it is open. Styles: .m-sheet* in mobile.css. */
+  let openCount = 0;
+
+  function openSheet(opts) {
+    opts = opts || {};
+    const backdrop = document.createElement("div");
+    backdrop.className = "m-sheet-backdrop";
+    const sheet = document.createElement("div");
+    sheet.className = "m-sheet " + (opts.className || "");
+    sheet.setAttribute("role", "dialog");
+    sheet.setAttribute("aria-modal", "true");
+    if (opts.title) sheet.setAttribute("aria-label", opts.title);
+    sheet.innerHTML =
+      '<div class="m-sheet-grab" aria-hidden="true"><span></span></div>' +
+      '<div class="m-sheet-head">' +
+        '<h2 class="m-sheet-title">' + (opts.title || "") + "</h2>" +
+        '<button type="button" class="m-sheet-close" aria-label="Close">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+        "</button>" +
+      "</div>" +
+      '<div class="m-sheet-body"></div>' +
+      '<div class="m-sheet-footer"></div>';
+    const body = sheet.querySelector(".m-sheet-body");
+    const footerEl = sheet.querySelector(".m-sheet-footer");
+    const put = (host, c) => { if (c == null) return; if (typeof c === "string") host.innerHTML = c; else host.appendChild(c); };
+    put(body, opts.content);
+    put(footerEl, opts.footer);
+    if (!opts.footer) footerEl.style.display = "none";
+
+    document.body.appendChild(backdrop);
+    document.body.appendChild(sheet);
+    if (openCount++ === 0) document.documentElement.style.overflow = "hidden";
+
+    let closed = false;
+    function close() {
+      if (closed) return;
+      closed = true;
+      backdrop.classList.remove("open");
+      sheet.classList.remove("open");
+      sheet.style.transform = "";
+      document.removeEventListener("keydown", onKey);
+      if (--openCount === 0) document.documentElement.style.overflow = "";
+      setTimeout(() => { backdrop.remove(); sheet.remove(); }, reduced() ? 0 : 450);
+      if (typeof opts.onClose === "function") opts.onClose();
+    }
+    function onKey(e) { if (e.key === "Escape") close(); }
+    document.addEventListener("keydown", onKey);
+    backdrop.addEventListener("click", close);
+    sheet.querySelector(".m-sheet-close").addEventListener("click", close);
+
+    /* swipe down on the grab zone / header */
+    let startY = null, dy = 0, t0 = 0;
+    const dragZone = [sheet.querySelector(".m-sheet-grab"), sheet.querySelector(".m-sheet-head")];
+    dragZone.forEach((z) => {
+      z.addEventListener("touchstart", (e) => {
+        startY = e.touches[0].clientY; dy = 0; t0 = Date.now();
+        sheet.style.transition = "none";
+      }, { passive: true });
+      z.addEventListener("touchmove", (e) => {
+        if (startY == null) return;
+        dy = Math.max(0, e.touches[0].clientY - startY);
+        sheet.style.transform = "translateY(" + dy + "px)";
+      }, { passive: true });
+      z.addEventListener("touchend", () => {
+        if (startY == null) return;
+        const fast = dy / Math.max(1, Date.now() - t0) > 0.5;
+        sheet.style.transition = "";
+        startY = null;
+        if (dy > 110 || fast && dy > 30) close(); else sheet.style.transform = "";
+      });
+    });
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      backdrop.classList.add("open");
+      sheet.classList.add("open");
+    }));
+    return { close: close, el: sheet, body: body, footerEl: footerEl };
+  }
+
+  /* ---------------- load-more bar (Phase 3 / 4) ----------------
+     createLoadMore(afterEl, { onMore, label }) → { update(shown, total), el }
+     Renders "Showing 12 of 40" + an outline "Load more" pill after `afterEl`.
+     Hidden when everything is already shown. */
+  function createLoadMore(afterEl, opts) {
+    opts = opts || {};
+    const el = document.createElement("div");
+    el.className = "m-loadmore";
+    el.hidden = true;
+    el.innerHTML = '<p class="m-loadmore-count" aria-live="polite"></p>' +
+      '<button type="button" class="m-loadmore-btn">' + (opts.label || "Load more") + "</button>";
+    afterEl.insertAdjacentElement("afterend", el);
+    const count = el.querySelector(".m-loadmore-count");
+    el.querySelector(".m-loadmore-btn").addEventListener("click", () => { if (opts.onMore) opts.onMore(); });
+    return {
+      el: el,
+      update: function (shown, total) {
+        const show = isMobile() && total > shown;
+        el.hidden = !show;
+        if (show) count.textContent = "Showing " + shown + " of " + total;
+      },
+    };
+  }
+
+  window.MobileUI = {
+    isMobile: isMobile, mq: mq, flushReveals: flushReveals,
+    openSheet: openSheet, createLoadMore: createLoadMore,
+  };
 })();
