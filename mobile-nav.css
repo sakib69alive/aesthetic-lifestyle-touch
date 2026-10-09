@@ -222,6 +222,13 @@ button.mnav-quick-link{ background: none; border: none; cursor: pointer; font: i
    under it instead of the grey chip. Hide-on-idle is unchanged.
    ================================================================ */
 @media (max-width: 767px){
+  /* menu trigger: a solid round disc with two short bars (header pill, see mobile.css) */
+  .mnav-trigger{ width: 44px; height: 44px; border-radius: 50%; background: var(--alt-black); gap: 6px; }
+  .mnav-trigger .mnav-bar{ width: 16px; background: var(--alt-white); }
+  .mnav-trigger .mnav-bar:nth-child(2){ display: none; }
+  .mnav-trigger.open .mnav-bar:nth-child(1){ transform: translateY(3.8px) rotate(45deg); }
+  .mnav-trigger.open .mnav-bar:nth-child(3){ transform: translateY(-3.8px) rotate(-45deg); }
+
   .mnav-bb-item{ min-height: 54px; }
   .mnav-bb-icon svg{ width: 22px; height: 22px; }
   .mnav-bb-label{ font-size: 10px; }

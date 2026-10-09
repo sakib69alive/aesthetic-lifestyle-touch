@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="110 290 1020 720" width="1020" height="720">
+  <title>Aesthetic Lifestyle Touch</title>
+  <defs>
+    <linearGradient id="gold" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#A06A2E"/>
+      <stop offset="1" stop-color="#D3A064"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Monogram AL -->
+  <g fill="#1C1917">
+    <!-- A upper -->
+    <path d="M597,305 L612,306 L692,508 L650,498 L570,365 L522,458 L508,457 Z"/>
+    <!-- A lower -->
+    <path d="M497,533 L522,548 L505,620 L536,632 L536,645 L410,645 L410,636 L442,631 Z"/>
+    <!-- L -->
+    <path d="M668,372 H770 V384 L745,388 V612 Q790,626 840,614 L886,572 L862,645 H645 V636 L688,628 V388 L668,382 Z"/>
+  </g>
+
+  <!-- Gold swoosh -->
+  <path fill="url(#gold)" d="M393,585 C400,510 460,462 540,462 C640,462 720,555 800,580 C830,590 855,592 872,590 C850,605 810,610 770,600 C690,580 630,500 545,490 C470,490 420,530 393,585 Z"/>
+
+  <!-- Sparkle -->
+  <path fill="#B47A3C" d="M832,392 Q836,425 874,435 Q836,445 832,478 Q828,445 790,435 Q828,425 832,392 Z"/>
+
+  <!-- Text -->
+  <g font-family="'Cormorant Garamond','Cinzel','Trajan Pro','Times New Roman',Georgia,serif">
+    <text x="140" y="808" font-size="132" fill="#1C1917" textLength="978" lengthAdjust="spacing">AESTHETIC</text>
+    <text x="232" y="897" font-size="64" fill="#A8712F" textLength="800" lengthAdjust="spacing">LIFESTYLE TOUCH</text>
+  </g>
+  <g font-family="'Montserrat','Helvetica Neue',Arial,sans-serif">
+    <text x="333" y="978" font-size="25" fill="#1C1917" textLength="597" lengthAdjust="spacing">SMALL THINGS   BIG VIBES</text>
+  </g>
+  <g stroke="#A8712F" stroke-width="2.5">
+    <line x1="165" y1="970" x2="297" y2="970"/>
+    <line x1="960" y1="970" x2="1092" y2="970"/>
+  </g>
+</svg>
