@@ -377,6 +377,26 @@
     #pdp-root{ opacity: 1 !important; transform: none !important; filter: none !important; }
   }
 
+  /* ================= QR DIALOG ================= */
+  #qr-modal[hidden]{ display: none; }
+  #qr-modal{ position: fixed; inset: 0; z-index: 140; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .qr-backdrop{ position: absolute; inset: 0; background: rgba(10,10,10,0.5); }
+  .qr-card{
+    position: relative; width: 100%; max-width: 340px; padding: 28px 24px 24px; text-align: center;
+    background: var(--alt-white); color: var(--alt-black); border: 1px solid var(--alt-border); border-radius: 26px;
+    box-shadow: 0 40px 100px -30px rgba(10,10,10,0.5);
+    animation: qr-in .35s cubic-bezier(0.16,1,0.3,1);
+  }
+  @keyframes qr-in{ from{ opacity: 0; transform: translateY(14px) scale(.97); } to{ opacity: 1; transform: none; } }
+  .qr-close{ position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; color: var(--alt-muted); }
+  .qr-box{ margin: 20px auto 14px; width: 220px; height: 220px; padding: 14px; border-radius: 18px; background: #fff; display: flex; align-items: center; justify-content: center; }
+  .qr-box svg{ width: 100%; height: 100%; display: block; }
+  .qr-url{ font-size: 11px; color: var(--alt-muted); word-break: break-all; margin-bottom: 18px; }
+  .qr-actions{ display: flex; gap: 10px; }
+  .qr-btn{ flex: 1; height: 48px; border-radius: 999px; border: 1px solid var(--alt-border); font-size: 14px; font-weight: 500; }
+  .qr-btn.is-dark{ background: var(--alt-black); color: var(--alt-white); border-color: var(--alt-black); }
+  @media (prefers-reduced-motion: reduce){ .qr-card{ animation: none; } }
+
   /* ===== MOBILE (≤767px) ===== */
   .m-gallery-track, .m-gallery-count, .m-gallery-dots, .m-acc-sum, .m-review-actions{ display: none; }
   .m-acc-sum::-webkit-details-marker{ display: none; }
@@ -647,10 +667,10 @@
               </svg>
               <span id="wishlist-label">Wishlist</span>
             </button>
-            <button id="share-btn" class="icon-btn w-11 h-11 rounded-full border border-[var(--alt-border)] flex items-center justify-center text-[var(--alt-muted)] hover:text-[var(--alt-black)] shrink-0" aria-label="Share this product">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                <circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/>
-                <path d="M8.3 10.7l7.4-4.4M8.3 13.3l7.4 4.4"/>
+            <button id="share-btn" class="icon-btn w-11 h-11 rounded-full border border-[var(--alt-border)] flex items-center justify-center text-[var(--alt-muted)] hover:text-[var(--alt-black)] shrink-0" aria-label="Show QR code for this product" aria-haspopup="dialog">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>
+                <path d="M14 14h3v3h-3zM20 14v1M14 20h1M17 20h4v1M20 17v0"/>
               </svg>
             </button>
           </div>
@@ -796,6 +816,24 @@
   <button class="lb-btn absolute top-5 right-5" id="lb-close" aria-label="Close fullscreen viewer">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
   </button>
+</div>
+
+<!-- QR code dialog (opened by the QR button next to Wishlist) -->
+<div id="qr-modal" role="dialog" aria-modal="true" aria-labelledby="qr-title" hidden>
+  <div class="qr-backdrop" data-qr-close></div>
+  <div class="qr-card">
+    <button type="button" class="qr-close" data-qr-close aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <p class="font-mono text-[11px] tracking-widest uppercase text-[var(--alt-muted)] mb-2">Scan to open</p>
+    <h2 id="qr-title" class="font-display text-xl font-medium"></h2>
+    <div id="qr-box" class="qr-box" aria-label="QR code"></div>
+    <p id="qr-url" class="qr-url font-mono"></p>
+    <div class="qr-actions">
+      <button type="button" id="qr-copy" class="qr-btn">Copy link</button>
+      <button type="button" id="qr-share" class="qr-btn is-dark">Share</button>
+    </div>
+  </div>
 </div>
 
 <!-- Toast -->
@@ -1259,19 +1297,57 @@ wishlistBtn.addEventListener("click", () => {
   if (active){ pulseHeart(wishlistBtn); glowCard(document.getElementById("gallery-stage")); }
 });
 
-/* Share — copies the product link, with a graceful clipboard fallback */
-document.getElementById("share-btn").addEventListener("click", async () => {
-  const url = window.location.href;
+/* QR code — the button next to Wishlist opens a dialog with a QR code for this
+   product's link (qrcode.js, MIT, loaded the first time it is needed), plus
+   Copy link / Share. */
+const qrModal = document.getElementById("qr-modal");
+let qrReady = null;
+function loadQrLib(){
+  if (window.qrcode) return Promise.resolve();
+  if (!qrReady) qrReady = new Promise((resolve, reject) => {
+    const sc = document.createElement("script");
+    sc.src = "qrcode.js"; sc.onload = resolve; sc.onerror = () => { qrReady = null; reject(new Error("qr lib")); };
+    document.head.appendChild(sc);
+  });
+  return qrReady;
+}
+function productShareUrl(){ return window.location.href.split("#")[0]; }
+async function openQr(){
+  const url = productShareUrl();
+  document.getElementById("qr-title").textContent = product.name;
+  document.getElementById("qr-url").textContent = url;
+  qrModal.hidden = false;
+  document.documentElement.style.overflow = "hidden";
+  const box = document.getElementById("qr-box");
+  box.innerHTML = "";
   try {
-    if (navigator.share) {
-      await navigator.share({ title: product.name, url });
-      return;
-    }
-    await navigator.clipboard.writeText(url);
-    showCartToast("Link copied to clipboard");
-  } catch (err) {
-    showCartToast("Link copied to clipboard");
+    await loadQrLib();
+    const qr = qrcode(0, "M");
+    qr.addData(url);
+    qr.make();
+    box.innerHTML = qr.createSvgTag({ scalable: true, margin: 0 });
+  } catch (e) {
+    box.innerHTML = '<p class="text-xs text-[var(--alt-muted)]" style="color:#8A8A8A;">QR code could not be created.</p>';
   }
+  document.getElementById("qr-copy").focus();
+}
+function closeQr(){
+  qrModal.hidden = true;
+  document.documentElement.style.overflow = "";
+  document.getElementById("share-btn").focus();
+}
+document.getElementById("share-btn").addEventListener("click", openQr);
+qrModal.addEventListener("click", (e) => { if (e.target.closest("[data-qr-close]")) closeQr(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !qrModal.hidden) closeQr(); });
+document.getElementById("qr-copy").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(productShareUrl()); } catch (err) { /* fall through to the toast */ }
+  showCartToast("Link copied to clipboard");
+});
+document.getElementById("qr-share").addEventListener("click", async () => {
+  try {
+    if (navigator.share) await navigator.share({ title: product.name, url: productShareUrl() });
+    else { await navigator.clipboard.writeText(productShareUrl()); showCartToast("Link copied to clipboard"); }
+  } catch (err) { /* share sheet dismissed */ }
 });
 
 /* ================================================================
