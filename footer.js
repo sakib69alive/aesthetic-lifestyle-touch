@@ -206,7 +206,6 @@ function initSiteFooter(){
             <a href="terms.html" class="ft-link" style="padding:0; display:inline;">Terms</a>
             <button type="button" class="ft-link" style="padding:0; display:inline;" data-ft-soon="Cookies">Cookies</button>
             <button type="button" class="ft-link" style="padding:0; display:inline;" data-ft-soon="Accessibility">Accessibility</button>
-            <a href="admin.html" class="ft-link" style="padding:0; display:inline; opacity:0.6;">Store Admin</a>
           </div>
         </div>
       </div>

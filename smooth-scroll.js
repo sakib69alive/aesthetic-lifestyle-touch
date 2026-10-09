@@ -18,6 +18,10 @@
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   if (!window.matchMedia("(pointer: fine)").matches) return; // touch-first devices: stay native
+  // weaker machines (<= 4 cores, <= 4 GB, or data-saver on): the glide itself costs more than it is worth — native scrolling
+  if ((navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+      (navigator.deviceMemory && navigator.deviceMemory <= 4) ||
+      (navigator.connection && navigator.connection.saveData)) return;
 
   var PUSH = 1.15;      // how hard one wheel notch pushes
   var TAU = 0.30;       // seconds; bigger = heavier, longer glide

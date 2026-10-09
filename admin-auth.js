@@ -17,7 +17,15 @@ const ADMIN_LOCKOUT_DURATION_MS = 15 * 60 * 1000; // how long a lockout lasts
 /* TEMPORARY: while true, anyone who opens admin.html / cms.html goes straight
    in with no login. Set back to false to restore the normal password gate
    (nothing else needs to change — login, lockout and sessions are intact). */
-const ADMIN_LOCK_OFF = true;
+const ADMIN_LOCK_OFF = false;
+
+/* The owner login. Signing in on account.html with these credentials goes
+   straight to the admin panel (see AdminAuth.loginOwner). Only the SHA-256
+   hash of the password is stored here, but note that this is a static site:
+   everything in this file is public, so a short password can be guessed. */
+const ADMIN_OWNER_EMAIL = "sakib69alive@gmail.com";
+const ADMIN_OWNER_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
+const ADMIN_OLD_SEED_EMAIL = "owner@aestheticlifestyletouch.com";
 
 const AdminAuth = {
   record(){ try { return JSON.parse(localStorage.getItem(ADMIN_KEY) || "null"); } catch (e) { return null; } },
@@ -30,15 +38,21 @@ const AdminAuth = {
     return s;
   },
   isLoggedIn(){ return ADMIN_LOCK_OFF || !!this.session(); },
+  ownerRecord(createdAt){
+    return { email: ADMIN_OWNER_EMAIL, name: "Store Owner", role: "Owner", passwordHash: ADMIN_OWNER_HASH, createdAt: createdAt || Date.now() };
+  },
   async ensureSeeded(){
-    if (this.record()) return;
-    this.save({
-      email: "owner@aestheticlifestyletouch.com",
-      name: "Store Owner",
-      role: "Owner",
-      passwordHash: await Auth.hash("Owner@2026"),
-      createdAt: Date.now(),
-    });
+    const rec = this.record();
+    // fresh browser, or the old placeholder owner account -> the real owner login
+    if (!rec || rec.email === ADMIN_OLD_SEED_EMAIL) this.save(this.ownerRecord(rec && rec.createdAt));
+  },
+  /* Used by account.html's sign-in form: returns { handled:false } when the
+     email isn't the owner's (the normal customer sign-in then runs). */
+  async loginOwner(identifier, password){
+    if (String(identifier || "").trim().toLowerCase() !== ADMIN_OWNER_EMAIL) return { handled: false };
+    await this.ensureSeeded();
+    const res = await this.login(identifier, password);
+    return Object.assign({ handled: true }, res);
   },
   /* ---------------- brute-force lockout ---------------- */
   lockoutState(){ try { return JSON.parse(localStorage.getItem(ADMIN_LOCKOUT_KEY) || "null"); } catch (e) { return null; } },

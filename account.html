@@ -16,6 +16,7 @@
 <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
 
 <script src="auth.js"></script>
+<script src="admin-auth.js"></script>
 <script src="theme.js"></script>
 <script src="loader.js"></script>
 <link rel="stylesheet" href="loader.css">
@@ -529,6 +530,17 @@ async function doSignin(){
   document.getElementById("signin-label").innerHTML = `<span class="spinner"></span> Signing in…`;
 
   const remember = document.getElementById("si-remember").checked;
+
+  // the owner's email signs straight into the admin panel
+  const owner = await AdminAuth.loginOwner(identifier, password);
+  if (owner.handled){
+    btn.disabled = false;
+    document.getElementById("signin-label").textContent = "Sign In";
+    if (!owner.ok){ showFormError("signin-error", owner.error); return; }
+    window.location.href = "admin.html";
+    return;
+  }
+
   const result = await Auth.login({ identifier, password, rememberMe: remember });
 
   btn.disabled = false;

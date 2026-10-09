@@ -394,3 +394,26 @@ body{ overflow-x: hidden; max-width: 100vw; }
     border: 1px solid var(--alt-border);
   }
 }
+
+/* ================================================================
+   PERFORMANCE — ALL SCREENS (scroll + first-load smoothness)
+   The things that made pages stutter on desktop and low-end phones:
+   1. live backdrop blur under fixed / sticky bars (re-blurred every scroll frame)
+   2. blur() + scale() on the whole page root during the entrance fade (rasterises
+      a 5-17k px tall layer), and the animated blur(60px) loader glow
+   Same look, minus the expensive effects: bars are a near-opaque tint, the page
+   root just fades in.
+   ================================================================ */
+.nav-glass{
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  background: rgba(255,255,255,0.94) !important;
+}
+:root[data-theme="dark"] .nav-glass{ background: rgba(10,9,7,0.94) !important; }
+#co-subnav, #stepper{
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  background: color-mix(in srgb, var(--alt-white) 96%, transparent) !important;
+}
+.sl-glow{ filter: none; animation: none; }
+#store-root, #co-root, #pdp-root, #wl-root, #ab-root, #ct-root, #lg-root, #rp-root, #checkout-root{
+  filter: none !important; transform: none !important;
+}
