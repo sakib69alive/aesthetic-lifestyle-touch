@@ -155,3 +155,52 @@
   }
   #site-footer{ opacity: 1 !important; transform: none !important; }
 }
+
+/* ================================================================
+   ===== MOBILE (≤767px) =====
+   Compact footer (MOBILE_PLAN.md §Phase 1.1): brand + newsletter, then
+   ONE continuous accordion list (link groups, contact, payments, trust),
+   a centred social row and a tidy legal row. footer.js only emits the
+   accordion markup below 768px, so none of this touches desktop.
+   ================================================================ */
+@media (max-width: 767px){
+  #site-footer .ft-inner{
+    padding: 32px var(--m-gutter, 20px) var(--m-bottom-safe, 96px);
+  }
+
+  /* brand + newsletter */
+  #site-footer .ft-block-brand{ gap: 20px; padding-bottom: 0; border-bottom: 0; }
+  #site-footer .ft-brand-long,
+  #site-footer .ft-news-desc{ display: none; }
+  #site-footer #ft-newsletter-form{ flex-direction: row; gap: 8px; }
+  #site-footer .ft-news-input{ flex: 1; min-width: 0; height: 48px; padding: 0 18px; }
+  #site-footer #ft-newsletter-submit{ height: 48px; padding: 0 20px; }
+
+  /* accordion list: continuous, 56px rows, closed by a final hairline */
+  #site-footer .ft-block-groups{ display: block; margin-top: 20px; padding: 0; border-bottom: 0; }
+  #site-footer .ft-group summary{ min-height: 56px; padding: 0; }
+  #site-footer .ft-group:last-child{ border-bottom: 1px solid var(--alt-border); }
+  #site-footer .ft-group-title{ font-size: var(--m-fs-eyebrow, 11px); letter-spacing: var(--m-ls-eyebrow, 0.18em); color: var(--alt-black); }
+  #site-footer .ft-group .ft-group-body{ padding-bottom: 12px; }
+  #site-footer .ft-link{ display: flex; align-items: center; width: 100%; min-height: 44px; padding: 0; font-size: 14px; }
+
+  /* social: one centred row of 44px circles */
+  #site-footer .ft-block-follow{ padding: 28px 0 8px; text-align: center; }
+  #site-footer .ft-block-follow .ft-group-title{ display: none; }  /* icons carry aria-labels */
+  #site-footer #ft-social-row{ justify-content: center; gap: 8px; }
+  #site-footer #ft-social-row .ft-icon-btn{ flex-shrink: 0; }
+
+  /* legal row: wrapped links, 44px tap height, copyright below */
+  #site-footer .ft-legal{ padding-top: 4px; gap: 4px; }
+  #site-footer .ft-legal > div{ flex-wrap: wrap; justify-content: center; gap: 0 12px; }
+  #site-footer .ft-legal .ft-link{
+    display: inline-flex !important; align-items: center; justify-content: center; width: auto;
+    min-height: 44px; min-width: 44px; padding: 0 4px !important; font-size: 12px;
+  }
+  #site-footer #ft-copyright{ order: 2; padding-top: 4px; }
+
+  .ft-soon{ font-size: 11px; }
+
+  /* the bottom bar's Home tap + native scroll-to-top replace the floating button */
+  #scroll-to-top{ display: none !important; }
+}

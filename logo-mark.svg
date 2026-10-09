@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="385 295 515 360">
+  <title>Aesthetic Lifestyle Touch</title>
+  <defs>
+    <linearGradient id="gold" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#A06A2E"/>
+      <stop offset="1" stop-color="#D3A064"/>
+    </linearGradient>
+  </defs>
+  <g fill="#1C1917">
+    <path d="M597,305 L612,306 L692,508 L650,498 L570,365 L522,458 L508,457 Z"/>
+    <path d="M497,533 L522,548 L505,620 L536,632 L536,645 L410,645 L410,636 L442,631 Z"/>
+    <path d="M668,372 H770 V384 L745,388 V612 Q790,626 840,614 L886,572 L862,645 H645 V636 L688,628 V388 L668,382 Z"/>
+  </g>
+  <path fill="url(#gold)" d="M393,585 C400,510 460,462 540,462 C640,462 720,555 800,580 C830,590 855,592 872,590 C850,605 810,610 770,600 C690,580 630,500 545,490 C470,490 420,530 393,585 Z"/>
+  <path fill="#B47A3C" d="M832,392 Q836,425 874,435 Q836,445 832,478 Q828,445 790,435 Q828,425 832,392 Z"/>
+</svg>

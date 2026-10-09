@@ -5,6 +5,20 @@
    to dismissal. Dispatches "site-loader-dismissed" on document in case
    a page wants to defer something non-critical until after it's gone.
    ================================================================ */
+/* Phones: the loader is short and shows once per browsing session — repeat
+   page loads skip it entirely (hidden before first paint, since this file is
+   loaded from <head>), and it never stays longer than ~800ms. Desktop and
+   tablet are untouched. */
+const SL_PHONE = window.matchMedia("(max-width: 767px)").matches;
+const SL_SEEN_KEY = "alt_loader_seen_v1";
+let SL_SEEN = false;
+try { SL_SEEN = SL_PHONE && sessionStorage.getItem(SL_SEEN_KEY) === "1"; } catch (e) { /* storage blocked */ }
+if (SL_SEEN){
+  const hide = document.createElement("style");
+  hide.textContent = "#site-loader{display:none !important}";
+  document.head.appendChild(hide);
+}
+
 function initSiteLoader(){
   // This file is loaded from <head>, same as cart.js/auth.js/search.js —
   // #site-loader (first child of <body>) doesn't exist yet at that point,
@@ -19,7 +33,14 @@ function initSiteLoader(){
     return;
   }
 
-  const MIN_VISIBLE_MS = 500;
+  if (SL_SEEN){
+    loaderEl.remove();
+    document.dispatchEvent(new CustomEvent("site-loader-dismissed"));
+    return;
+  }
+  if (SL_PHONE){ try { sessionStorage.setItem(SL_SEEN_KEY, "1"); } catch (e) { /* storage blocked */ } }
+
+  const MIN_VISIBLE_MS = SL_PHONE ? 250 : 500;
   const startedAt = Date.now();
   const fill = loaderEl.querySelector(".sl-progress-fill");
 
@@ -50,7 +71,7 @@ function initSiteLoader(){
   // Safety net: a blocked/slow sub-resource (e.g. the manifest link under
   // file:// origins, where its CORS fetch can stall) must never leave the
   // loader stuck on screen forever.
-  setTimeout(dismissOnce, 2500);
+  setTimeout(dismissOnce, SL_PHONE ? 600 : 2500);
 }
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initSiteLoader);

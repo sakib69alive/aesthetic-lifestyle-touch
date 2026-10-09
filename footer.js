@@ -91,11 +91,7 @@ function initSiteFooter(){
     ).join("");
   }
 
-  function groupHTML(title, links){
-    const body = `<div class="ft-group-body space-y-0">${linkListHTML(links)}</div>`;
-    if (isDesktop){
-      return `<div><p class="ft-group-title mb-4">${title}</p>${body}</div>`;
-    }
+  function accordionHTML(title, body){
     return `
       <details class="ft-group">
         <summary><span class="ft-group-title">${title}</span>
@@ -106,50 +102,31 @@ function initSiteFooter(){
     `;
   }
 
-  /* ---------------- build + inject ---------------- */
-  const wrap = document.createElement("div");
-  wrap.innerHTML = `
-    <footer id="site-footer" aria-label="Site footer">
-      <div class="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-20">
+  function groupHTML(title, links){
+    const body = `<div class="ft-group-body space-y-0">${linkListHTML(links)}</div>`;
+    if (isDesktop){
+      return `<div><p class="ft-group-title mb-4">${title}</p>${body}</div>`;
+    }
+    return accordionHTML(title, body);
+  }
 
-        <!-- Brand + Newsletter -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 pb-14 border-b border-[var(--alt-border)]">
-          <div>
-            <p class="ft-font-display text-lg font-medium tracking-tight mb-4">
-              AESTHETIC <span class="text-[var(--alt-muted)] font-normal">LIFESTYLE TOUCH</span>
-            </p>
-            <p class="text-sm text-[var(--alt-muted)] max-w-sm leading-relaxed mb-4">
-              Thoughtfully curated products designed to elevate everyday living.
-            </p>
-            <p class="text-sm text-[var(--alt-muted)] max-w-md leading-relaxed">
-              We believe that beautiful design and everyday functionality should exist together. Every product is selected with intention, quality, and purpose.
-            </p>
-          </div>
-          <div>
-            <h2 class="ft-font-display text-xl font-medium tracking-tight mb-2">${(wc && wc.newsletterHeadline) || "Stay Inspired."}</h2>
-            <p class="text-sm text-[var(--alt-muted)] mb-6 max-w-sm">Updates on new collections, exclusive launches, limited editions, and design inspiration — nothing else.</p>
-            <div id="ft-newsletter-form" class="flex flex-col sm:flex-row gap-3">
-              <input id="ft-newsletter-email" type="email" placeholder="you@email.com" class="ft-news-input flex-1" aria-label="Email address">
-              <button id="ft-newsletter-submit" class="px-7 py-3.5 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium shrink-0">Subscribe</button>
-            </div>
-            <p id="ft-newsletter-success" class="text-sm mt-3" style="display:none; color:#3F8F5F;">You're on the list — thank you.</p>
-            <p id="ft-newsletter-error" class="text-xs mt-2" style="display:none; color:#B23B3B;">Enter a valid email address.</p>
-          </div>
-        </div>
+  /* Contact / payments / trust: two-column blocks on desktop (unchanged),
+     accordions in one continuous list with the link groups on mobile —
+     one long stack of open blocks was what made the footer ~1,900px tall. */
+  const contactBodyHTML = `
+    <div class="space-y-2 text-sm text-[var(--alt-muted)]">
+      <p>Email: <span style="color:var(--alt-black)">${(wc && wc.contactEmail) || "aestheticlifestyletouch@gmail.com"}</span></p>
+      <p>Phone: <span style="color:var(--alt-black)">${(wc && wc.contactPhone) || "01313667726"}</span></p>
+      <p>Hours: <span style="color:var(--alt-black)">Sat–Thu, 10am–7pm (GMT+6)</span></p>
+      <p>Address: <span style="color:var(--alt-black)">Dhaka, Bangladesh</span></p>
+    </div>`;
 
-        <!-- Nav groups -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 py-14 border-b border-[var(--alt-border)]" id="ft-groups"></div>
-
+  const middleHTML = isDesktop ? `
         <!-- Contact + Social -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-10 py-14 border-b border-[var(--alt-border)]">
           <div>
             <p class="ft-group-title mb-4">Contact</p>
-            <div class="space-y-2 text-sm text-[var(--alt-muted)]">
-              <p>Email: <span style="color:var(--alt-black)">${(wc && wc.contactEmail) || "aestheticlifestyletouch@gmail.com"}</span></p>
-              <p>Phone: <span style="color:var(--alt-black)">${(wc && wc.contactPhone) || "01313667726"}</span></p>
-              <p>Hours: <span style="color:var(--alt-black)">Sat–Thu, 10am–7pm (GMT+6)</span></p>
-              <p>Address: <span style="color:var(--alt-black)">Dhaka, Bangladesh</span></p>
-            </div>
+            ${contactBodyHTML}
           </div>
           <div class="md:text-right">
             <p class="ft-group-title mb-4 md:text-right">Follow</p>
@@ -176,9 +153,52 @@ function initSiteFooter(){
           <select class="ft-region-select" disabled><option>BDT (৳)</option></select>
           <select class="ft-region-select" disabled><option>English</option></select>
         </div>
+  ` : `
+        <!-- Follow (the contact / payments / trust accordions are appended to #ft-groups) -->
+        <div class="ft-block-follow">
+          <p class="ft-group-title">Follow</p>
+          <div class="flex gap-2.5" id="ft-social-row"></div>
+        </div>
+  `;
+
+  /* ---------------- build + inject ---------------- */
+  const wrap = document.createElement("div");
+  wrap.innerHTML = `
+    <footer id="site-footer" aria-label="Site footer">
+      <div class="ft-inner max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-20">
+
+        <!-- Brand + Newsletter -->
+        <div class="ft-block-brand grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 pb-14 border-b border-[var(--alt-border)]">
+          <div>
+            <p class="ft-font-display text-lg font-medium tracking-tight mb-4">
+              AESTHETIC <span class="text-[var(--alt-muted)] font-normal">LIFESTYLE TOUCH</span>
+            </p>
+            <p class="text-sm text-[var(--alt-muted)] max-w-sm leading-relaxed mb-4">
+              Thoughtfully curated products designed to elevate everyday living.
+            </p>
+            <p class="ft-brand-long text-sm text-[var(--alt-muted)] max-w-md leading-relaxed">
+              We believe that beautiful design and everyday functionality should exist together. Every product is selected with intention, quality, and purpose.
+            </p>
+          </div>
+          <div>
+            <h2 class="ft-font-display text-xl font-medium tracking-tight mb-2">${(wc && wc.newsletterHeadline) || "Stay Inspired."}</h2>
+            <p class="ft-news-desc text-sm text-[var(--alt-muted)] mb-6 max-w-sm">Updates on new collections, exclusive launches, limited editions, and design inspiration — nothing else.</p>
+            <div id="ft-newsletter-form" class="flex flex-col sm:flex-row gap-3">
+              <input id="ft-newsletter-email" type="email" placeholder="you@email.com" class="ft-news-input flex-1" aria-label="Email address">
+              <button id="ft-newsletter-submit" class="px-7 py-3.5 rounded-full bg-[var(--alt-black)] text-[var(--alt-white)] text-sm font-medium shrink-0">Subscribe</button>
+            </div>
+            <p id="ft-newsletter-success" class="text-sm mt-3" style="display:none; color:#3F8F5F;">You're on the list — thank you.</p>
+            <p id="ft-newsletter-error" class="text-xs mt-2" style="display:none; color:#B23B3B;">Enter a valid email address.</p>
+          </div>
+        </div>
+
+        <!-- Nav groups -->
+        <div class="ft-block-groups grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 py-14 border-b border-[var(--alt-border)]" id="ft-groups"></div>
+
+        ${middleHTML}
 
         <!-- Copyright -->
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 text-xs text-[var(--alt-muted)]">
+        <div class="ft-legal flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 text-xs text-[var(--alt-muted)]">
           <p id="ft-copyright"></p>
           <div class="flex items-center gap-5">
             ${(wc && wc.footerLinks || []).map(l => `<a href="${l.href}" class="ft-link" style="padding:0; display:inline;">${l.label}</a>`).join("")}
@@ -186,7 +206,6 @@ function initSiteFooter(){
             <a href="terms.html" class="ft-link" style="padding:0; display:inline;">Terms</a>
             <button type="button" class="ft-link" style="padding:0; display:inline;" data-ft-soon="Cookies">Cookies</button>
             <button type="button" class="ft-link" style="padding:0; display:inline;" data-ft-soon="Accessibility">Accessibility</button>
-            <a href="admin.html" class="ft-link" style="padding:0; display:inline; opacity:0.6;">Store Admin</a>
           </div>
         </div>
       </div>
@@ -200,7 +219,11 @@ function initSiteFooter(){
 
   /* ---------------- fill dynamic bits ---------------- */
   document.getElementById("ft-groups").innerHTML =
-    groupHTML("Shop", SHOP_LINKS) + groupHTML("Company", COMPANY_LINKS) + groupHTML("Customer Support", SUPPORT_LINKS);
+    groupHTML("Shop", SHOP_LINKS) + groupHTML("Company", COMPANY_LINKS) + groupHTML("Customer Support", SUPPORT_LINKS)
+    + (isDesktop ? "" :
+        accordionHTML("Contact", `<div class="ft-group-body">${contactBodyHTML}</div>`)
+      + accordionHTML("Payment Methods", `<div class="ft-group-body"><div class="flex flex-wrap gap-2" id="ft-payment-row"></div></div>`)
+      + accordionHTML("Why Trust Us", `<div class="ft-group-body"><div class="grid grid-cols-2 gap-3" id="ft-trust-row"></div></div>`));
 
   document.getElementById("ft-social-row").innerHTML = SOCIALS.map(s => `
     <button type="button" class="ft-icon-btn" aria-label="${s.label} (coming soon)" data-ft-soon="${s.label}">

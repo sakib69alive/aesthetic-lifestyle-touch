@@ -32,6 +32,9 @@ function initMobileNav(){
     `).join("");
 
     const loggedIn = typeof Auth !== "undefined" && Auth.isLoggedIn();
+    /* product.html has no bottom bar, and on phones its header drops the
+       search icon (see mobile.css) — so the menu carries Search there. */
+    const menuSearch = hasProductMobileBar && window.matchMedia("(max-width: 767px)").matches;
     const wrap = document.createElement("div");
     wrap.innerHTML = `
       <div id="mnav-overlay" role="dialog" aria-modal="true" aria-label="Menu">
@@ -42,6 +45,7 @@ function initMobileNav(){
         <nav class="mnav-links" aria-label="Main">${linksHTML}</nav>
         <div class="mnav-divider" aria-hidden="true"></div>
         <div class="mnav-quick">
+          ${menuSearch ? `<button type="button" class="mnav-quick-link" data-mnav-search>Search</button>` : ""}
           <a href="account.html" class="mnav-quick-link">${loggedIn ? "My Account" : "Sign In / Register"}</a>
           <a href="wishlist.html" class="mnav-quick-link">Wishlist</a>
           <a href="dashboard.html" class="mnav-quick-link">${loggedIn ? "My Orders" : "Track Order"}</a>
@@ -55,6 +59,8 @@ function initMobileNav(){
       </div>
     `;
     document.body.appendChild(wrap);
+    const menuSearchBtn = wrap.querySelector("[data-mnav-search]");
+    if (menuSearchBtn) menuSearchBtn.addEventListener("click", () => { if (typeof Search !== "undefined") Search.open(); });
   }
 
   function openMenu(){

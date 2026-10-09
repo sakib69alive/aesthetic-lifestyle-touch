@@ -12,23 +12,25 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
 
 <script src="products-data.js"></script>
 <script src="site-content.js"></script>
 <script src="cart.js"></script>
 <script src="auth.js"></script>
 <script src="theme.js"></script>
-<script src="search.js"></script>
+<script src="search.js" defer></script>
 <link rel="stylesheet" href="cart.css">
 <link rel="stylesheet" href="search.css">
 <script src="loader.js"></script>
 <link rel="stylesheet" href="loader.css">
-<script src="footer.js"></script>
+<script src="footer.js" defer></script>
 <link rel="stylesheet" href="footer.css">
-<script src="mobile-nav.js"></script>
+<script src="mobile-nav.js" defer></script>
 <link rel="stylesheet" href="mobile-nav.css">
 <link rel="stylesheet" href="mobile.css">
+<script src="mobile-ui.js"></script>
 <script src="smooth-scroll.js" defer></script>
 
 <style>
@@ -87,6 +89,17 @@
     [data-enter], #lg-root{ transition:none !important; animation:none !important; }
     [data-enter]{ opacity:1 !important; transform:none !important; }
     #lg-root{ opacity:1 !important; transform:none !important; filter:none !important; }
+  }
+
+  /* ===== MOBILE (≤767px) ===== */
+  @media (max-width: 767px){
+    #lg-root > section:first-of-type{ padding: calc(var(--m-header-h) + 32px) var(--m-gutter) 12px; }
+    #lg-root h1{ font-size: var(--m-fs-h2); line-height: var(--m-lh-h2); letter-spacing: var(--m-ls-h2); }
+    #lg-root p.font-mono[class*="tracking-[0.22em]"]{ font-size: var(--m-fs-eyebrow); letter-spacing: var(--m-ls-eyebrow); }
+    #lg-root > section + section{ padding-bottom: calc(var(--m-section) + 16px); }
+    .lg-prose p, .lg-prose li{ font-size: var(--m-fs-body); line-height: 1.7; }
+    .lg-prose h2{ font-size: 1.25rem; margin-top: 2rem; scroll-margin-top: calc(var(--m-header-h) + 16px); }
+    .lg-note{ font-size: 14px; }
   }
 </style>
 <link rel="stylesheet" href="tailwind.css">

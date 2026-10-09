@@ -18,23 +18,25 @@
      ============================================================ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
 
 <script src="products-data.js"></script>
 <script src="site-content.js"></script>
 <script src="cart.js"></script>
 <script src="auth.js"></script>
 <script src="theme.js"></script>
-<script src="search.js"></script>
+<script src="search.js" defer></script>
 <link rel="stylesheet" href="cart.css">
 <link rel="stylesheet" href="search.css">
 <script src="loader.js"></script>
 <link rel="stylesheet" href="loader.css">
-<script src="footer.js"></script>
+<script src="footer.js" defer></script>
 <link rel="stylesheet" href="footer.css">
-<script src="mobile-nav.js"></script>
+<script src="mobile-nav.js" defer></script>
 <link rel="stylesheet" href="mobile-nav.css">
 <link rel="stylesheet" href="mobile.css">
+<script src="mobile-ui.js"></script>
 <script src="smooth-scroll.js" defer></script>
 
 <style>
@@ -343,6 +345,77 @@
 
   .no-scrollbar::-webkit-scrollbar{ display:none; }
   .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
+
+  /* ===== MOBILE (≤767px) ===== */
+  @media (max-width: 767px){
+
+    /* ---- hero: one quiet, full-screen typographic moment. No photo, no product —
+       the only way in is the Shop Now pill, which hands over to the store. ---- */
+    #home{
+      height: 100vh; min-height: 560px;
+      flex-direction: column; align-items: stretch; justify-content: flex-start;
+      background:
+        radial-gradient(120% 55% at 50% 0%, color-mix(in srgb, var(--alt-beige) 30%, transparent), transparent 70%),
+        var(--alt-white);
+    }
+    @supports (height: 100svh){ #home{ height: 100svh; } }
+    #home .ambient-light{ display: none; }
+
+    /* hairline gallery frame + a huge outlined monogram behind the type */
+    #home::after{
+      content: ""; position: absolute; z-index: 0; pointer-events: none;
+      inset: calc(var(--m-header-h) + 10px) 14px 14px 14px;
+      border: 1px solid var(--alt-border); border-radius: 30px;
+    }
+    #home::before{
+      content: "ALT"; position: absolute; z-index: 0; pointer-events: none;
+      right: -4vw; bottom: calc(var(--m-bottom-safe) + 9vh);
+      font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 52vw; line-height: .8; letter-spacing: -0.04em;
+      color: transparent; -webkit-text-stroke: 1px var(--alt-border);
+    }
+
+    #home > div.relative.z-10{
+      flex: 1; display: flex; flex-direction: column; align-items: stretch; min-height: 0;
+      padding: calc(var(--m-header-h) + 40px) calc(var(--m-gutter) + 14px) calc(var(--m-bottom-safe) - 4px);
+    }
+    /* the text column dissolves so eyebrow / headline / copy+CTA can be spread top, middle, bottom */
+    #home > div.relative.z-10 > div:first-child{ display: contents; }
+
+    #home .font-mono.uppercase{
+      font-size: var(--m-fs-eyebrow); letter-spacing: var(--m-ls-eyebrow); margin: 0;
+    }
+    #home .font-mono.uppercase::before{
+      content: ""; display: inline-block; width: 26px; height: 1px; background: currentColor;
+      vertical-align: middle; margin-right: 12px; opacity: .6;
+    }
+    #headline{
+      margin: auto 0;
+      font-size: clamp(2.6rem, 13.2vw, 3.6rem); line-height: 1; letter-spacing: -0.035em;
+    }
+    #headline .word:last-child{ color: transparent; -webkit-text-stroke: 1.2px var(--alt-black); }   /* the closing word is outlined */
+    #hero-subtext{
+      margin: 0 0 24px; max-width: 28ch;
+      font-size: var(--m-fs-body); line-height: var(--m-lh-body);
+    }
+    #home div:has(> #shop-now){ margin-top: 0; flex-direction: column; align-items: stretch; gap: 2px; }
+    #shop-now{
+      width: 100%; height: 60px; padding: 0 10px 0 28px; font-size: 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    #shop-now::after{                  /* arrow disc (replaces the desktop glow) */
+      content: "\2192"; position: static; inset: auto; opacity: 1; filter: none; z-index: auto;
+      width: 42px; height: 42px; border-radius: 50%; background: var(--alt-white); color: var(--alt-black);
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+    #home a[href="collections.html"]{
+      align-self: center; display: inline-flex; align-items: center; min-height: 44px; padding: 0;
+      border-bottom: 0; text-decoration: underline; text-underline-offset: 6px; font-size: 14px; color: var(--alt-muted);
+    }
+
+    /* entrance: 600ms fade-up, shorter travel */
+    [data-enter]{ transform: translateY(16px); transition-duration: 0.6s; }
+    [data-enter].in{ transform: translateY(0); }
+  }
 </style>
 <link rel="stylesheet" href="tailwind.css">
 </head>
@@ -458,7 +531,7 @@
         <button id="shop-now" class="btn-primary font-display bg-[var(--alt-black)] text-[var(--alt-white)] text-sm md:text-base font-medium tracking-wide px-9 py-4 md:px-10 md:py-[18px] rounded-full">
           <span id="hero-cta-label">Shop Now</span>
         </button>
-        <a href="#collections" class="text-sm font-medium border-b border-[var(--alt-black)] pb-0.5 hover:opacity-60 transition-opacity">
+        <a href="collections.html" class="text-sm font-medium border-b border-[var(--alt-black)] pb-0.5 hover:opacity-60 transition-opacity">
           View Collections
         </a>
       </div>
@@ -480,95 +553,6 @@
 </section>
 </main>
 
-<!-- ================================================================
-     COLLECTIONS — bridges Home to the Store, one tile per world
-     Scroll-triggered reveal (data-reveal), same visual language as hero
-     ================================================================ -->
-<section id="collections" class="relative w-full px-6 md:px-10 py-24 md:py-32">
-  <div class="max-w-7xl mx-auto">
-
-    <div class="max-w-2xl">
-      <p data-reveal class="font-mono text-xs tracking-[0.22em] text-[var(--alt-muted)] uppercase mb-6">
-        Shop by Collection
-      </p>
-      <h2 data-reveal class="font-display text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight leading-[1.1]" style="transition-delay: 0.08s;">
-        Every category, held to the same standard.
-      </h2>
-      <p data-reveal class="mt-5 text-base md:text-lg text-[var(--alt-muted)] leading-relaxed max-w-md" style="transition-delay: 0.16s;">
-        From the desk to the door — each collection is edited down
-        to the pieces we'd actually keep.
-      </p>
-    </div>
-
-    <div class="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
-
-      <a href="store.html?category=desk-setup" data-reveal class="collection-card group" style="transition-delay: 0.05s;">
-        <img src="https://images.unsplash.com/photo-1518106797856-4d7c3e0f1e9a?w=640&q=72&auto=format&fit=crop"
-             alt="Desk setup collection — organizers, trays and lighting"
-             loading="lazy" decoding="async"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-        <div class="fallback" style="display:none;">Desk &amp; Work</div>
-        <span class="card-index font-mono text-[11px] tracking-[0.15em]">01</span>
-        <div class="card-overlay"></div>
-        <div class="card-foot">
-          <span class="font-display text-lg md:text-xl font-medium tracking-tight">Desk &amp; Work</span>
-          <span class="card-arrow" aria-hidden="true">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17L17 7M9 7h8v8"/></svg>
-          </span>
-        </div>
-      </a>
-
-      <a href="store.html?category=room-decor" data-reveal class="collection-card group" style="transition-delay: 0.11s;">
-        <img src="https://images.unsplash.com/photo-1602874801007-bd458bb1b8b6?w=640&q=72&auto=format&fit=crop"
-             alt="Room decor collection — vases, candles and ceramics"
-             loading="lazy" decoding="async"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-        <div class="fallback" style="display:none;">Room &amp; Decor</div>
-        <span class="card-index font-mono text-[11px] tracking-[0.15em]">02</span>
-        <div class="card-overlay"></div>
-        <div class="card-foot">
-          <span class="font-display text-lg md:text-xl font-medium tracking-tight">Room &amp; Decor</span>
-          <span class="card-arrow" aria-hidden="true">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17L17 7M9 7h8v8"/></svg>
-          </span>
-        </div>
-      </a>
-
-      <a href="store.html?category=gadgets" data-reveal class="collection-card group" style="transition-delay: 0.17s;">
-        <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=640&q=72&auto=format&fit=crop"
-             alt="Tech and gadgets collection"
-             loading="lazy" decoding="async"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-        <div class="fallback" style="display:none;">Tech &amp; Gadgets</div>
-        <span class="card-index font-mono text-[11px] tracking-[0.15em]">03</span>
-        <div class="card-overlay"></div>
-        <div class="card-foot">
-          <span class="font-display text-lg md:text-xl font-medium tracking-tight">Tech &amp; Gadgets</span>
-          <span class="card-arrow" aria-hidden="true">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17L17 7M9 7h8v8"/></svg>
-          </span>
-        </div>
-      </a>
-
-      <a href="store.html?category=accessories" data-reveal class="collection-card group" style="transition-delay: 0.23s;">
-        <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=640&q=72&auto=format&fit=crop"
-             alt="Everyday carry and accessories collection"
-             loading="lazy" decoding="async"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-        <div class="fallback" style="display:none;">Accessories</div>
-        <span class="card-index font-mono text-[11px] tracking-[0.15em]">04</span>
-        <div class="card-overlay"></div>
-        <div class="card-foot">
-          <span class="font-display text-lg md:text-xl font-medium tracking-tight">Accessories</span>
-          <span class="card-arrow" aria-hidden="true">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17L17 7M9 7h8v8"/></svg>
-          </span>
-        </div>
-      </a>
-
-    </div>
-  </div>
-</section>
 
 <!-- ================================================================
      CINEMATIC TRANSITION CURTAIN
@@ -596,6 +580,28 @@
     if (wc.heroSubtext) document.getElementById('hero-subtext').textContent = wc.heroSubtext;
     if (wc.heroCtaLabel) document.getElementById('hero-cta-label').textContent = wc.heroCtaLabel;
   }
+
+  // ============================================================
+  // 0-m. MOBILE: show only the first sentence of the hero subtext
+  //     (the full CMS text stays in the DOM data attribute and is
+  //     restored if the viewport grows past the mobile breakpoint)
+  // ============================================================
+  (function(){
+    const sub = document.getElementById('hero-subtext');
+    if (!sub) return;
+    const full = sub.textContent.replace(/\s+/g, ' ').trim();
+    sub.dataset.full = full;
+    const first = full.split(/\s[—–]\s/)[0].replace(/[,;:]+$/, '');
+    // own matchMedia: this inline script runs before the deferred mobile-ui.js
+    const isMobile = window.matchMedia('(max-width: 767px)');
+    function apply(){
+      sub.textContent = (isMobile.matches && first.length > 30 && first !== full)
+        ? first + (/[.!?]$/.test(first) ? '' : '.')
+        : full;
+    }
+    apply();
+    isMobile.addEventListener('change', apply);
+  })();
 
   // ============================================================
   // 0a. HERO FEATURED PRODUCTS — which 3 float in the hero composition

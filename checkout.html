@@ -12,7 +12,8 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
 
 <script src="products-data.js"></script>
 <script src="auth.js"></script>
@@ -27,6 +28,7 @@
 <script src="loader.js"></script>
 <link rel="stylesheet" href="loader.css">
 <link rel="stylesheet" href="mobile.css">
+<script src="mobile-ui.js"></script>
 <script src="smooth-scroll.js" defer></script>
 
 <style>
@@ -288,6 +290,90 @@
     [data-enter]{ opacity:1 !important; transform:none !important; }
     #checkout-root{ opacity:1 !important; transform:none !important; filter:none !important; }
   }
+
+  /* ===== MOBILE (≤767px) ===== */
+  .m-summary-toggle{ display: none; }
+  @media (max-width: 767px){
+
+    /* header 56px; stepper sticky right under it */
+    header.nav-glass > div{ height: var(--m-header-h); padding-inline: var(--m-gutter); }
+    header a[href="Home.html"]{ display: inline-block; padding-block: 14px; margin-block: -14px; }
+    .theme-toggle-icon-btn{ width: 44px; height: 44px; }
+    #checkout-root{ padding-top: var(--m-header-h); }
+    #stepper{ top: var(--m-header-h); background: var(--alt-white); -webkit-backdrop-filter: none; backdrop-filter: none; }
+    #stepper > div{ padding: 12px var(--m-gutter); overflow: visible; }
+    #stepper .step-track{ min-width: 0; }
+    /* compact: 3 dots + the current step's name (cart ✓ and "complete" dots are hidden) */
+    #stepper .step-item[data-step-id="cart"], #stepper .step-item[data-step-id="cart"] + .step-line,
+    #stepper .step-item[data-step-id="complete"], #stepper .step-line:has(+ .step-item[data-step-id="complete"]){ display: none; }
+    #stepper .step-label{ display: none; }
+    #stepper .step-item.active .step-label{ display: inline; font-size: 12px; margin-left: 2px; }
+    #stepper .step-line{ margin: 0 8px; }
+
+    /* layout: summary bar on top, forms single column */
+    #checkout-layout{ padding: 16px var(--m-gutter) 120px; gap: 16px; }
+    .ck-summary-col{ order: -1; }
+    .m-summary-toggle{
+      display: flex; align-items: center; gap: 8px; width: 100%; min-height: 52px; padding: 0 16px;
+      border-radius: 16px; background: var(--alt-surface); font-size: 14px; font-weight: 500;
+    }
+    .m-summary-toggle .m-summary-chev{ transition: transform .3s var(--m-ease); }
+    .ck-summary-col.m-open .m-summary-chev{ transform: rotate(180deg); }
+    .m-summary-total{ margin-left: auto; font-size: 15px; }
+    #ck-summary-card{ display: none; margin-top: 12px; }
+    .ck-summary-col.m-open #ck-summary-card{ display: block; }
+    #ck-summary-card > div{ border-radius: var(--m-radius-card); padding: 20px; }
+
+    .step-panel h2{ font-size: var(--m-fs-h2); line-height: var(--m-lh-h2); letter-spacing: var(--m-ls-h2); }
+    .step-panel h2.text-lg{ font-size: 1.125rem; }
+    .field-label{ font-size: 13px; }
+    .field-input{ height: 52px; padding: 0 16px; font-size: var(--m-fs-input); border-radius: 14px; }
+    textarea.field-input{ height: auto; padding: 14px 16px; }
+    select.field-input{ padding-right: 40px; }
+    .field-check{ min-height: 44px; font-size: 14px; }
+    .field-check input{ width: 22px; height: 22px; }
+    #wallet-fields .max-w-xs{ max-width: none; }
+    #checkout-coupon-apply{ min-height: 52px; }
+    .edit-link{ display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; font-size: 13px; }
+
+    /* < 400px: every field full width, except the short Apartment + Postal pair */
+  }
+  @media (max-width: 399px){
+    #checkout-layout .grid.grid-cols-2 > div:not(:has(#sf-apartment)):not(:has(#sf-postal)){ grid-column: 1 / -1; }
+  }
+  @media (max-width: 767px){
+    /* delivery + payment options: full-width 64px rows, radio on the right */
+    #delivery-cards, #payment-cards{ grid-template-columns: 1fr; gap: 10px; }
+    .select-card{ min-height: 64px; display: flex; align-items: center; gap: 12px; text-align: left; border-radius: var(--m-radius-card); }
+    .select-card:hover{ transform: none; box-shadow: none; }
+    #delivery-cards .select-radio{ order: 3; width: 22px; height: 22px; }
+    #delivery-cards .select-card > span.flex-1 > span:first-child{ font-size: 15px; }
+    #delivery-cards .select-card > span.flex-1 > span:last-child{ font-size: 12px; }
+    #payment-cards .select-card{ flex-direction: row; }
+    #payment-cards .select-card span.text-xs{ font-size: 15px; text-align: left; }
+    #payment-cards .select-card::after{
+      content: ""; margin-left: auto; flex: none; width: 22px; height: 22px; border-radius: 50%;
+      border: 1.5px solid var(--alt-border); transition: border-color .25s ease, background-color .25s ease, box-shadow .25s ease;
+    }
+    #payment-cards .select-card.selected::after{ border-color: var(--alt-black); background: var(--alt-black); box-shadow: inset 0 0 0 4px var(--alt-surface); }
+
+    /* one primary CTA per screen: the sticky bar owns it, inline copies are hidden
+       (the bar clicks them programmatically, which still works while hidden) */
+    #shipping-continue-btn, #payment-continue-btn, #place-order-btn{ display: none; }
+    #payment-back-btn{ height: 52px; padding: 0; }
+    #checkout-mobile-bar{
+      padding: 12px var(--m-gutter) calc(12px + var(--sab)); gap: 14px;
+      background: var(--alt-white); -webkit-backdrop-filter: none; backdrop-filter: none;
+    }
+    #mobile-total{ font-size: 1.0625rem; font-weight: 500; }
+    #mobile-cta{ max-width: none; height: 52px; padding: 0 16px; font-size: 15px; }
+
+    /* success / failure states */
+    #checkout-complete{ padding: 40px var(--m-gutter) 60px; min-height: 0; }
+    #view-success button, #view-failure button, #view-failure a{ min-height: 52px; }
+    #share-order-btn{ min-height: 44px; padding: 0 12px; }
+    #order-number{ font-size: 1rem; letter-spacing: .04em; }
+  }
 </style>
 <link rel="stylesheet" href="tailwind.css">
 </head>
@@ -544,8 +630,14 @@
     </div>
 
     <!-- RIGHT: sticky order summary -->
-    <div class="lg:col-span-5">
-      <div class="lg:sticky lg:top-32" data-enter style="transition-delay:0.1s;">
+    <div class="lg:col-span-5 ck-summary-col">
+      <!-- phones: "Show order summary ▾ ৳X" bar; the card below is collapsed until it is tapped -->
+      <button type="button" id="m-summary-toggle" class="m-summary-toggle" aria-expanded="false" aria-controls="ck-summary-card">
+        <span class="m-summary-label">Show order summary</span>
+        <svg class="m-summary-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        <span id="m-summary-total" class="m-summary-total font-mono"></span>
+      </button>
+      <div id="ck-summary-card" class="lg:sticky lg:top-32" data-enter style="transition-delay:0.1s;">
         <div class="border border-[var(--alt-border)] rounded-[22px] p-6">
           <h3 class="font-display text-lg font-medium mb-5">Order Summary</h3>
           <div id="summary-items" class="space-y-4 max-h-64 overflow-y-auto no-scrollbar"></div>
@@ -1070,6 +1162,7 @@ function renderSummary(){
   document.getElementById("summary-total").textContent = bdt(total);
   document.getElementById("summary-delivery-estimate").textContent = `Estimated delivery: ${delivery.eta}`;
   document.getElementById("mobile-total").textContent = bdt(total);
+  document.getElementById("m-summary-total").textContent = bdt(total);
 
   renderRewardsRedeemToggle();
   if (checkoutState.step === "review") renderReview();
@@ -1116,6 +1209,30 @@ document.getElementById("checkout-coupon-apply").addEventListener("click", () =>
 document.getElementById("checkout-coupon-input").addEventListener("keydown", (e) => {
   if (e.key === "Enter") applyCheckoutCoupon(e.target.value);
 });
+
+/* phones: collapsible order summary */
+document.getElementById("m-summary-toggle").addEventListener("click", (e) => {
+  const col = document.querySelector(".ck-summary-col");
+  const open = col.classList.toggle("m-open");
+  e.currentTarget.setAttribute("aria-expanded", String(open));
+  e.currentTarget.querySelector(".m-summary-label").textContent = open ? "Hide order summary" : "Show order summary";
+});
+
+/* keyboard / autofill hints for phones (harmless on desktop) */
+(function(){
+  const set = (id, attrs) => { const el = document.getElementById(id); if (el) Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v)); };
+  set("cf-phone", { inputmode: "tel", enterkeyhint: "next" });
+  set("cf-email", { inputmode: "email", enterkeyhint: "next" });
+  set("cf-first", { enterkeyhint: "next" }); set("cf-last", { enterkeyhint: "next" });
+  set("sf-division", { autocomplete: "address-level1" });
+  set("sf-district", { autocomplete: "address-level2" });
+  set("sf-upazila", { enterkeyhint: "next" }); set("sf-area", { enterkeyhint: "next" });
+  set("sf-street", { enterkeyhint: "next" }); set("sf-apartment", { enterkeyhint: "next" });
+  set("sf-postal", { autocomplete: "postal-code", inputmode: "numeric", enterkeyhint: "done" });
+  set("wallet-number", { inputmode: "tel", enterkeyhint: "next" });
+  set("wallet-txn", { autocapitalize: "characters", enterkeyhint: "done" });
+  set("checkout-coupon-input", { autocapitalize: "characters", enterkeyhint: "done" });
+})();
 
 /* Contextual CTA buttons (summary + mobile bar mirror the left column's own button) */
 document.getElementById("summary-cta").addEventListener("click", () => {

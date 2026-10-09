@@ -12,23 +12,25 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
 
 <script src="products-data.js"></script>
 <script src="site-content.js"></script>
 <script src="cart.js"></script>
 <script src="auth.js"></script>
 <script src="theme.js"></script>
-<script src="search.js"></script>
+<script src="search.js" defer></script>
 <link rel="stylesheet" href="cart.css">
 <link rel="stylesheet" href="search.css">
 <script src="loader.js"></script>
 <link rel="stylesheet" href="loader.css">
-<script src="footer.js"></script>
+<script src="footer.js" defer></script>
 <link rel="stylesheet" href="footer.css">
-<script src="mobile-nav.js"></script>
+<script src="mobile-nav.js" defer></script>
 <link rel="stylesheet" href="mobile-nav.css">
 <link rel="stylesheet" href="mobile.css">
+<script src="mobile-ui.js"></script>
 <script src="smooth-scroll.js" defer></script>
 
 <style>
@@ -123,6 +125,45 @@
     [data-enter], [data-reveal]{ opacity:1 !important; transform:none !important; }
     #ab-root{ opacity:1 !important; transform:none !important; filter:none !important; }
   }
+
+  /* ===== MOBILE (≤767px) ===== */
+  @media (max-width: 767px){
+    /* hero ~70svh, no scroll cue */
+    body > #ab-root > section:first-of-type, #ab-root > section:first-of-type{ height: auto; min-height: 64svh; padding: calc(var(--m-header-h) + 24px) var(--m-gutter) 40px; }
+    #ab-root > section:first-of-type > div[data-enter]{ display: none; }
+    #ab-root h1{ font-size: var(--m-fs-hero); line-height: var(--m-lh-hero); letter-spacing: var(--m-ls-hero); }
+    #ab-root p.font-mono[class*="tracking-[0.22em]"]{ font-size: var(--m-fs-eyebrow); letter-spacing: var(--m-ls-eyebrow); margin-bottom: 12px; }
+    #ab-root h1 + p{ margin-top: 16px; font-size: var(--m-fs-body); line-height: var(--m-lh-body); }
+    #ab-root h2{ font-size: 1.5rem; line-height: 1.2; letter-spacing: var(--m-ls-h2); }
+    #ab-root h2.mb-14, #ab-root h2.mb-16{ margin-bottom: 24px; }
+    #ab-root h2.mb-12{ margin-bottom: 20px; }
+
+    /* card lists → horizontal snap rails */
+    #ab-root .ab-rail{
+      display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+      margin-inline: calc(-1 * var(--m-gutter)); padding: 0 var(--m-gutter) 4px; scroll-padding-inline: var(--m-gutter);
+    }
+    #ab-root .ab-rail::-webkit-scrollbar{ display: none; }
+    #ab-root .ab-rail > *{ flex: 0 0 76%; scroll-snap-align: start; }
+    #ab-root .ab-rail-plain > *{ border: 1px solid var(--alt-border); border-radius: var(--m-radius-card); padding: 20px; }
+    .ab-card, .ab-quote-card{ padding: 20px; border-radius: var(--m-radius-card); }
+    .ab-card:hover{ transform: none; box-shadow: none; }
+    #ab-root .ab-quote-card{ flex-basis: 86%; }
+
+    /* "Behind the brand": 16:10 image, tighter stack */
+    #ab-root .ab-img{ aspect-ratio: 16 / 9; border-radius: var(--m-radius-card); }
+    #ab-root section .grid.mb-20{ margin-bottom: 28px; gap: 16px; }
+    #ab-root .space-y-6 > * + *{ margin-top: 16px; }
+    #ab-root section .grid.mb-20 + .grid, #ab-root section .grid.mb-20{ align-items: start; }
+    #ab-root h3.text-xl{ font-size: 1.25rem; margin-bottom: 8px; }
+    .ab-pullquote{ padding-left: 1rem; font-size: 1.125rem; }
+
+    /* FAQ + final CTA */
+    .faq-q{ min-height: 56px; padding: 0; }
+    #ab-root section:last-of-type .flex.flex-col{ align-items: stretch; gap: 4px; }
+    #ab-root section:last-of-type a.btn-primary{ display: flex; align-items: center; justify-content: center; height: 52px; padding: 0; }
+    #ab-root section:last-of-type a:not(.btn-primary){ display: inline-flex; align-self: center; align-items: center; min-height: 44px; border-bottom: 0; text-decoration: underline; text-underline-offset: 5px; }
+  }
 </style>
 <link rel="stylesheet" href="tailwind.css">
 </head>
@@ -207,7 +248,7 @@
   <section class="px-6 md:px-10 py-20 md:py-28 max-w-4xl mx-auto">
     <p class="font-mono text-xs tracking-[0.22em] text-[var(--alt-muted)] uppercase mb-4" data-reveal>Brand Philosophy</p>
     <h2 class="font-display text-2xl md:text-4xl font-medium tracking-tight max-w-lg mb-14" data-reveal style="transition-delay:0.06s;">Four ideas we don't compromise on.</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12">
+    <div class="ab-rail ab-rail-plain grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12">
       <div data-reveal>
         <p class="font-mono text-xs text-[var(--alt-muted)] mb-2">01</p>
         <h3 class="font-display text-lg font-medium mb-2">Design should improve everyday life.</h3>
@@ -255,7 +296,7 @@
   <section class="px-6 md:px-10 py-20 md:py-28 max-w-6xl mx-auto">
     <p class="font-mono text-xs tracking-[0.22em] text-[var(--alt-muted)] uppercase mb-4" data-reveal>Our Mission</p>
     <h2 class="font-display text-2xl md:text-4xl font-medium tracking-tight max-w-lg mb-14" data-reveal style="transition-delay:0.06s;">What we're actually trying to do.</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="ab-rail ab-rail-plain grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <div data-reveal>
         <p class="font-display text-2xl mb-3">01</p>
         <h3 class="font-display text-base font-medium mb-2">Curate meaningful products</h3>
@@ -300,7 +341,7 @@
   <section class="px-6 md:px-10 py-20 md:py-28 max-w-6xl mx-auto">
     <p class="font-mono text-xs tracking-[0.22em] text-[var(--alt-muted)] uppercase mb-4" data-reveal>Our Values</p>
     <h2 class="font-display text-2xl md:text-4xl font-medium tracking-tight max-w-lg mb-14" data-reveal style="transition-delay:0.06s;">What we hold ourselves to.</h2>
-    <div id="ab-values-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+    <div id="ab-values-grid" class="ab-rail grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
   </section>
 
   <!-- ============================================================
@@ -310,7 +351,7 @@
     <div class="max-w-6xl mx-auto">
       <p class="font-mono text-xs tracking-[0.22em] text-[var(--alt-muted)] uppercase mb-4" data-reveal>Why Choose Us</p>
       <h2 class="font-display text-2xl md:text-4xl font-medium tracking-tight max-w-lg mb-14" data-reveal style="transition-delay:0.06s;">Small differences that add up.</h2>
-      <div id="ab-why-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-10"></div>
+      <div id="ab-why-grid" class="ab-rail ab-rail-plain grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-10"></div>
     </div>
   </section>
 
@@ -380,7 +421,7 @@
     <h2 class="font-display text-2xl md:text-4xl font-medium tracking-tight max-w-lg mb-4" data-reveal style="transition-delay:0.06s;">We're early — here's the tone we're aiming for.</h2>
     <p class="text-sm text-[var(--alt-muted)] mb-12 max-w-lg" data-reveal style="transition-delay:0.1s;">Illustrative quotes, shown here to set expectations — replace with real customer voices as they come in.</p>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-16">
+    <div class="ab-rail grid grid-cols-1 md:grid-cols-3 gap-5 mb-16">
       <div class="ab-quote-card" data-reveal>
         <p class="text-sm leading-relaxed mb-4">"Feels a lot more considered than the price tag suggests. Genuinely impressed with the finish on the desk lamp."</p>
         <p class="font-mono text-xs text-[var(--alt-muted)]">— Sample voice, Desk Setup</p>
@@ -421,7 +462,7 @@
         <span class="ab-soon">Future Ready</span>
       </div>
       <h2 class="font-display text-2xl md:text-4xl font-medium tracking-tight max-w-lg mb-14" data-reveal style="transition-delay:0.06s;">Where we're headed next.</h2>
-      <div id="ab-sustain-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+      <div id="ab-sustain-grid" class="ab-rail grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
     </div>
   </section>
 

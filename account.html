@@ -12,13 +12,16 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
 
 <script src="auth.js"></script>
+<script src="admin-auth.js"></script>
 <script src="theme.js"></script>
 <script src="loader.js"></script>
 <link rel="stylesheet" href="loader.css">
 <link rel="stylesheet" href="mobile.css">
+<script src="mobile-ui.js"></script>
 <script src="smooth-scroll.js" defer></script>
 
 <style>
@@ -168,6 +171,38 @@
     [data-enter]{ opacity:1 !important; transform:none !important; }
     #auth-root{ opacity:1 !important; transform:none !important; }
   }
+
+  /* ===== MOBILE (≤767px) ===== */
+  .social-label{ display: none; }
+  @media (max-width: 767px){
+    body > header{ padding: 8px var(--m-gutter); }
+    header a[href="Home.html"]{ display: inline-block; padding-block: 14px; margin-block: -14px; }
+    .theme-toggle-icon-btn{ width: 44px; height: 44px; }
+    #auth-root{ min-height: 0; align-items: flex-start; padding: 8px var(--m-gutter) 40px; }
+    #auth-root > div > div.border{ padding: 24px 20px; border-radius: var(--m-radius-card); }
+
+    .auth-tab{ padding: 14px 0; font-size: 15px; }
+    #auth-root h1{ font-size: var(--m-fs-h2); line-height: var(--m-lh-h2); letter-spacing: var(--m-ls-h2); }
+
+    /* inputs: 56px, 16px text, floating labels never below 11px */
+    .float-field input{ height: 56px; padding: 22px 16px 6px; font-size: var(--m-fs-input); border-radius: 14px; }
+    .float-field label{ top: 18px; font-size: 15px; }
+    .float-field input:focus + label,
+    .float-field input:not(:placeholder-shown) + label{ top: 8px; font-size: 11px; }
+    .pw-toggle{ padding: 14px; margin: -14px; }
+    .field-check{ min-height: 44px; align-items: center; font-size: 14px; }
+    .field-check input{ width: 22px; height: 22px; margin-top: 0; }
+    #show-forgot{ min-height: 44px; padding: 0 2px; display: inline-flex; align-items: center; }
+    #signin-submit, #signup-submit, #forgot-submit, #reset-submit, #verify-continue{ height: 52px; padding: 0; font-size: 15px; }
+    #auth-root a.underline{ display: inline-block; padding: 12px 2px; margin: -12px 0; }
+
+    /* social sign-in: full-width outline pills with icon + label */
+    #auth-root .grid.grid-cols-3{ grid-template-columns: 1fr; gap: 10px; }
+    .social-btn{ height: 52px; padding: 0 20px; font-size: 15px; justify-content: center; }
+    .social-label{ display: inline; }
+    #show-guest-1, #show-guest-2, #forgot-back, #resend-verify, #forgot-continue{ min-height: 44px; }
+    #show-guest-1, #show-guest-2{ display: block; }
+  }
 </style>
 <link rel="stylesheet" href="tailwind.css">
 </head>
@@ -247,12 +282,15 @@
         <div class="grid grid-cols-3 gap-3">
           <button class="social-btn" data-provider="Google" aria-label="Continue with Google">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
+            <span class="social-label">Continue with Google</span>
           </button>
           <button class="social-btn" data-provider="Apple" aria-label="Continue with Apple">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l8 3v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V6l8-3z"/></svg>
+            <span class="social-label">Continue with Apple</span>
           </button>
           <button class="social-btn" data-provider="Facebook" aria-label="Continue with Facebook">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M14 9h-2a1 1 0 0 0-1 1v2h3M11 12v6"/></svg>
+            <span class="social-label">Continue with Facebook</span>
           </button>
         </div>
 
@@ -492,6 +530,17 @@ async function doSignin(){
   document.getElementById("signin-label").innerHTML = `<span class="spinner"></span> Signing in…`;
 
   const remember = document.getElementById("si-remember").checked;
+
+  // the owner's email signs straight into the admin panel
+  const owner = await AdminAuth.loginOwner(identifier, password);
+  if (owner.handled){
+    btn.disabled = false;
+    document.getElementById("signin-label").textContent = "Sign In";
+    if (!owner.ok){ showFormError("signin-error", owner.error); return; }
+    window.location.href = "admin.html";
+    return;
+  }
+
   const result = await Auth.login({ identifier, password, rememberMe: remember });
 
   btn.disabled = false;
