@@ -146,6 +146,25 @@
     };
   }
 
+  /* ---------------- legal pages: "On this page" TOC (Phase 8) ----------------
+     Terms / Privacy: give each h2 an id and build a collapsible TOC above the
+     text. Hidden on desktop by mobile.css, so nothing visible changes there. */
+  function buildLegalToc() {
+    const prose = document.querySelector(".lg-prose");
+    if (!prose || document.querySelector(".lg-toc")) return;
+    const heads = Array.from(prose.querySelectorAll("h2"));
+    if (heads.length < 3) return;
+    heads.forEach((h, i) => { if (!h.id) h.id = "sec-" + (i + 1); });
+    const toc = document.createElement("details");
+    toc.className = "lg-toc";
+    toc.innerHTML = "<summary>On this page<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M6 9l6 6 6-6\"/></svg></summary><ol>" +
+      heads.map((h) => "<li><a href=\"#" + h.id + "\">" + h.textContent.replace(/^\d+\.\s*/, "") + "</a></li>").join("") + "</ol>";
+    prose.parentNode.insertBefore(toc, prose);
+    toc.addEventListener("click", (e) => { if (e.target.closest("a")) toc.open = false; });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", buildLegalToc);
+  else buildLegalToc();
+
   window.MobileUI = {
     isMobile: isMobile, mq: mq, flushReveals: flushReveals,
     openSheet: openSheet, createLoadMore: createLoadMore,

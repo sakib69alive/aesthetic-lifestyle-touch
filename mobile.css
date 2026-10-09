@@ -314,3 +314,22 @@ body{ overflow-x: hidden; max-width: 100vw; }
 @media (prefers-reduced-motion: reduce){
   .m-sheet, .m-sheet-backdrop, .m-loadmore-btn{ transition: none !important; }
 }
+
+/* ================================================================
+   LEGAL PAGES — "On this page" TOC (built by mobile-ui.js) — Phase 8
+   ================================================================ */
+.lg-toc{ display: none; }
+@media (max-width: 767px){
+  .lg-toc{ display: block; margin: 0 0 8px; border: 1px solid var(--alt-border); border-radius: var(--m-radius-card); background: var(--alt-surface); }
+  .lg-toc summary{
+    display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding: 0 18px;
+    list-style: none; cursor: pointer; font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 1rem;
+  }
+  .lg-toc summary::-webkit-details-marker{ display: none; }
+  .lg-toc summary svg{ color: var(--alt-muted); transition: transform .3s var(--m-ease); }
+  .lg-toc[open] summary svg{ transform: rotate(180deg); }
+  .lg-toc ol{ list-style: none; margin: 0; padding: 0 18px 8px; counter-reset: lg; }
+  .lg-toc li{ counter-increment: lg; border-top: 1px solid var(--alt-border); }
+  .lg-toc a{ display: flex; align-items: center; gap: 12px; min-height: 48px; font-size: 14.5px; color: var(--alt-black); }
+  .lg-toc a::before{ content: counter(lg, decimal-leading-zero); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--alt-muted); }
+}

@@ -130,6 +130,62 @@
     [data-enter], [data-reveal]{ opacity:1 !important; transform:none !important; }
     #ct-root{ opacity:1 !important; transform:none !important; filter:none !important; }
   }
+
+  /* ===== MOBILE (≤767px) ===== */
+  .ct-quick, .m-acc-sum{ display: none; }
+  .m-acc-sum::-webkit-details-marker{ display: none; }
+  @media (max-width: 767px){
+    #ct-root > section:first-of-type{ padding: calc(var(--m-header-h) + 32px) var(--m-gutter) 28px; }
+    #ct-root h1{ font-size: var(--m-fs-hero); line-height: var(--m-lh-hero); letter-spacing: var(--m-ls-hero); }
+    #ct-root p.font-mono[class*="tracking-[0.22em]"]{ font-size: var(--m-fs-eyebrow); letter-spacing: var(--m-ls-eyebrow); }
+    #ct-root h1 + p{ font-size: var(--m-fs-body); line-height: var(--m-lh-body); }
+    #ct-root h2{ font-size: 1.5rem; line-height: 1.2; letter-spacing: var(--m-ls-h2); }
+
+    /* quick actions: three 72px tiles */
+    .ct-quick{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 var(--m-gutter) 28px; }
+    .ct-quick-tile{
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+      min-height: 72px; border: 1px solid var(--alt-border); border-radius: var(--m-radius-card);
+      font-size: 13px; font-weight: 500; color: var(--alt-black); background: var(--alt-surface);
+    }
+    .ct-quick-tile:active{ transform: scale(.97); }
+
+    /* topic cards: snap rail */
+    #ct-support-cards{
+      display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+      margin-inline: calc(-1 * var(--m-gutter)); padding-inline: var(--m-gutter); scroll-padding-inline: var(--m-gutter);
+    }
+    #ct-support-cards::-webkit-scrollbar{ display: none; }
+    #ct-support-cards .ct-card{ flex: 0 0 74%; scroll-snap-align: start; padding: 20px; border-radius: var(--m-radius-card); }
+    #ct-root > section:nth-of-type(2){ padding-bottom: 24px; }
+
+    /* form: 56px inputs, 16px text, labels never below 11px */
+    .float-field input, .float-field textarea, .float-field select{ font-size: var(--m-fs-input); border-radius: 14px; }
+    .float-field input, .float-field select{ height: 56px; padding: 22px 16px 6px; }
+    .float-field select{ padding-right: 36px; }
+    .float-field label{ top: 18px; font-size: 15px; }
+    .float-field input:focus + label, .float-field input:not(:placeholder-shown) + label,
+    .float-field textarea:focus + label, .float-field textarea:not(:placeholder-shown) + label,
+    .float-field select + label{ top: 8px; font-size: 11px; }
+    #cf-submit{ height: 52px; padding: 0; font-size: 15px; }
+    #contact-form-section > div{ gap: 28px; }
+
+    /* hours & location accordion */
+    body:has(#mnav-overlay) #ct-root #contact-form-section{ padding-block: var(--m-section-tight); }
+    .m-acc-sum{
+      display: flex; align-items: center; justify-content: space-between; min-height: 56px; list-style: none; cursor: pointer;
+      border-top: 1px solid var(--alt-border); font-family: 'Space Grotesk', sans-serif; font-size: 1.0625rem; font-weight: 500;
+    }
+    .m-acc:not([open]) .m-acc-sum{ border-bottom: 1px solid var(--alt-border); }
+    .m-acc-chev{ color: var(--alt-muted); transition: transform .3s var(--m-ease); }
+    .m-acc[open] .m-acc-chev{ transform: rotate(180deg); }
+    .m-acc > h2{ display: none; }
+    .m-acc .ct-map-placeholder{ display: none; }
+    .m-acc[open]{ padding-bottom: 8px; }
+    .m-acc > .grid{ margin-top: 12px; }
+    .faq-q{ min-height: 56px; padding: 0; }
+    .faq-a-inner{ font-size: 14px; }
+  }
 </style>
 <link rel="stylesheet" href="tailwind.css">
 </head>
@@ -201,6 +257,9 @@
     </p>
   </section>
 
+  <!-- phones: Call · WhatsApp · Email quick actions (hidden on desktop) -->
+  <div id="ct-quick" class="ct-quick" aria-label="Quick contact"></div>
+
   <!-- ============================================================
        SUPPORT CARDS
        ============================================================ -->
@@ -268,6 +327,8 @@
 
       <!-- Business Info -->
       <div data-reveal style="transition-delay:0.1s;">
+       <details class="m-acc" open>
+        <summary class="m-acc-sum"><span>Hours &amp; location</span><svg class="m-acc-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
         <h2 class="font-display text-2xl md:text-3xl font-medium tracking-tight mb-8">Good to know.</h2>
         <div class="grid grid-cols-2 gap-6 mb-8">
           <div>
@@ -306,6 +367,7 @@
           </div>
           <span class="ct-soon">Coming Soon</span>
         </div>
+       </details>
       </div>
     </div>
   </section>
@@ -340,6 +402,24 @@ document.getElementById("ct-support-cards").innerHTML = SUPPORT_CARDS.map((c, i)
     <p class="text-sm text-[var(--alt-muted)] leading-relaxed">${c.desc}</p>
   </div>
 `).join("");
+/* phones: Call / WhatsApp / Email tiles, from the same CMS contact details the footer uses */
+(function(){
+  const wc = (typeof websiteContent === "function") ? websiteContent() : {};
+  const phone = String(wc.contactPhone || "01313667726").replace(/[^\d+]/g, "");
+  const email = wc.contactEmail || "aestheticlifestyletouch@gmail.com";
+  const intl = phone.startsWith("+") ? phone.slice(1) : (phone.startsWith("880") ? phone : "88" + phone);
+  const tiles = [
+    { label: "Call", href: "tel:" + phone, icon: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>' },
+    { label: "WhatsApp", href: "https://wa.me/" + intl, icon: '<path d="M4 20l1.3-4.2A8 8 0 1 1 8.4 18.8L4 20z"/><path d="M9 9.5c.5 2 2.5 4 5 5l1.2-1.2-1.8-1-1 .6a4 4 0 0 1-1.8-1.8l.6-1-1-1.8L9 9.5z"/>' },
+    { label: "Email", href: "mailto:" + email, icon: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>' },
+  ];
+  document.getElementById("ct-quick").innerHTML = tiles.map(t => `
+    <a class="ct-quick-tile" href="${t.href}" ${t.label === "WhatsApp" ? 'target="_blank" rel="noopener"' : ""}>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">${t.icon}</svg>
+      <span>${t.label}</span>
+    </a>`).join("");
+})();
+
 document.querySelectorAll("#ct-support-cards .ct-card").forEach(card => {
   card.addEventListener("click", () => {
     document.getElementById("cf-subject").value = card.dataset.subject;
@@ -438,6 +518,12 @@ const ctRevealObserver = new IntersectionObserver((entries, obs) => {
   entries.forEach(entry => { if (entry.isIntersecting){ entry.target.classList.add("in"); obs.unobserve(entry.target); } });
 }, { threshold: 0.01, rootMargin: "0px 0px -4% 0px" });
 document.querySelectorAll("[data-reveal]").forEach(el => ctRevealObserver.observe(el));
+
+(function(){
+  const mq = window.matchMedia("(max-width: 767px)");
+  const sync = () => document.querySelectorAll(".m-acc").forEach(d => { d.open = !mq.matches; });
+  sync(); mq.addEventListener("change", sync);
+})();
 
 window.addEventListener("load", () => {
   document.getElementById("ct-root").classList.add("settled");

@@ -89,6 +89,17 @@
     [data-enter]{ opacity:1 !important; transform:none !important; }
     #lg-root{ opacity:1 !important; transform:none !important; filter:none !important; }
   }
+
+  /* ===== MOBILE (≤767px) ===== */
+  @media (max-width: 767px){
+    #lg-root > section:first-of-type{ padding: calc(var(--m-header-h) + 32px) var(--m-gutter) 12px; }
+    #lg-root h1{ font-size: var(--m-fs-h2); line-height: var(--m-lh-h2); letter-spacing: var(--m-ls-h2); }
+    #lg-root p.font-mono[class*="tracking-[0.22em]"]{ font-size: var(--m-fs-eyebrow); letter-spacing: var(--m-ls-eyebrow); }
+    #lg-root > section + section{ padding-bottom: calc(var(--m-section) + 16px); }
+    .lg-prose p, .lg-prose li{ font-size: var(--m-fs-body); line-height: 1.7; }
+    .lg-prose h2{ font-size: 1.25rem; margin-top: 2rem; scroll-margin-top: calc(var(--m-header-h) + 16px); }
+    .lg-note{ font-size: 14px; }
+  }
 </style>
 <link rel="stylesheet" href="tailwind.css">
 </head>
