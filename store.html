@@ -15,21 +15,22 @@
      ============================================================ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
 
 <script src="products-data.js"></script>
 <script src="site-content.js"></script>
 <script src="cart.js"></script>
 <script src="auth.js"></script>
 <script src="theme.js"></script>
-<script src="search.js"></script>
+<script src="search.js" defer></script>
 <link rel="stylesheet" href="cart.css">
 <link rel="stylesheet" href="search.css">
 <script src="loader.js"></script>
 <link rel="stylesheet" href="loader.css">
-<script src="footer.js"></script>
+<script src="footer.js" defer></script>
 <link rel="stylesheet" href="footer.css">
-<script src="mobile-nav.js"></script>
+<script src="mobile-nav.js" defer></script>
 <link rel="stylesheet" href="mobile-nav.css">
 <link rel="stylesheet" href="mobile.css">
 <script src="mobile-ui.js"></script>
@@ -824,13 +825,13 @@ const emptyState = document.getElementById("empty-state");
    the matching template's markup is ever created. */
 const isMobileDevice = () => window.matchMedia("(max-width: 767px)").matches;
 
-function productCardHTMLMobile(p){
+function productCardHTMLMobile(p, i){
   const isWished = Wishlist.has(p.id);
   const soldOut = p.stock === 0;
   return `
     <article class="pm-card ${soldOut ? "opacity-70" : ""}" data-id="${p.id}">
       <div class="pm-stage">
-        <img src="${thumb(p.img, 560)}" alt="${p.name}" loading="lazy" decoding="async"
+        <img src="${thumb(p.img, 560)}" alt="${p.name}" ${i < 4 ? `loading="eager" fetchpriority="${i === 0 ? "high" : "auto"}"` : `loading="lazy"`} decoding="async"
              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
         <div class="fallback" style="display:none;">${p.name}</div>
         ${soldOut
@@ -843,7 +844,7 @@ function productCardHTMLMobile(p){
         </button>
       </div>
       <div class="pm-info">
-        <h3 class="pm-name">${p.name}</h3>
+        <h2 class="pm-name">${p.name}</h2>
         <p class="pm-rating"><span style="color:var(--alt-black)">${starString(p.rating)}</span> ${p.rating} (${p.reviews})</p>
         <div class="pm-bottom">
           <span class="pm-price">${bdt(p.price)}</span>
@@ -956,7 +957,7 @@ function showMoreProducts(){
   mobileShown += MOBILE_PAGE;
   const next = visible.slice(from, mobileShown);
   const before = grid.querySelectorAll(".pm-card").length;
-  grid.insertAdjacentHTML("beforeend", next.map(productCardHTMLMobile).join(""));
+  grid.insertAdjacentHTML("beforeend", next.map(p => productCardHTMLMobile(p, 99)).join(""));
   const added = Array.from(grid.querySelectorAll(".pm-card")).slice(before);
   added.forEach((card, i) => {
     card.style.opacity = 0;

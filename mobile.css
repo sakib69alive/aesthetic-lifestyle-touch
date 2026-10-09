@@ -333,3 +333,28 @@ body{ overflow-x: hidden; max-width: 100vw; }
   .lg-toc a{ display: flex; align-items: center; gap: 12px; min-height: 48px; font-size: 14.5px; color: var(--alt-black); }
   .lg-toc a::before{ content: counter(lg, decimal-leading-zero); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--alt-muted); }
 }
+
+/* ================================================================
+   PHASE 9 — PERFORMANCE (phones): no endless animation, no parallax, no
+   big live-blur layers, no idle will-change.
+   ================================================================ */
+@media (max-width: 767px){
+  .sl-glow{ animation: none; filter: none; }
+  .drift-a, .drift-b, .drift-c,
+  .scroll-indicator::before,
+  .empty-heart-illo .orbit{ animation: none !important; }
+  #ab-hero-bg{ will-change: auto; transform: none !important; }          /* about: no parallax on phones */
+  .float-card{ will-change: auto; }
+  /* full-screen / large blur surfaces → plain translucent tint */
+  #search-overlay, #modal-backdrop, #co-qv-backdrop, #reward-popup-backdrop{
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  }
+  #search-panel{ -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--alt-white); }
+  :root[data-theme="dark"] #search-panel{ background: var(--alt-white); }
+}
+
+/* ---- readable secondary text on phones (Lighthouse a11y: #8A8A8A on white is 3.45:1, AA needs 4.5:1).
+   Same token, a touch darker, phones only; dark mode already passes. ---- */
+@media (max-width: 767px){
+  :root:root:not([data-theme="dark"]){ --alt-muted: #767676; }
+}
