@@ -407,7 +407,7 @@
       width: 42px; height: 42px; border-radius: 50%; background: var(--alt-white); color: var(--alt-black);
       display: flex; align-items: center; justify-content: center; font-size: 20px;
     }
-    #home a[href="#collections"]{
+    #home a[href="collections.html"]{
       align-self: center; display: inline-flex; align-items: center; min-height: 44px; padding: 0;
       border-bottom: 0; text-decoration: underline; text-underline-offset: 6px; font-size: 14px; color: var(--alt-muted);
     }
@@ -415,31 +415,6 @@
     /* entrance: 600ms fade-up, shorter travel */
     [data-enter]{ transform: translateY(16px); transition-duration: 0.6s; }
     [data-enter].in{ transform: translateY(0); }
-
-    /* ---- Shop by Collection: a typographic index (no photos) ---- */
-    #collections{ padding-block: var(--m-section) var(--m-section); }
-    #collections .max-w-2xl p.font-mono{
-      font-size: var(--m-fs-eyebrow); letter-spacing: var(--m-ls-eyebrow); margin-bottom: 14px;
-    }
-    #collections h2{ font-size: var(--m-fs-h2); line-height: var(--m-lh-h2); letter-spacing: var(--m-ls-h2); }
-    #collections .max-w-2xl p:not(.font-mono){ display: none; }
-    #collections .grid{ display: block; margin-top: 28px; border-top: 1px solid var(--alt-border); }
-    .collection-card{
-      display: flex; align-items: center; gap: 16px; aspect-ratio: auto; min-height: 84px;
-      border-radius: 0; background: none; overflow: visible; border-bottom: 1px solid var(--alt-border);
-    }
-    .collection-card img, .collection-card .fallback, .collection-card .card-overlay{ display: none !important; }
-    .collection-card .card-index{ position: static; color: var(--alt-muted); font-size: 12px; min-width: 22px; }
-    .collection-card .card-foot{ position: static; flex: 1; padding: 0; color: var(--alt-black); }
-    .collection-card .card-foot > span:first-child{
-      font-size: 1.5rem; line-height: 1.15; letter-spacing: -0.015em; font-weight: 500;
-    }
-    .collection-card .card-arrow{
-      width: 44px; height: 44px; background: none; color: var(--alt-black); border: 1px solid var(--alt-border);
-      transition: background-color .2s ease, color .2s ease;
-    }
-    .collection-card .card-arrow svg{ transform: rotate(45deg); }   /* ↗ becomes → */
-    .collection-card:active .card-arrow{ background: var(--alt-black); color: var(--alt-white); }
   }
 </style>
 <link rel="stylesheet" href="tailwind.css">
@@ -556,7 +531,7 @@
         <button id="shop-now" class="btn-primary font-display bg-[var(--alt-black)] text-[var(--alt-white)] text-sm md:text-base font-medium tracking-wide px-9 py-4 md:px-10 md:py-[18px] rounded-full">
           <span id="hero-cta-label">Shop Now</span>
         </button>
-        <a href="#collections" class="text-sm font-medium border-b border-[var(--alt-black)] pb-0.5 hover:opacity-60 transition-opacity">
+        <a href="collections.html" class="text-sm font-medium border-b border-[var(--alt-black)] pb-0.5 hover:opacity-60 transition-opacity">
           View Collections
         </a>
       </div>
@@ -578,95 +553,6 @@
 </section>
 </main>
 
-<!-- ================================================================
-     COLLECTIONS — bridges Home to the Store, one tile per world
-     Scroll-triggered reveal (data-reveal), same visual language as hero
-     ================================================================ -->
-<section id="collections" class="relative w-full px-6 md:px-10 py-24 md:py-32">
-  <div class="max-w-7xl mx-auto">
-
-    <div class="max-w-2xl">
-      <p data-reveal class="font-mono text-xs tracking-[0.22em] text-[var(--alt-muted)] uppercase mb-6">
-        Shop by Collection
-      </p>
-      <h2 data-reveal class="font-display text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight leading-[1.1]" style="transition-delay: 0.08s;">
-        Every category, held to the same standard.
-      </h2>
-      <p data-reveal class="mt-5 text-base md:text-lg text-[var(--alt-muted)] leading-relaxed max-w-md" style="transition-delay: 0.16s;">
-        From the desk to the door — each collection is edited down
-        to the pieces we'd actually keep.
-      </p>
-    </div>
-
-    <div class="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
-
-      <a href="store.html?category=desk-setup" data-reveal class="collection-card group" style="transition-delay: 0.05s;">
-        <img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=640&q=72&auto=format&fit=crop"
-             alt="Desk setup collection — organizers, trays and lighting"
-             loading="lazy" decoding="async"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-        <div class="fallback" style="display:none;">Desk &amp; Work</div>
-        <span class="card-index font-mono text-[11px] tracking-[0.15em]">01</span>
-        <div class="card-overlay"></div>
-        <div class="card-foot">
-          <span class="font-display text-lg md:text-xl font-medium tracking-tight">Desk &amp; Work</span>
-          <span class="card-arrow" aria-hidden="true">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17L17 7M9 7h8v8"/></svg>
-          </span>
-        </div>
-      </a>
-
-      <a href="store.html?category=room-decor" data-reveal class="collection-card group" style="transition-delay: 0.11s;">
-        <img src="https://images.unsplash.com/photo-1602874801007-bd458bb1b8b6?w=640&q=72&auto=format&fit=crop"
-             alt="Room decor collection — vases, candles and ceramics"
-             loading="lazy" decoding="async"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-        <div class="fallback" style="display:none;">Room &amp; Decor</div>
-        <span class="card-index font-mono text-[11px] tracking-[0.15em]">02</span>
-        <div class="card-overlay"></div>
-        <div class="card-foot">
-          <span class="font-display text-lg md:text-xl font-medium tracking-tight">Room &amp; Decor</span>
-          <span class="card-arrow" aria-hidden="true">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17L17 7M9 7h8v8"/></svg>
-          </span>
-        </div>
-      </a>
-
-      <a href="store.html?category=gadgets" data-reveal class="collection-card group" style="transition-delay: 0.17s;">
-        <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=640&q=72&auto=format&fit=crop"
-             alt="Tech and gadgets collection"
-             loading="lazy" decoding="async"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-        <div class="fallback" style="display:none;">Tech &amp; Gadgets</div>
-        <span class="card-index font-mono text-[11px] tracking-[0.15em]">03</span>
-        <div class="card-overlay"></div>
-        <div class="card-foot">
-          <span class="font-display text-lg md:text-xl font-medium tracking-tight">Tech &amp; Gadgets</span>
-          <span class="card-arrow" aria-hidden="true">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17L17 7M9 7h8v8"/></svg>
-          </span>
-        </div>
-      </a>
-
-      <a href="store.html?category=accessories" data-reveal class="collection-card group" style="transition-delay: 0.23s;">
-        <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=640&q=72&auto=format&fit=crop"
-             alt="Everyday carry and accessories collection"
-             loading="lazy" decoding="async"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-        <div class="fallback" style="display:none;">Accessories</div>
-        <span class="card-index font-mono text-[11px] tracking-[0.15em]">04</span>
-        <div class="card-overlay"></div>
-        <div class="card-foot">
-          <span class="font-display text-lg md:text-xl font-medium tracking-tight">Accessories</span>
-          <span class="card-arrow" aria-hidden="true">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17L17 7M9 7h8v8"/></svg>
-          </span>
-        </div>
-      </a>
-
-    </div>
-  </div>
-</section>
 
 <!-- ================================================================
      CINEMATIC TRANSITION CURTAIN
